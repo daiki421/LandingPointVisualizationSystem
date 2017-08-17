@@ -22,10 +22,12 @@ long groundTimeLeft = 0, landingTimeLeft = 0, groundTimeRight = 0, landingTimeRi
 
 void setup() {
   size(800, 800);
-  output = createWriter(year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
-  outputPeak = createWriter("p"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
+  //output = createWriter(year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
+  output = createWriter("Test.csv");
+  //outputPeak = createWriter("p"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
+  //outputPeak = createWriter("PeakTest.csv");
   output.println("time1,inByte1_0,inByte1_1,inByte1_2,inByte1_3,inByte1_4,time2,inByte2_0,inByte2_1,inByte2_2,inByte2_3,inByte2_4");
-  outputPeak.println("time1,inByte1_0,inByte1_1,inByte1_2,inByte1_3,inByte1_4,time2,inByte2_0,inByte2_1,inByte2_2,inByte2_3,inByte2_4");
+  //outputPeak.println("inByte1_0,inByte1_1,inByte1_2,inByte1_3,inByte1_4,inByte2_0,inByte2_1,inByte2_2,inByte2_3,inByte2_4");
   myPort1 = new Serial(this, "/dev/tty.HC-06-DevB", 9600);
   myPort2 = new Serial(this, "/dev/tty.HC-06-DevB-2", 9600);
   good_imgLeft = loadImage("good.png");
@@ -216,8 +218,8 @@ void draw() {
   
   if (mousePressed) {
       if (mouseX>=0 && mouseX<800 && mouseY>=0 && mouseY<=800) {
-        outputPeak.flush();
-        outputPeak.close();
+        //outputPeak.flush();
+        //outputPeak.close();
         output.flush();
         output.close();
         println("File Close");
@@ -236,10 +238,10 @@ void draw() {
         //image(good_imgLeft, 270, 440, 100, 100);
       } else {
         isLandingPoint1_0 = true;
-        if (inByte1_0 < peak1_0) {
+        if (inByte1_0 <= peak1_0) {
           peak1_0 = inByte1_0;
         } else if (inByte1_0 > peak1_0) {
-          outputPeak.println(","+peak1_0);
+          //outputPeak.println(peak1_0);
         }
         if (isLandingPoint1_1 || isLandingPoint1_2 || isLandingPoint1_3 || isLandingPoint1_4) {
           
@@ -267,10 +269,10 @@ void draw() {
         //image(good_imgLeft, 270, 440, 100, 100);
       } else {
         isLandingPoint1_1 = true;
-        if (inByte1_1 < peak1_1) {
+        if (inByte1_1 <= peak1_1) {
           peak1_1 = inByte1_1;
         } else if (inByte1_1 > peak1_1) {
-          outputPeak.println(","+","+peak1_1);
+          //outputPeak.println(","+peak1_1);
         }
         if (isLandingPoint1_0 || isLandingPoint1_2 || isLandingPoint1_3 || isLandingPoint1_4) {
           
@@ -298,10 +300,10 @@ void draw() {
         //image(good_imgLeft, 270, 440, 100, 100);
       } else {
         isLandingPoint1_2 = true;
-        if (inByte1_2 < peak1_2) {
+        if (inByte1_2 <= peak1_2) {
           peak1_2 = inByte1_2;
         } else if (inByte1_2 > peak1_2) {
-          outputPeak.println(","+","+","+peak1_2);
+          //outputPeak.println(","+","+peak1_2);
         }
         if (isLandingPoint1_0 || isLandingPoint1_1 || isLandingPoint1_3 || isLandingPoint1_4) {
           
@@ -329,10 +331,10 @@ void draw() {
         //image(bad_imgLeft, 270, 540, 100, 100);
       } else {
         isLandingPoint1_3 = true;
-        if (inByte1_3 < peak1_3) {
+        if (inByte1_3 <= peak1_3) {
           peak1_3 = inByte1_3;
         } else if (inByte1_3 > peak1_3) {
-          outputPeak.println(","+","+","+","+peak1_3);
+          //outputPeak.println(","+","+","+peak1_3);
         }
         if (isLandingPoint1_0 || isLandingPoint1_1 || isLandingPoint1_2 || isLandingPoint1_4) {
           
@@ -360,10 +362,10 @@ void draw() {
         //image(good_imgLeft, 270, 440, 100, 100);
       } else {
         isLandingPoint1_4 = true;
-        if (inByte1_4 < peak1_4) {
+        if (inByte1_4 <= peak1_4) {
           peak1_4 = inByte1_4;
         } else if (inByte1_4 > peak1_4) {
-          outputPeak.println(","+","+","+","+","+peak1_4);
+          //outputPeak.println(","+","+","+","+peak1_4);
         }
         if (isLandingPoint1_0 || isLandingPoint1_1 || isLandingPoint1_2 || isLandingPoint1_3) {
           
@@ -409,10 +411,10 @@ void draw() {
         //image(good_imgRight, 430, 440, 100, 100);
       } else {
         isLandingPoint2_0 = true;
-        if (inByte2_0 < peak2_0) {
+        if (inByte2_0 <= peak2_0) {
           peak2_0 = inByte2_0;
         } else if (inByte2_0 > peak2_0) {
-          outputPeak.println(","+","+","+","+","+","+","+peak2_0);
+          //outputPeak.println(","+","+","+","+","+peak2_0);
         }
         if (isLandingPoint2_1 || isLandingPoint2_2 || isLandingPoint2_3 || isLandingPoint2_4) {
           
@@ -422,8 +424,8 @@ void draw() {
         //image(bad_imgRight, 430, 540, 100, 100);
       }
       for (int i = 0; i < pressOrderRight.length; i++) {
-        if (pressOrderLeft[i] == 10) {
-          pressOrderLeft[i] = 0;
+        if (pressOrderRight[i] == 10) {
+          pressOrderRight[i] = 0;
           break;
         } else {
           continue;
@@ -440,10 +442,10 @@ void draw() {
         //image(good_imgRight, 430, 440, 100, 100);
       } else {
         isLandingPoint2_1 = true;
-        if (inByte2_1 < peak2_1) {
+        if (inByte2_1 <= peak2_1) {
           peak2_1 = inByte2_1;
         } else if (inByte2_1 > peak2_1) {
-          outputPeak.println(","+","+","+","+","+","+","+","+peak2_1);
+          //outputPeak.println(","+","+","+","+","+","+peak2_1);
         }
         if (isLandingPoint2_0 || isLandingPoint2_2 || isLandingPoint2_3 || isLandingPoint2_4) {
           
@@ -453,8 +455,8 @@ void draw() {
         //image(bad_imgRight, 430, 540, 100, 100);
       }
       for (int i = 0; i < pressOrderRight.length; i++) {
-        if (pressOrderLeft[i] == 10) {
-          pressOrderLeft[i] = 1;
+        if (pressOrderRight[i] == 10) {
+          pressOrderRight[i] = 1;
           break;
         } else {
           continue;
@@ -471,10 +473,10 @@ void draw() {
         //image(good_imgRight, 430, 440, 100, 100);
       } else {
         isLandingPoint2_2 = true;
-        if (inByte2_2 < peak2_2) {
+        if (inByte2_2 <= peak2_2) {
           peak2_2 = inByte2_2;
         } else if (inByte2_2 > peak2_2) {
-          outputPeak.println(","+","+","+","+","+","+","+","+","+peak2_2);
+          //outputPeak.println(","+","+","+","+","+","+","+peak2_2);
         }
         if (isLandingPoint2_0 || isLandingPoint2_1 || isLandingPoint2_3 || isLandingPoint2_4) {
           
@@ -484,8 +486,8 @@ void draw() {
         //image(bad_imgRight, 430, 540, 100, 100);
       }
       for (int i = 0; i < pressOrderRight.length; i++) {
-        if (pressOrderLeft[i] == 10) {
-          pressOrderLeft[i] = 2;
+        if (pressOrderRight[i] == 10) {
+          pressOrderRight[i] = 2;
           break;
         } else {
           continue;
@@ -503,10 +505,10 @@ void draw() {
       } else {
         //println(isLandingPoint2_0+","+isLandingPoint2_1+","+isLandingPoint2_2+","+isLandingPoint2_4);
         isLandingPoint2_3 = true;
-        if (inByte2_3 < peak2_3) {
+        if (inByte2_3 <= peak2_3) {
           peak2_3 = inByte2_3;
         } else if (inByte2_3 > peak2_3) {
-          outputPeak.println(","+","+","+","+","+","+","+","+","+","+peak2_3);
+          //outputPeak.println(","+","+","+","+","+","+","+","+peak2_3);
         }
         if (isLandingPoint2_0 || isLandingPoint2_1 || isLandingPoint2_2 || isLandingPoint2_4) {
           
@@ -516,8 +518,8 @@ void draw() {
         //image(good_imgRight, 430, 440, 100, 100);
       }
       for (int i = 0; i < pressOrderRight.length; i++) {
-        if (pressOrderLeft[i] == 10) {
-          pressOrderLeft[i] = 3;
+        if (pressOrderRight[i] == 10) {
+          pressOrderRight[i] = 3;
           break;
         } else {
           continue;
@@ -534,10 +536,10 @@ void draw() {
         //image(good_imgRight, 430, 440, 100, 100);
       } else {
         isLandingPoint2_4 = true;
-        if (inByte2_4 < peak2_4) {
+        if (inByte2_4 <= peak2_4) {
           peak2_4 = inByte2_4;
         } else if (inByte2_4 > peak2_4) {
-          outputPeak.println(","+","+","+","+","+","+","+","+","+","+","+peak2_4);
+          //outputPeak.println(","+","+","+","+","+","+","+","+","+peak2_4);
         }
         if (isLandingPoint2_0 || isLandingPoint2_1 || isLandingPoint2_2 || isLandingPoint2_3) {
           
@@ -547,8 +549,8 @@ void draw() {
         //image(bad_imgRight, 430, 540, 100, 100);
       }
       for (int i = 0; i < pressOrderRight.length; i++) {
-        if (pressOrderLeft[i] == 10) {
-          pressOrderLeft[i] = 4;
+        if (pressOrderRight[i] == 10) {
+          pressOrderRight[i] = 4;
           break;
         } else {
           continue;
