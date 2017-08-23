@@ -49,173 +49,9 @@ void setup() {
   right_red = loadImage("rightred.png");
   right_blue = loadImage("rightblue.png");
   image(foot_img, 0, 0, 800, 800);
-  
-  //sTime = millis();
-  //image(one_img, 270, 400, 100, 100);
-  //image(two_img, 270, 500, 100, 100);
-  //image(three_img, 270, 600, 100, 100);
-  //image(good_imgLeft, 270, 440, 100, 100);
-  //image(bad_imgLeft, 270, 540, 100, 100);
-  //image(good_imgRight, 430, 440, 100, 100);
-  //image(bad_imgRight, 430, 540, 100, 100);
-  //image(whiteBoardGood_imgLeft, 270, 440, 100, 100);
-  //image(whiteBoardBad_imgLeft, 270, 540, 100, 100);
-  //image(whiteBoardGood_imgRight, 430, 440, 100, 100);
-  //image(whiteBoardBad_imgRight, 430, 540, 100, 100);
 }
 
 void draw() {
-  //lTime = millis() - sTime;
-  //if(myPort1.available()>0){
-  //  //image(whiteBoardGood_imgLeft, 270, 440, 100, 100);
-  //  //image(whiteBoardBad_imgLeft, 270, 540, 100, 100);
-  //  image(foot_img, 0, 0, 800, 800);
-  //  if (inByte1_0 <= 900) {
-  //    if (isLandingPoint1_3) {
-  //      //image(good_imgLeft, 270, 440, 100, 100);
-  //    } else {
-  //      isLandingPoint1_0 = true;
-  //      //image(bad_imgLeft, 270, 540, 100, 100);
-  //    }
-  //    //image(landingPoint_img, 190, 0, 180, 180);
-  //    image(left_red, 0, 0);
-  //  } else {
-  //    isLandingPoint1_0 = false;
-  //    //image(landingPointWhite, winWidth*28/100, 65, 75, 75);
-  //  }
-    
-  //  if (inByte1_1 <= 1000) {
-  //    if (isLandingPoint1_3) {
-  //      //image(good_imgLeft, 270, 440, 100, 100);
-  //    } else {
-  //      isLandingPoint1_1 = true;
-  //      //image(bad_imgLeft, 270, 540, 100, 100);
-  //    }
-  //    //image(landingPoint_img, 9, winHeight*4/25, 100, 100);
-  //    image(left_red, 0, 0);
-  //  } else {
-  //    isLandingPoint1_1 = false;
-  //    //image(landingPointWhite, 28, 166, 40, 40);
-  //  }
-    
-  //  if (inByte1_2 <= 900) {
-  //    if (isLandingPoint1_3) {
-  //      //image(good_imgLeft, 270, 440, 100, 100);
-  //    } else {
-  //      isLandingPoint1_2 = true;
-  //      //image(bad_imgLeft, 270, 540, 100, 100);
-  //    }
-  //    //image(landingPoint_img, 170, 120, 210, 210);
-  //    image(left_red, 0, 0);
-  //  } else {
-  //    isLandingPoint1_2 = false;
-  //    //image(landingPointWhite, 200, winHeight*6/25, 100, 100);
-  //  }
-    
-  //  if (inByte1_3 <= 1000) {
-  //    if (isLandingPoint1_0 || isLandingPoint1_1 || isLandingPoint1_2 || isLandingPoint1_4) {
-  //      //image(bad_imgLeft, 270, 540, 100, 100);
-  //    } else {
-  //      isLandingPoint1_3 = true;
-  //      //image(good_imgLeft, 270, 440, 100, 100);
-  //    }
-  //    //image(landingPoint_img, 5, winHeight*6/25, 170, 170);
-  //    image(left_red, 0, 0);
-  //  } else {
-  //    isLandingPoint1_3 = false;
-  //    //image(landingPointWhite, 33, winHeight*8/25, 75, 75);
-  //  }
-    
-  //  if (inByte1_4 <= 900) {
-  //    if (isLandingPoint1_3) {
-  //      //image(good_imgLeft, 270, 440, 100, 100);
-  //    } else {
-  //      isLandingPoint1_4 = true;
-  //      //image(bad_imgLeft, 270, 540, 100, 100);
-  //    }
-  //    //image(landingPoint_img, 70, winHeight*18/25, 220, 220);
-  //    image(left_blue, 0, 0);
-  //  } else {
-  //    isLandingPoint1_4 = false;
-  //    //image(landingPointWhite, 111, 660, 90, 90);
-  //  }
-  //}
-  //if(myPort2.available()>0){
-  //  //image(whiteBoardGood_imgRight, 430, 440, 100, 100);
-  //  //image(whiteBoardBad_imgRight, 430, 540, 100, 100);
-    
-  //  if (inByte2_0 <= 1000) {
-  //    if (isLandingPoint2_3) {
-  //      //image(good_imgRight, 430, 440, 100, 100);
-  //    } else {
-  //      isLandingPoint2_0 = true;
-  //      //image(bad_imgRight, 430, 540, 100, 100);
-  //    }
-  //    //image(landingPoint_img, 468, 0, 180, 180);
-  //    image(right_red, 0, 0);
-  //  } else {
-  //    isLandingPoint2_0 = false;
-  //    //image(landingPointWhite, 500, 65, 75, 75);
-  //  }
-    
-  //  if (inByte2_1 <= 1000) {
-  //    if (isLandingPoint2_3) {
-  //      //image(good_imgRight, 430, 440, 100, 100);
-  //    } else {
-  //      isLandingPoint2_1 = true;
-  //      //image(bad_imgRight, 430, 540, 100, 100);
-  //    }
-  //    //image(landingPoint_img, 715, winHeight*4/25, 100, 100);
-  //    image(right_red, 0, 0);
-  //  } else {
-  //    isLandingPoint2_1 = false;
-  //    //image(landingPointWhite, 734, 166, 40, 40);
-  //  }
-    
-  //  if (inByte2_2 <= 1000) {// 900
-  //    if (isLandingPoint2_3) {
-  //      //image(good_imgRight, 430, 440, 100, 100);
-  //    } else {
-  //      isLandingPoint2_2 = true;
-  //      //image(bad_imgRight, 430, 540, 100, 100);
-  //    }
-  //    //image(landingPoint_img, winWidth*29/50, 120, 210, 210);
-  //    image(right_red, 0, 0);
-  //  } else {
-  //    isLandingPoint2_2 = false;
-  //    //image(landingPointWhite, 500, winHeight*12.2/50, 90, 90);
-  //  }
-    
-  //  if (inByte2_3 <= 900) {
-  //    if (isLandingPoint2_0 || isLandingPoint2_1 || isLandingPoint2_2 || isLandingPoint2_4) {
-  //      //image(bad_imgRight, 430, 540, 100, 100);
-  //    } else {
-  //      //println(isLandingPoint2_0+","+isLandingPoint2_1+","+isLandingPoint2_2+","+isLandingPoint2_4);
-  //      isLandingPoint2_3 = true;
-  //      //image(good_imgRight, 430, 440, 100, 100);
-  //    }
-  //    //image(landingPoint_img, winWidth*21/25, winHeight*6/25, 170, 170);
-  //    image(right_red, 0, 0);
-  //  } else {
-  //    isLandingPoint2_3 = false;
-  //    //image(landingPointWhite, winWidth*21.9/25, winHeight*8/25, 75, 75);
-  //  }
-    
-  //  if (inByte2_4 <= 900) {
-  //    if (isLandingPoint2_3) {
-  //      //image(good_imgRight, 430, 440, 100, 100);
-  //    } else {
-  //      isLandingPoint2_4 = true;
-  //      //image(bad_imgRight, 430, 540, 100, 100);
-  //    }
-  //    //image(landingPoint_img, winWidth*17.5/25, winHeight*18/25, 220, 220);
-  //    image(right_blue, 0, 0);
-  //  } else {
-  //    isLandingPoint2_4 = false;
-  //    //image(landingPointWhite, 601, 660, 90, 90);
-  //  }
-  //}
-  
   if (mousePressed) {
       if (mouseX>=0 && mouseX<800 && mouseY>=0 && mouseY<=800) {
         //outputPeak.flush();
@@ -226,13 +62,23 @@ void draw() {
       }
   }
   
+  if (isLandingPoint1_0 || isLandingPoint1_1 || isLandingPoint1_2 || isLandingPoint1_3 || isLandingPoint1_4) {
+    for (int i = 0; i < pressOrderRight.length; i++) {
+        pressOrderRight[i] = 10;
+    }
+  }
+  
+  if (isLandingPoint2_0 || isLandingPoint2_1 || isLandingPoint2_2 || isLandingPoint2_3 || isLandingPoint2_4) {
+    for (int i = 0; i < pressOrderLeft.length; i++) {
+        pressOrderLeft[i] = 10;
+    }
+  }
+  
   //Left
   if(myPort1.available()>0){
     image(whiteBoardGood_imgLeft, 270, 440, 100, 100);
     image(whiteBoardBad_imgLeft, 270, 540, 100, 100);
-    for (int i = 0; i < pressOrderLeft.length; i++) {
-        pressOrderLeft[i] = 10;
-    }
+    
     if (inByte1_0 <= 900) {
       if (isLandingPoint1_3) {
         //image(good_imgLeft, 270, 440, 100, 100);
@@ -388,15 +234,17 @@ void draw() {
       image(landingPointWhite, 111, 660, 90, 90);
     }
     if (!isLandingPoint1_0 && !isLandingPoint1_1 && !isLandingPoint1_2 && !isLandingPoint1_3 && !isLandingPoint1_4) {
-      landingTimeLeft = millis();
-      diffLeft = landingTimeLeft - groundTimeLeft;
       peak1_0 = 2000;
       peak1_1 = 2000;
       peak1_2 = 2000;
       peak1_3 = 2000;
       peak1_4 = 2000;
     }
-    output.println(diffLeft+","+pressOrderLeft[0]+","+pressOrderLeft[1]+","+pressOrderLeft[2]+","+pressOrderLeft[3]+","+pressOrderLeft[4]+","+","+","+","+","+",");
+    if (inByte1_0 >=1000 && inByte1_1 >= 1000 && inByte1_2 >= 1000 && inByte1_3 >= 1000 && inByte1_4 >= 1000) {
+      landingTimeLeft = millis();
+      diffLeft = landingTimeLeft - groundTimeLeft;
+      output.println(diffLeft+","+pressOrderLeft[0]+","+pressOrderLeft[1]+","+pressOrderLeft[2]+","+pressOrderLeft[3]+","+pressOrderLeft[4]+","+","+","+","+","+",");
+    }
   }
   
   // Right
@@ -562,16 +410,18 @@ void draw() {
       image(landingPointWhite, 601, 660, 90, 90);
     }
     if (!isLandingPoint2_0 && !isLandingPoint2_1 && !isLandingPoint2_2 && !isLandingPoint2_3 && !isLandingPoint2_4) {
-      landingTimeRight = millis();
-      diffRight = landingTimeRight - groundTimeRight;
       peak2_0 = 2000;
       peak2_1 = 2000;
       peak2_2 = 2000;
       peak2_3 = 2000;
       peak2_4 = 2000;
     }
+    if (inByte2_0 >=1000 && inByte2_1 >= 1000 && inByte2_2 >= 1000 && inByte2_3 >= 1000 && inByte2_4 >= 1000) {
+      landingTimeRight = millis();
+      diffRight = landingTimeRight - groundTimeRight;
+      output.println(","+","+","+","+","+","+diffRight+","+pressOrderRight[0]+","+pressOrderRight[1]+","+pressOrderRight[2]+","+pressOrderRight[3]+","+pressOrderRight[4]);
+    }
   }
-  output.println(","+","+","+","+","+","+diffRight+","+pressOrderRight[0]+","+pressOrderRight[1]+","+pressOrderRight[2]+","+pressOrderRight[3]+","+pressOrderRight[4]);
 }
 
 void serialEvent(Serial port) {
