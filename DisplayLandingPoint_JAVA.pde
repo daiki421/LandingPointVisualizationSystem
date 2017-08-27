@@ -30,6 +30,7 @@ void setup() {
   outputPeak = createWriter("PeakTest.csv");
   output.println("time1,inByte1_0,inByte1_1,inByte1_2,inByte1_3,inByte1_4,time2,inByte2_0,inByte2_1,inByte2_2,inByte2_3,inByte2_4");
   outputPeak.println("inByte1_0,inByte1_1,inByte1_2,inByte1_3,inByte1_4,inByte2_0,inByte2_1,inByte2_2,inByte2_3,inByte2_4");
+  outputPressOrder.println("ContactTimeLeft,LeftOrder1,LeftOrder2,LeftOrder3,LeftOrder4,LeftOrder5,ContactTimeRight,RightOrder1,RightOrder2,RightOrder3,RightOrder4,RightOrder5");
   myPort1 = new Serial(this, "/dev/tty.HC-06-DevB", 9600);
   myPort2 = new Serial(this, "/dev/tty.HC-06-DevB-2", 9600);
   good_imgLeft = loadImage("good.png");
@@ -43,13 +44,6 @@ void setup() {
   foot_img = loadImage("foot_sole900.jpeg");
   landingPoint_img = loadImage("Landing_Point.png");
   landingPointWhite = loadImage("white.png");
-  one_img = loadImage("one.png");
-  two_img = loadImage("two.png");
-  three_img = loadImage("three.png");
-  left_red = loadImage("leftred.png");
-  left_blue = loadImage("leftblue.png");
-  right_red = loadImage("rightred.png");
-  right_blue = loadImage("rightblue.png");
   image(foot_img, 0, 0, 800, 800);
 }
 
@@ -180,16 +174,8 @@ void draw() {
       isLandingPoint1_4 = false;
       image(landingPointWhite, 111, 660, 90, 90);
     }
-    //if (!isLandingPoint1_0 && !isLandingPoint1_1 && !isLandingPoint1_2 && !isLandingPoint1_3 && !isLandingPoint1_4) {
-    //  peak1_0 = 2000;
-    //  peak1_1 = 2000;
-    //  peak1_2 = 2000;
-    //  peak1_3 = 2000;
-    //  peak1_4 = 2000;
-    //}
     
     if (!isLandingPoint1_0 && !isLandingPoint1_1 && !isLandingPoint1_2 && !isLandingPoint1_3 && !isLandingPoint1_4) {
-      
       if (pressOrderLeft[0] == 0 && pressOrderLeft[1] == 0 && pressOrderLeft[2] == 0 && pressOrderLeft[3] == 0 && pressOrderLeft[4] == 0) {
         
       } else {
@@ -198,12 +184,17 @@ void draw() {
           diffLeft = landingTimeLeft - groundTimeLeft;
         }
         outputPressOrder.println(diffLeft+","+pressOrderLeft[0]+","+pressOrderLeft[1]+","+pressOrderLeft[2]+","+pressOrderLeft[3]+","+pressOrderLeft[4]);
-        output.println(diffLeft+","+pressOrderLeft[0]+","+pressOrderLeft[1]+","+pressOrderLeft[2]+","+pressOrderLeft[3]+","+pressOrderLeft[4]);
+        outputPressOrder.println(","+peak1_0+","+peak1_1+","+peak1_2+","+peak1_3+","+peak1_4);
         for (int i = 0; i < pressOrderLeft.length; i++) {
           pressOrderLeft[i] = 0;
         }
         orderLeft = 1;
-      } 
+      }
+      peak1_0 = 2000;
+      peak1_1 = 2000;
+      peak1_2 = 2000;
+      peak1_3 = 2000;
+      peak1_4 = 2000;
     }
   }
   
@@ -227,16 +218,6 @@ void draw() {
       } else {
         groundTimeRight = millis();
       }
-      for (int i = 0; i < pressOrderRight.length; i++) {
-        if (pressOrderRight[i] == 10) {
-          pressOrderRight[i] = 0;
-          break;
-        } else if (pressOrderRight[i] == 0) {
-          break;
-        } else {
-          continue;
-        }
-      }
       image(landingPoint_img, 468, 0, 180, 180);
     } else {
       isLandingPoint2_0 = false;
@@ -258,16 +239,6 @@ void draw() {
         
       } else {
         groundTimeRight = millis();
-      }
-      for (int i = 0; i < pressOrderRight.length; i++) {
-        if (pressOrderRight[i] == 10) {
-          pressOrderRight[i] = 1;
-          break;
-        } else if (pressOrderRight[i] == 1) {
-          break;
-        } else {
-          continue;
-        }
       }
       image(landingPoint_img, 715, winHeight*4/25, 100, 100);
     } else {
@@ -291,16 +262,6 @@ void draw() {
       } else {
         groundTimeRight = millis();
       }
-      for (int i = 0; i < pressOrderRight.length; i++) {
-        if (pressOrderRight[i] == 10) {
-          pressOrderRight[i] = 2;
-          break;
-        } else if (pressOrderRight[i] == 2) {
-          break;
-        } else {
-          continue;
-        }
-      }
       image(landingPoint_img, winWidth*29/50, 120, 210, 210);
     } else {
       isLandingPoint2_2 = false;
@@ -322,16 +283,6 @@ void draw() {
         
       } else {
         groundTimeRight = millis();
-      }
-      for (int i = 0; i < pressOrderRight.length; i++) {
-        if (pressOrderRight[i] == 10) {
-          pressOrderRight[i] = 3;
-          break;
-        } else if (pressOrderRight[i] == 3) {
-          break;
-        } else {
-          continue;
-        }
       }
       image(landingPoint_img, winWidth*21/25, winHeight*6/25, 170, 170);
     } else {
@@ -355,40 +306,32 @@ void draw() {
       } else {
         groundTimeRight = millis();
       }
-      for (int i = 0; i < pressOrderRight.length; i++) {
-        if (pressOrderRight[i] == 10) {
-          pressOrderRight[i] = 4;
-          break;
-        } else if (pressOrderRight[i] == 4) {
-          break;
-        } else {
-          continue;
-        }
-      }
       image(landingPoint_img, winWidth*17.5/25, winHeight*18/25, 220, 220);
     } else {
       isLandingPoint2_4 = false;
       image(landingPointWhite, 601, 660, 90, 90);
     }
+    
     if (!isLandingPoint2_0 && !isLandingPoint2_1 && !isLandingPoint2_2 && !isLandingPoint2_3 && !isLandingPoint2_4) {
+      if (pressOrderRight[0] == 0 && pressOrderRight[1] == 0 && pressOrderRight[2] == 0 && pressOrderRight[3] == 0 && pressOrderRight[4] == 0) {
+        
+      } else {
+        if (groundTimeLeft != 0) {
+          landingTimeLeft = millis();
+          diffRight = landingTimeLeft - groundTimeLeft;
+        }
+        outputPressOrder.println(","+","+","+","+","+diffRight+","+pressOrderRight[0]+","+pressOrderRight[1]+","+pressOrderRight[2]+","+pressOrderRight[3]+","+pressOrderRight[4]);
+        outputPressOrder.println(","+","+","+","+","+","+peak2_0+","+peak2_1+","+peak2_2+","+peak2_3+","+peak2_4);
+        for (int i = 0; i < pressOrderRight.length; i++) {
+          pressOrderRight[i] = 0;
+        }
+        orderRight = 1;
+      }
       peak2_0 = 2000;
       peak2_1 = 2000;
       peak2_2 = 2000;
       peak2_3 = 2000;
       peak2_4 = 2000;
-    }
-    
-    if (inByte2_0 > 1000 && inByte2_1 > 1000 && inByte2_2 > 1000 && inByte2_3 > 1000 && inByte2_4 > 900) {
-      if (groundTimeRight != 0) {
-        landingTimeRight = millis();
-        diffRight = landingTimeRight - groundTimeRight;
-        //output.println("ContactTime"+diffRight);
-      }
-      //output.println(","+","+","+","+","+","+diffRight+","+pressOrderRight[0]+","+pressOrderRight[1]+","+pressOrderRight[2]+","+pressOrderRight[3]+","+pressOrderRight[4]);
-      for (int i = 0; i < pressOrderRight.length; i++) {
-        pressOrderRight[i] = 0;
-      }
-      orderRight = 1;
     }
   }
 }
