@@ -7,18 +7,18 @@ Serial myPort1, myPort2;
 int analog1_0_high, analog1_0_low, analog1_1_high, analog1_1_low, analog1_2_high, analog1_2_low, analog1_3_high, analog1_3_low, analog1_4_high, analog1_4_low;// get from SerialPort
 int analog2_0_high, analog2_0_low, analog2_1_high, analog2_1_low, analog2_2_high, analog2_2_low, analog2_3_high, analog2_3_low, analog2_4_high, analog2_4_low;
 int portIndex = 2;
-int inByte1_0, inByte1_1, inByte1_2, inByte1_3, inByte1_4, inByte1_5, inByte2_0, inByte2_1, inByte2_2, inByte2_3, inByte2_4, inByte2_5;
+int sensorValueLeft0, sensorValueLeft1, sensorValueLeft2, sensorValueLeft3, sensorValueLeft4, sensorValueRight0, sensorValueRight1, sensorValueRight2, sensorValueRight3, sensorValueRight4;
 int winWidth = 800, winHeight = 800;
 PrintWriter output, outputPeak, outputPressOrder;
 boolean isLandingPoint1_0 = false, isLandingPoint1_1 = false, isLandingPoint1_2 = false, isLandingPoint1_3 = false, isLandingPoint1_4 = false;
 boolean isLandingPoint2_0 = false, isLandingPoint2_1 = false, isLandingPoint2_2 = false, isLandingPoint2_3 = false, isLandingPoint2_4 = false;
-long sTime, lTime;
-long time1 = 0, time2 = 0, time = 0;
+long time1 = 0, time2 = 0, groundTimeLeft = 0, landingTimeLeft = 0, groundTimeRight = 0, landingTimeRight = 0, diffLeft = 0, diffRight = 0;
+long timeIntervalLeft0_1 = 0, timeIntervalLeft1_2 = 0, timeIntervalLeft2_3 = 0, timeIntervalLeft3_4 = 0, timeIntervalRight0_1 = 0, timeIntervalRight1_2 = 0, timeIntervalRight2_3 = 0, timeIntervalRight3_4 = 0;
+long sensorReactedTimeLeft[] = {0, 0, 0, 0, 0}, sensorReactedTimeRight[] = {0, 0, 0, 0, 0};
+long evacuateLeft0 = 0, evacuateLeft1 = 0, evacuateLeft2 = 0, evacuateLeft3 = 0, evacuateLeft4 = 0, evacuateRight0 = 0, evacuateRight1 = 0, evacuateRight2 = 0, evacuateRight3 = 0, evacuateRight4 = 0;
 int storage1_0 = 0, storage1_1 = 0, storage1_2 = 0, storage1_3 = 0, storage1_4 = 0, storage2_0 = 0, storage2_1 = 0, storage2_2 = 0, storage2_3 = 0, storage2_4 = 0;
 int peak1_0 = 2000, peak1_1 = 2000, peak1_2 = 2000, peak1_3 = 2000, peak1_4 = 2000, peak2_0 = 2000, peak2_1 = 2000, peak2_2 = 2000, peak2_3 = 2000, peak2_4 = 2000;
-int pressOrderRight[] = {0, 0, 0, 0, 0};
-int pressOrderLeft[] = {0, 0, 0, 0, 0};
-long groundTimeLeft = 0, landingTimeLeft = 0, groundTimeRight = 0, landingTimeRight = 0, diffLeft = 0, diffRight = 0;
+int pressOrderLeft[] = {0, 0, 0, 0, 0}, pressOrderRight[] = {0, 0, 0, 0, 0};
 int orderLeft = 1, orderRight = 1;
 
 void setup() {
@@ -65,16 +65,16 @@ void draw() {
     image(whiteBoardGood_imgLeft, 270, 440, 100, 100);
     image(whiteBoardBad_imgLeft, 270, 540, 100, 100);
     
-    if (inByte1_0 <= 900) {
+    if (sensorValueLeft0 <= 900) {
       isLandingPoint1_0 = true;
+      sensorReactedTimeLeft[0] = millis();
       if (pressOrderLeft[0] == 0) {
         pressOrderLeft[0] = orderLeft;
         orderLeft++;
       }
-      if (inByte1_0 <= peak1_0) {
-        peak1_0 = inByte1_0;
-      } else if (inByte1_0 > peak1_0) {
-        outputPeak.println(peak1_0);
+      if (sensorValueLeft0 <= peak1_0) {
+        peak1_0 = sensorValueLeft0;
+      } else if (sensorValueLeft0 > peak1_0) {
       }
       if (isLandingPoint1_1 || isLandingPoint1_2 || isLandingPoint1_3 || isLandingPoint1_4) {
         
@@ -87,16 +87,16 @@ void draw() {
       image(landingPointWhite, winWidth*28/100, 65, 75, 75);
     }
     
-    if (inByte1_1 <= 1000) {
+    if (sensorValueLeft1 <= 1000) {
       isLandingPoint1_1 = true;
+      sensorReactedTimeLeft[1] = millis();
       if (pressOrderLeft[1] == 0) {
         pressOrderLeft[1] = orderLeft;
         orderLeft++;
       }
-      if (inByte1_1 <= peak1_1) {
-        peak1_1 = inByte1_1;
-      } else if (inByte1_1 > peak1_1) {
-        outputPeak.println(","+peak1_1);
+      if (sensorValueLeft1 <= peak1_1) {
+        peak1_1 = sensorValueLeft1;
+      } else if (sensorValueLeft1 > peak1_1) {
       }
       if (isLandingPoint1_0 || isLandingPoint1_2 || isLandingPoint1_3 || isLandingPoint1_4) {
         
@@ -109,16 +109,16 @@ void draw() {
       image(landingPointWhite, 28, 166, 40, 40);
     }
     
-    if (inByte1_2 <= 900) {
+    if (sensorValueLeft2 <= 900) {
       isLandingPoint1_2 = true;
+      sensorReactedTimeLeft[2] = millis();
       if (pressOrderLeft[2] == 0) {
         pressOrderLeft[2] = orderLeft;
         orderLeft++;
       }
-      if (inByte1_2 <= peak1_2) {
-        peak1_2 = inByte1_2;
-      } else if (inByte1_2 > peak1_2) {
-        outputPeak.println(","+","+peak1_2);
+      if (sensorValueLeft2 <= peak1_2) {
+        peak1_2 = sensorValueLeft2;
+      } else if (sensorValueLeft2 > peak1_2) {
       }
       if (isLandingPoint1_0 || isLandingPoint1_1 || isLandingPoint1_3 || isLandingPoint1_4) {
         
@@ -131,16 +131,16 @@ void draw() {
       image(landingPointWhite, 200, winHeight*6/25, 100, 100);
     }
     
-    if (inByte1_3 <= 1000) {
+    if (sensorValueLeft3 <= 1000) {
       isLandingPoint1_3 = true;
+      sensorReactedTimeLeft[3] = millis();
       if (pressOrderLeft[3] == 0) {
         pressOrderLeft[3] = orderLeft;
         orderLeft++;
       }
-      if (inByte1_3 <= peak1_3) {
-        peak1_3 = inByte1_3;
-      } else if (inByte1_3 > peak1_3) {
-        outputPeak.println(","+","+","+peak1_3);
+      if (sensorValueLeft3 <= peak1_3) {
+        peak1_3 = sensorValueLeft3;
+      } else if (sensorValueLeft3 > peak1_3) {
       }
       if (isLandingPoint1_0 || isLandingPoint1_1 || isLandingPoint1_2 || isLandingPoint1_4) {
         
@@ -153,16 +153,16 @@ void draw() {
       image(landingPointWhite, 33, winHeight*8/25, 75, 75);
     }
     
-    if (inByte1_4 <= 900) {
+    if (sensorValueLeft4 <= 900) {
       isLandingPoint1_4 = true;
+      sensorReactedTimeLeft[4] = millis();
       if (pressOrderLeft[4] == 0) {
         pressOrderLeft[4] = orderLeft;
         orderLeft++;
       }
-      if (inByte1_4 <= peak1_4) {
-        peak1_4 = inByte1_4;
-      } else if (inByte1_4 > peak1_4) {
-        outputPeak.println(","+","+","+","+peak1_4);
+      if (sensorValueLeft4 <= peak1_4) {
+        peak1_4 = sensorValueLeft4;
+      } else if (sensorValueLeft4 > peak1_4) {
       }
       if (isLandingPoint1_0 || isLandingPoint1_1 || isLandingPoint1_2 || isLandingPoint1_3) {
         
@@ -190,6 +190,24 @@ void draw() {
         }
         orderLeft = 1;
       }
+      for (int i = 0; i < 5; i++) {
+        if (pressOrderLeft[i] == 2) {
+          timeIntervalLeft0_1 = sensorReactedTimeLeft[i] - groundTimeLeft;
+          evacuateLeft2 = sensorReactedTimeLeft[i];
+        }
+        if (pressOrderLeft[i] == 3) {
+          timeIntervalLeft1_2 = sensorReactedTimeLeft[i] - evacuateLeft2;
+          evacuateLeft3 = sensorReactedTimeLeft[i];
+        }
+        if (pressOrderLeft[i] == 4) {
+          timeIntervalLeft2_3 = sensorReactedTimeLeft[i] - evacuateLeft3;
+          evacuateLeft4 = sensorReactedTimeLeft[i];
+        }
+        if (pressOrderLeft[i] == 5) {
+          timeIntervalLeft3_4 = sensorReactedTimeLeft[i] - evacuateLeft4;
+        }
+      }
+      outputPressOrder.println(","+","+timeIntervalLeft0_1+timeIntervalLeft1_2+timeIntervalLeft2_3+timeIntervalLeft3_4);
       peak1_0 = 2000;
       peak1_1 = 2000;
       peak1_2 = 2000;
@@ -202,16 +220,15 @@ void draw() {
   if(myPort2.available()>0){
     image(whiteBoardGood_imgRight, 430, 440, 100, 100);
     image(whiteBoardBad_imgRight, 430, 540, 100, 100);
-    if (inByte2_0 <= 1000) {
+    if (sensorValueRight0 <= 1000) {
       isLandingPoint2_0 = true;
       if (pressOrderRight[0] == 0) {
         pressOrderRight[0] = orderRight;
         orderRight++;
       }
-      if (inByte2_0 <= peak2_0) {
-        peak2_0 = inByte2_0;
-      } else if (inByte2_0 > peak2_0) {
-        outputPeak.println(","+","+","+","+","+peak2_0);
+      if (sensorValueRight0 <= peak2_0) {
+        peak2_0 = sensorValueRight0;
+      } else if (sensorValueRight0 > peak2_0) {
       }
       if (isLandingPoint2_1 || isLandingPoint2_2 || isLandingPoint2_3 || isLandingPoint2_4) {
         
@@ -224,16 +241,15 @@ void draw() {
       image(landingPointWhite, 500, 65, 75, 75);
     }
     
-    if (inByte2_1 <= 1000) {
+    if (sensorValueRight1 <= 1000) {
       isLandingPoint2_1 = true;
       if (pressOrderRight[1] == 0) {
         pressOrderRight[1] = orderRight;
         orderRight++;
       }
-      if (inByte2_1 <= peak2_1) {
-        peak2_1 = inByte2_1;
-      } else if (inByte2_1 > peak2_1) {
-        outputPeak.println(","+","+","+","+","+","+peak2_1);
+      if (sensorValueRight1 <= peak2_1) {
+        peak2_1 = sensorValueRight1;
+      } else if (sensorValueRight1 > peak2_1) {
       }
       if (isLandingPoint2_0 || isLandingPoint2_2 || isLandingPoint2_3 || isLandingPoint2_4) {
         
@@ -246,16 +262,15 @@ void draw() {
       image(landingPointWhite, 734, 166, 40, 40);
     }
     
-    if (inByte2_2 <= 1000) {
+    if (sensorValueRight2 <= 1000) {
       isLandingPoint2_2 = true;
       if (pressOrderRight[2] == 0) {
         pressOrderRight[2] = orderRight;
         orderRight++;
       }
-      if (inByte2_2 <= peak2_2) {
-        peak2_2 = inByte2_2;
-      } else if (inByte2_2 > peak2_2) {
-        outputPeak.println(","+","+","+","+","+","+","+peak2_2);
+      if (sensorValueRight2 <= peak2_2) {
+        peak2_2 = sensorValueRight2;
+      } else if (sensorValueRight2 > peak2_2) {
       }
       if (isLandingPoint2_0 || isLandingPoint2_1 || isLandingPoint2_3 || isLandingPoint2_4) {
         
@@ -268,16 +283,15 @@ void draw() {
       image(landingPointWhite, 500, winHeight*12.2/50, 90, 90);
     }
     
-    if (inByte2_3 <= 1000) {
+    if (sensorValueRight3 <= 1000) {
       isLandingPoint2_3 = true;
       if (pressOrderRight[3] == 0) {
         pressOrderRight[3] = orderRight;
         orderRight++;
       }
-      if (inByte2_3 <= peak2_3) {
-        peak2_3 = inByte2_3;
-      } else if (inByte2_3 > peak2_3) {
-        outputPeak.println(","+","+","+","+","+","+","+","+peak2_3);
+      if (sensorValueRight3 <= peak2_3) {
+        peak2_3 = sensorValueRight3;
+      } else if (sensorValueRight3 > peak2_3) {
       }
       if (isLandingPoint2_0 || isLandingPoint2_1 || isLandingPoint2_2 || isLandingPoint2_4) {
         
@@ -290,16 +304,15 @@ void draw() {
       image(landingPointWhite, winWidth*21.9/25, winHeight*8/25, 75, 75);
     }
     
-    if (inByte2_4 <= 900) {
+    if (sensorValueRight4 <= 900) {
       isLandingPoint2_4 = true;
       if (pressOrderRight[4] == 0) {
         pressOrderRight[4] = orderRight;
         orderRight++;
       }
-      if (inByte2_4 <= peak2_4) {
-        peak2_4 = inByte2_4;
-      } else if (inByte2_4 > peak2_4) {
-        outputPeak.println(","+","+","+","+","+","+","+","+","+peak2_4);
+      if (sensorValueRight4 <= peak2_4) {
+        peak2_4 = sensorValueRight4;
+      } else if (sensorValueRight4 > peak2_4) {
       }
       if (isLandingPoint2_0 || isLandingPoint2_1 || isLandingPoint2_2 || isLandingPoint2_3) {
         
@@ -351,11 +364,11 @@ void serialEvent(Serial port) {
         analog1_3_low = port.read();
         analog1_4_high = port.read();
         analog1_4_low = port.read();
-        inByte1_0 = analog1_0_high*256 + analog1_0_low;
-        inByte1_1 = analog1_1_high*256 + analog1_1_low;
-        inByte1_2 = analog1_2_high*256 + analog1_2_low;
-        inByte1_3 = analog1_3_high*256 + analog1_3_low;
-        inByte1_4 = analog1_4_high*256 + analog1_4_low;
+        sensorValueLeft0 = analog1_0_high*256 + analog1_0_low;
+        sensorValueLeft1 = analog1_1_high*256 + analog1_1_low;
+        sensorValueLeft2 = analog1_2_high*256 + analog1_2_low;
+        sensorValueLeft3 = analog1_3_high*256 + analog1_3_low;
+        sensorValueLeft4 = analog1_4_high*256 + analog1_4_low;
       }
     }
   }
@@ -374,18 +387,18 @@ void serialEvent(Serial port) {
         analog2_3_low = port.read();
         analog2_4_high = port.read();
         analog2_4_low = port.read();
-        inByte2_0 = analog2_0_high*256 + analog2_0_low;
-        inByte2_1 = analog2_1_high*256 + analog2_1_low;
-        inByte2_2 = analog2_2_high*256 + analog2_2_low;
-        inByte2_3 = analog2_3_high*256 + analog2_3_low;
-        inByte2_4 = analog2_4_high*256 + analog2_4_low;
+        sensorValueRight0 = analog2_0_high*256 + analog2_0_low;
+        sensorValueRight1 = analog2_1_high*256 + analog2_1_low;
+        sensorValueRight2 = analog2_2_high*256 + analog2_2_low;
+        sensorValueRight3 = analog2_3_high*256 + analog2_3_low;
+        sensorValueRight4 = analog2_4_high*256 + analog2_4_low;
       }
     }
   }
-  if (inByte1_0 > 0 && inByte1_1 > 0 && inByte1_2 > 0 && inByte1_3 > 0 && inByte1_4 > 0 && inByte2_0 > 0 && inByte2_1 > 0 && inByte2_2 > 0 && inByte2_3 > 0 && inByte2_4 > 0) {
-    output.println(time1+","+inByte1_0+","+inByte1_1+","+inByte1_2+","+inByte1_3+","+inByte1_4+","+time2+","+inByte2_0+","+inByte2_1+","+inByte2_2+","+inByte2_3+","+inByte2_4);
+  if (sensorValueLeft0 > 0 && sensorValueLeft1 > 0 && sensorValueLeft2 > 0 && sensorValueLeft3 > 0 && sensorValueLeft4 > 0 && sensorValueRight0 > 0 && sensorValueRight1 > 0 && sensorValueRight2 > 0 && sensorValueRight3 > 0 && sensorValueRight4 > 0) {
+    output.println(time1+","+sensorValueLeft0+","+sensorValueLeft1+","+sensorValueLeft2+","+sensorValueLeft3+","+sensorValueLeft4+","+time2+","+sensorValueRight0+","+sensorValueRight1+","+sensorValueRight2+","+sensorValueRight3+","+sensorValueRight4);
   }
   
-  println("time1="+time1+"inByte1_0="+inByte1_0+", inByte1_1="+inByte1_1+", inByte1_2="+inByte1_2+", inByte1_3="+inByte1_3+", inByte1_4="+inByte1_4);
-  println("time2="+time2+"inByte2_0="+inByte2_0+", inByte2_1="+inByte2_1+", inByte2_2="+inByte2_2+", inByte2_3="+inByte2_3+", inByte2_4="+inByte2_4);
+  println("time1="+time1+"inByte1_0="+sensorValueLeft0+", inByte1_1="+sensorValueLeft1+", inByte1_2="+sensorValueLeft2+", inByte1_3="+sensorValueLeft3+", inByte1_4="+sensorValueLeft4);
+  println("time2="+time2+"inByte2_0="+sensorValueRight0+", inByte2_1="+sensorValueRight1+", inByte2_2="+sensorValueRight2+", inByte2_3="+sensorValueRight3+", inByte2_4="+sensorValueRight4);
 }
