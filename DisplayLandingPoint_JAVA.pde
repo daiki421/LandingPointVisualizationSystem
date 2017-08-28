@@ -189,30 +189,30 @@ void draw() {
           pressOrderLeft[i] = 0;
         }
         orderLeft = 1;
+        for (int i = 0; i < 5; i++) {
+          if (pressOrderLeft[i] == 2) {
+            timeIntervalLeft0_1 = sensorReactedTimeLeft[i] - groundTimeLeft;
+            evacuateLeft2 = sensorReactedTimeLeft[i];
+          }
+          if (pressOrderLeft[i] == 3) {
+            timeIntervalLeft1_2 = sensorReactedTimeLeft[i] - evacuateLeft2;
+            evacuateLeft3 = sensorReactedTimeLeft[i];
+          }
+          if (pressOrderLeft[i] == 4) {
+            timeIntervalLeft2_3 = sensorReactedTimeLeft[i] - evacuateLeft3;
+            evacuateLeft4 = sensorReactedTimeLeft[i];
+          }
+          if (pressOrderLeft[i] == 5) {
+            timeIntervalLeft3_4 = sensorReactedTimeLeft[i] - evacuateLeft4;
+          }
+        }
+        outputPressOrder.println(","+","+timeIntervalLeft0_1+timeIntervalLeft1_2+timeIntervalLeft2_3+timeIntervalLeft3_4);
+        peak1_0 = 2000;
+        peak1_1 = 2000;
+        peak1_2 = 2000;
+        peak1_3 = 2000;
+        peak1_4 = 2000;
       }
-      for (int i = 0; i < 5; i++) {
-        if (pressOrderLeft[i] == 2) {
-          timeIntervalLeft0_1 = sensorReactedTimeLeft[i] - groundTimeLeft;
-          evacuateLeft2 = sensorReactedTimeLeft[i];
-        }
-        if (pressOrderLeft[i] == 3) {
-          timeIntervalLeft1_2 = sensorReactedTimeLeft[i] - evacuateLeft2;
-          evacuateLeft3 = sensorReactedTimeLeft[i];
-        }
-        if (pressOrderLeft[i] == 4) {
-          timeIntervalLeft2_3 = sensorReactedTimeLeft[i] - evacuateLeft3;
-          evacuateLeft4 = sensorReactedTimeLeft[i];
-        }
-        if (pressOrderLeft[i] == 5) {
-          timeIntervalLeft3_4 = sensorReactedTimeLeft[i] - evacuateLeft4;
-        }
-      }
-      outputPressOrder.println(","+","+timeIntervalLeft0_1+timeIntervalLeft1_2+timeIntervalLeft2_3+timeIntervalLeft3_4);
-      peak1_0 = 2000;
-      peak1_1 = 2000;
-      peak1_2 = 2000;
-      peak1_3 = 2000;
-      peak1_4 = 2000;
     }
   }
   
@@ -222,6 +222,7 @@ void draw() {
     image(whiteBoardBad_imgRight, 430, 540, 100, 100);
     if (sensorValueRight0 <= 1000) {
       isLandingPoint2_0 = true;
+      sensorReactedTimeRight[0] = millis();
       if (pressOrderRight[0] == 0) {
         pressOrderRight[0] = orderRight;
         orderRight++;
@@ -243,6 +244,7 @@ void draw() {
     
     if (sensorValueRight1 <= 1000) {
       isLandingPoint2_1 = true;
+      sensorReactedTimeRight[1] = millis();
       if (pressOrderRight[1] == 0) {
         pressOrderRight[1] = orderRight;
         orderRight++;
@@ -264,6 +266,7 @@ void draw() {
     
     if (sensorValueRight2 <= 1000) {
       isLandingPoint2_2 = true;
+      sensorReactedTimeRight[2] = millis();
       if (pressOrderRight[2] == 0) {
         pressOrderRight[2] = orderRight;
         orderRight++;
@@ -285,6 +288,7 @@ void draw() {
     
     if (sensorValueRight3 <= 1000) {
       isLandingPoint2_3 = true;
+      sensorReactedTimeRight[3] = millis();
       if (pressOrderRight[3] == 0) {
         pressOrderRight[3] = orderRight;
         orderRight++;
@@ -306,6 +310,7 @@ void draw() {
     
     if (sensorValueRight4 <= 900) {
       isLandingPoint2_4 = true;
+      sensorReactedTimeRight[4] = millis();
       if (pressOrderRight[4] == 0) {
         pressOrderRight[4] = orderRight;
         orderRight++;
@@ -339,6 +344,24 @@ void draw() {
           pressOrderRight[i] = 0;
         }
         orderRight = 1;
+        for (int i = 0; i < 5; i++) {
+          if (pressOrderRight[i] == 2) {
+            timeIntervalRight0_1 = sensorReactedTimeRight[i] - groundTimeRight;
+            evacuateRight2 = sensorReactedTimeRight[i];
+          }
+          if (pressOrderRight[i] == 3) {
+            timeIntervalRight1_2 = sensorReactedTimeRight[i] - evacuateRight2;
+            evacuateRight3 = sensorReactedTimeRight[i];
+          }
+          if (pressOrderRight[i] == 4) {
+            timeIntervalRight2_3 = sensorReactedTimeRight[i] - evacuateRight3;
+            evacuateRight4 = sensorReactedTimeRight[i];
+          }
+          if (pressOrderRight[i] == 5) {
+            timeIntervalRight3_4 = sensorReactedTimeRight[i] - evacuateRight4;
+          }
+        }
+        outputPressOrder.println(","+","+","+","+","+","+","+timeIntervalRight0_1+timeIntervalRight1_2+timeIntervalRight2_3+timeIntervalRight3_4);
       }
       peak2_0 = 2000;
       peak2_1 = 2000;
