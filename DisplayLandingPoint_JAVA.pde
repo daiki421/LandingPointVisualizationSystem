@@ -385,6 +385,7 @@ void serialEvent(Serial port) {
   if (inByte1_0 > 0 && inByte1_1 > 0 && inByte1_2 > 0 && inByte1_3 > 0 && inByte1_4 > 0 && inByte2_0 > 0 && inByte2_1 > 0 && inByte2_2 > 0 && inByte2_3 > 0 && inByte2_4 > 0) {
     output.println(time1+","+inByte1_0+","+inByte1_1+","+inByte1_2+","+inByte1_3+","+inByte1_4+","+time2+","+inByte2_0+","+inByte2_1+","+inByte2_2+","+inByte2_3+","+inByte2_4);
   }
+  
   println("time1="+time1+"inByte1_0="+inByte1_0+", inByte1_1="+inByte1_1+", inByte1_2="+inByte1_2+", inByte1_3="+inByte1_3+", inByte1_4="+inByte1_4);
   println("time2="+time2+"inByte2_0="+inByte2_0+", inByte2_1="+inByte2_1+", inByte2_2="+inByte2_2+", inByte2_3="+inByte2_3+", inByte2_4="+inByte2_4);
 }
