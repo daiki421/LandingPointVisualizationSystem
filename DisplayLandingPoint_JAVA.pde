@@ -1,6 +1,6 @@
 import processing.serial.*;
 
-PImage foot_img, landingPoint_img, backButton, landingPointWhite, good_imgLeft, bad_imgLeft, good_imgRight, bad_imgRight;
+PImage foot_img, landingPoint_img, backButton, landingPointWhite;
 PImage whiteBoardGood_imgLeft, whiteBoardBad_imgLeft, whiteBoardGood_imgRight, whiteBoardBad_imgRight;
 Serial myPort1, myPort2;
 int analog1_0_high, analog1_0_low, analog1_1_high, analog1_1_low, analog1_2_high, analog1_2_low, analog1_3_high, analog1_3_low, analog1_4_high, analog1_4_low;// get from SerialPort
@@ -10,7 +10,7 @@ int winWidth = 800, winHeight = 800;
 PrintWriter output, outputPressOrder;
 boolean isLandingPoint1_0 = false, isLandingPoint1_1 = false, isLandingPoint1_2 = false, isLandingPoint1_3 = false, isLandingPoint1_4 = false;
 boolean isLandingPoint2_0 = false, isLandingPoint2_1 = false, isLandingPoint2_2 = false, isLandingPoint2_3 = false, isLandingPoint2_4 = false;
-long time1 = 0, time2 = 0, groundTimeLeft = 0, landingTimeLeft = 0, groundTimeRight = 0, landingTimeRight = 0, diffLeft = 0, diffRight = 0;
+long time1 = 0, time2 = 0, lapTime1 = 0, lapTime2 = 0, groundTimeLeft = 0, landingTimeLeft = 0, groundTimeRight = 0, landingTimeRight = 0, diffLeft = 0, diffRight = 0;
 long timeIntervalLeft0_1 = 0, timeIntervalLeft1_2 = 0, timeIntervalLeft2_3 = 0, timeIntervalLeft3_4 = 0, timeIntervalRight0_1 = 0, timeIntervalRight1_2 = 0, timeIntervalRight2_3 = 0, timeIntervalRight3_4 = 0;
 long sensorReactedTimeLeft[] = {0, 0, 0, 0, 0}, sensorReactedTimeRight[] = {0, 0, 0, 0, 0};
 long evacuateLeft0 = 0, evacuateLeft1 = 0, evacuateLeft2 = 0, evacuateLeft3 = 0, evacuateLeft4 = 0, evacuateRight0 = 0, evacuateRight1 = 0, evacuateRight2 = 0, evacuateRight3 = 0, evacuateRight4 = 0;
@@ -25,21 +25,13 @@ int orderLeft = 1, orderRight = 1;
 void setup() {
   size(800, 800);
   //output = createWriter(year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
-  output = createWriter("Test1.csv");
-  outputPressOrder = createWriter("outputPressOrderTest1.csv");
+  output = createWriter("Test2.csv");
+  outputPressOrder = createWriter("outputPressOrderTest2.csv");
   //outputPeak = createWriter("p"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
   output.println("time1,inByte1_0,inByte1_1,inByte1_2,inByte1_3,inByte1_4,time2,inByte2_0,inByte2_1,inByte2_2,inByte2_3,inByte2_4");
   outputPressOrder.println("ContactTimeLeft,LeftOrder1,LeftOrder2,LeftOrder3,LeftOrder4,LeftOrder5,ContactTimeRight,RightOrder1,RightOrder2,RightOrder3,RightOrder4,RightOrder5");
   myPort1 = new Serial(this, "/dev/tty.HC-06-DevB", 9600);
   myPort2 = new Serial(this, "/dev/tty.HC-06-DevB-2", 9600);
-  good_imgLeft = loadImage("good.png");
-  bad_imgLeft = loadImage("bad.png");
-  good_imgRight = loadImage("good.png");
-  bad_imgRight = loadImage("bad.png");
-  whiteBoardGood_imgLeft = loadImage("white_board_good.png");
-  whiteBoardBad_imgLeft = loadImage("white_board_good.png");
-  whiteBoardGood_imgRight = loadImage("white_board_good.png");
-  whiteBoardBad_imgRight = loadImage("white_board_good.png");
   foot_img = loadImage("foot_sole900.jpeg");
   landingPoint_img = loadImage("Landing_Point.png");
   landingPointWhite = loadImage("white.png");
@@ -59,9 +51,6 @@ void draw() {
   
   //Left
   if(myPort1.available()>0){
-    image(whiteBoardGood_imgLeft, 270, 440, 100, 100);
-    image(whiteBoardBad_imgLeft, 270, 540, 100, 100);
-    
     if (sensorValueLeft0 <= 900) {
       isLandingPoint1_0 = true;
       sensorReactedTimeLeft[0] = millis();
@@ -211,8 +200,6 @@ void draw() {
   
   // Right
   if(myPort2.available()>0){
-    image(whiteBoardGood_imgRight, 430, 440, 100, 100);
-    image(whiteBoardBad_imgRight, 430, 540, 100, 100);
     if (sensorValueRight0 <= 1000) {
       isLandingPoint2_0 = true;
       sensorReactedTimeRight[0] = millis();
