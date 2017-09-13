@@ -263,7 +263,7 @@ void draw() {
       image(landingPointWhite, 500, winHeight*12.2/50, 90, 90);
     }
     
-    if (sensorValueRight3 <= 1000) {
+    if (sensorValueRight3 <= 900) {
       isLandingPoint2_3 = true;
       sensorReactedTimeRight[3] = millis();
       if (pressOrderRight[3] == 0) {
