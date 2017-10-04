@@ -1,1 +1,15 @@
-ContactTimeLeft,LeftOrder1,LeftOrder2,LeftOrder3,LeftOrder4,LeftOrder5,ContactTimeRight,RightOrder1,RightOrder2,RightOrder3,RightOrder4,RightOrder5
+StrideLeft,ContactTimeLeft,LeftOrder1,LeftOrder2,LeftOrder3,LeftOrder4,LeftOrder5,StrideRight,ContactTimeRight,RightOrder1,RightOrder2,RightOrder3,RightOrder4,RightOrder5
+,,,,,,,0,0,0,1,0,0,0
+,,,,,,,,,2000,778,2000,2000,2000
+0,22,1,0,0,0,0
+,,894,2000,2000,2000,2000
+,,,,,,,0,871,0,1,0,0,0
+,,,,,,,,,2000,761,2000,2000,2000
+0,38,1,0,0,0,0
+,,896,2000,2000,2000,2000
+,,,,,,,0,975,0,1,0,0,0
+,,,,,,,,,2000,777,2000,2000,2000
+0,23,1,0,0,0,0
+,,898,2000,2000,2000,2000
+,,,,,,,0,1189,0,1,0,0,0
+,,,,,,,,,2000,797,2000,2000,2000

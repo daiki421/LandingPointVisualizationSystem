@@ -25,8 +25,8 @@ int orderLeft = 1, orderRight = 1;
 void setup() {
   size(800, 800);
   //output = createWriter(year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
-  output = createWriter("Test.csv");
-  outputPressOrder = createWriter("outputPressOrderTest.csv");
+  output = createWriter("Test2.csv");
+  outputPressOrder = createWriter("outputPressOrderTest2.csv");
   output.println("time1,inByte1_0,inByte1_1,inByte1_2,inByte1_3,inByte1_4,time2,inByte2_0,inByte2_1,inByte2_2,inByte2_3,inByte2_4");
   outputPressOrder.println("StrideLeft,ContactTimeLeft,LeftOrder1,LeftOrder2,LeftOrder3,LeftOrder4,LeftOrder5,StrideRight,ContactTimeRight,RightOrder1,RightOrder2,RightOrder3,RightOrder4,RightOrder5");
   myPort1 = new Serial(this, "/dev/tty.HC-06-DevB", 9600);
@@ -50,7 +50,7 @@ void draw() {
   
   //Left
   if(myPort1.available()>0){
-    if (sensorValueLeft0 <= 900) {
+    if (sensorValueLeft0 <= 1000) {
       isLandingPoint1_0 = true;
       // センサーが反応した時間
       sensorReactedTimeLeft[0] = millis();
@@ -96,7 +96,7 @@ void draw() {
       image(landingPointWhite, 28, 166, 40, 40);
     }
     
-    if (sensorValueLeft2 <= 900) {
+    if (sensorValueLeft2 <= 1000) {
       isLandingPoint1_2 = true;
       sensorReactedTimeLeft[2] = millis();
       if (pressOrderLeft[2] == 0) {
@@ -138,7 +138,7 @@ void draw() {
       image(landingPointWhite, 33, winHeight*8/25, 75, 75);
     }
     
-    if (sensorValueLeft4 <= 900) {
+    if (sensorValueLeft4 <= 1000) {
       isLandingPoint1_4 = true;
       sensorReactedTimeLeft[4] = millis();
       if (pressOrderLeft[4] == 0) {
@@ -168,7 +168,7 @@ void draw() {
           diffLeft = landingTimeLeft - groundTimeLeft; // Calcurate contact time
         }
         outputPressOrder.println((groundTimeLeft - distantTimeRight)*runningSpeed+","+diffLeft+","+pressOrderLeft[0]+","+pressOrderLeft[1]+","+pressOrderLeft[2]+","+pressOrderLeft[3]+","+pressOrderLeft[4]);
-        outputPressOrder.println(","+","+","+peak1_0+","+peak1_1+","+peak1_2+","+peak1_3+","+peak1_4);
+        outputPressOrder.println(","+","+peak1_0+","+peak1_1+","+peak1_2+","+peak1_3+","+peak1_4);
         for (int i = 0; i < pressOrderLeft.length; i++) {
           pressOrderLeft[i] = 0;
         }
@@ -314,7 +314,7 @@ void draw() {
         distantTimeRight = millis();
         if (groundTimeLeft != 0) {
           landingTimeLeft = millis();
-          diffRight = landingTimeLeft - groundTimeLeft;
+          diffRight = landingTimeRight- groundTimeRight;
         }
         outputPressOrder.println(","+","+","+","+","+","+","+(groundTimeRight - distantTimeLeft)*runningSpeed+","+diffRight+","+pressOrderRight[0]+","+pressOrderRight[1]+","+pressOrderRight[2]+","+pressOrderRight[3]+","+pressOrderRight[4]);
         outputPressOrder.println(","+","+","+","+","+","+","+","+","+peak2_0+","+peak2_1+","+peak2_2+","+peak2_3+","+peak2_4);
