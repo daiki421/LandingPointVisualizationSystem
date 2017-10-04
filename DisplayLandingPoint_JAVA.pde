@@ -313,7 +313,7 @@ void draw() {
       } else {
         distantTimeRight = millis();
         if (groundTimeLeft != 0) {
-          landingTimeLeft = millis();
+          landingTimeRight = millis();
           diffRight = landingTimeRight- groundTimeRight;
         }
         outputPressOrder.println(","+","+","+","+","+","+","+(groundTimeRight - distantTimeLeft)*runningSpeed+","+diffRight+","+pressOrderRight[0]+","+pressOrderRight[1]+","+pressOrderRight[2]+","+pressOrderRight[3]+","+pressOrderRight[4]);
