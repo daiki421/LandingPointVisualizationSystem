@@ -191,7 +191,7 @@ void draw() {
           }
         }
         // Calcurate timeInterval
-        //outputPressOrder.println("Interval"+","+","+timeIntervalLeft0_1+timeIntervalLeft1_2+timeIntervalLeft2_3+timeIntervalLeft3_4);
+        outputPressOrder.println("IntervalLeft"+","+","+timeIntervalLeft0_1+timeIntervalLeft1_2+timeIntervalLeft2_3+timeIntervalLeft3_4);
         peak1_0 = 2000;
         peak1_1 = 2000;
         peak1_2 = 2000;
@@ -339,7 +339,7 @@ void draw() {
             timeIntervalRight3_4 = sensorReactedTimeRight[i] - evacuateRight4;
           }
         }
-        //outputPressOrder.println(","+","+","+","+","+","+","+timeIntervalRight0_1+timeIntervalRight1_2+timeIntervalRight2_3+timeIntervalRight3_4);
+        outputPressOrder.println("IntervalRight"+","+","+","+","+","+","+","+","+","+timeIntervalRight0_1+timeIntervalRight1_2+timeIntervalRight2_3+timeIntervalRight3_4);
       }
       peak2_0 = 2000;
       peak2_1 = 2000;
