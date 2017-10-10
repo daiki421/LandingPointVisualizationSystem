@@ -7,26 +7,25 @@ int analog1_0_high, analog1_0_low, analog1_1_high, analog1_1_low, analog1_2_high
 int analog2_0_high, analog2_0_low, analog2_1_high, analog2_1_low, analog2_2_high, analog2_2_low, analog2_3_high, analog2_3_low, analog2_4_high, analog2_4_low;
 int sensorValueLeft0, sensorValueLeft1, sensorValueLeft2, sensorValueLeft3, sensorValueLeft4, sensorValueRight0, sensorValueRight1, sensorValueRight2, sensorValueRight3, sensorValueRight4;
 int winWidth = 800, winHeight = 800;
-PrintWriter output, outputPressOrder;
-boolean isLandingPoint1_0 = false, isLandingPoint1_1 = false, isLandingPoint1_2 = false, isLandingPoint1_3 = false, isLandingPoint1_4 = false;
+PrintWriter output, outputPressOrder; // ファイル変数
+boolean isLandingPoint1_0 = false, isLandingPoint1_1 = false, isLandingPoint1_2 = false, isLandingPoint1_3 = false, isLandingPoint1_4 = false;// 圧力センサの接地判定
 boolean isLandingPoint2_0 = false, isLandingPoint2_1 = false, isLandingPoint2_2 = false, isLandingPoint2_3 = false, isLandingPoint2_4 = false;
 long time1 = 0, time2 = 0, lapTime1 = 0, lapTime2 = 0, groundTimeLeft = 0, landingTimeLeft = 0, groundTimeRight = 0, landingTimeRight = 0, diffLeft = 0, diffRight = 0;
-long timeIntervalLeft0_1 = 0, timeIntervalLeft1_2 = 0, timeIntervalLeft2_3 = 0, timeIntervalLeft3_4 = 0, timeIntervalRight0_1 = 0, timeIntervalRight1_2 = 0, timeIntervalRight2_3 = 0, timeIntervalRight3_4 = 0;
-long sensorReactedTimeLeft[] = {0, 0, 0, 0, 0}, sensorReactedTimeRight[] = {0, 0, 0, 0, 0};
-long evacuateLeft0 = 0, evacuateLeft1 = 0, evacuateLeft2 = 0, evacuateLeft3 = 0, evacuateLeft4 = 0, evacuateRight0 = 0, evacuateRight1 = 0, evacuateRight2 = 0, evacuateRight3 = 0, evacuateRight4 = 0;
-long distantTimeLeft = 0, distantTimeRight = 0;
-int stroke = 0;
+long timeIntervalLeft0_1 = 0, timeIntervalLeft1_2 = 0, timeIntervalLeft2_3 = 0, timeIntervalLeft3_4 = 0, timeIntervalRight0_1 = 0, timeIntervalRight1_2 = 0, timeIntervalRight2_3 = 0, timeIntervalRight3_4 = 0; // 各センサ間の設置時間間隔
+long sensorReactedTimeLeft[] = {0, 0, 0, 0, 0}, sensorReactedTimeRight[] = {0, 0, 0, 0, 0}; // 各センサが地面に設置した時間
+long evacuateLeft0 = 0, evacuateLeft1 = 0, evacuateLeft2 = 0, evacuateLeft3 = 0, evacuateLeft4 = 0, evacuateRight0 = 0, evacuateRight1 = 0, evacuateRight2 = 0, evacuateRight3 = 0, evacuateRight4 = 0; //センサが反応した時間を一時保存
+long distantTimeLeft = 0, distantTimeRight = 0; // 足が地面から離れたときの時間
 int runningSpeed = 0; // トレッドミルの速度に応じて変更
-int storage1_0 = 0, storage1_1 = 0, storage1_2 = 0, storage1_3 = 0, storage1_4 = 0, storage2_0 = 0, storage2_1 = 0, storage2_2 = 0, storage2_3 = 0, storage2_4 = 0;
-int peak1_0 = 2000, peak1_1 = 2000, peak1_2 = 2000, peak1_3 = 2000, peak1_4 = 2000, peak2_0 = 2000, peak2_1 = 2000, peak2_2 = 2000, peak2_3 = 2000, peak2_4 = 2000;
-int pressOrderLeft[] = {0, 0, 0, 0, 0}, pressOrderRight[] = {0, 0, 0, 0, 0};
-int orderLeft = 1, orderRight = 1;
+int peak1_0 = 2000, peak1_1 = 2000, peak1_2 = 2000, peak1_3 = 2000, peak1_4 = 2000, peak2_0 = 2000, peak2_1 = 2000, peak2_2 = 2000, peak2_3 = 2000, peak2_4 = 2000; // 各圧力センサ値のピーク
+int pressOrderLeft[] = {0, 0, 0, 0, 0}, pressOrderRight[] = {0, 0, 0, 0, 0}; // 着地点の順番を格納する
+int orderLeft = 1, orderRight = 1; // 着地点の順番
 
 void setup() {
   size(800, 800);
-  //output = createWriter(year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
-  output = createWriter("Test2.csv");
-  outputPressOrder = createWriter("outputPressOrderTest2.csv");
+  output = createWriter("Output"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
+  //output = createWriter("Testsakuta8.csv");
+  //outputPressOrder = createWriter("outputPressOrderTestsakuta8.csv");
+  outputPressOrder = createWriter("OutputOrder"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
   output.println("time1,inByte1_0,inByte1_1,inByte1_2,inByte1_3,inByte1_4,time2,inByte2_0,inByte2_1,inByte2_2,inByte2_3,inByte2_4");
   outputPressOrder.println("StrideLeft,ContactTimeLeft,LeftOrder1,LeftOrder2,LeftOrder3,LeftOrder4,LeftOrder5,StrideRight,ContactTimeRight,RightOrder1,RightOrder2,RightOrder3,RightOrder4,RightOrder5");
   myPort1 = new Serial(this, "/dev/tty.HC-06-DevB", 9600);
@@ -158,8 +157,8 @@ void draw() {
       isLandingPoint1_4 = false;
       image(landingPointWhite, 111, 660, 90, 90);
     }
-    // 全てのセンサで離地判定したら
-    if (!isLandingPoint1_0 && !isLandingPoint1_1 && !isLandingPoint1_2 && !isLandingPoint1_3 && !isLandingPoint1_4) {
+    // 全てのセンサで離地判定したら→右の足が設置したら
+    if (isLandingPoint2_0 || isLandingPoint2_1 || isLandingPoint2_2 || isLandingPoint2_3 || isLandingPoint2_4) {
       if (pressOrderLeft[0] == 0 && pressOrderLeft[1] == 0 && pressOrderLeft[2] == 0 && pressOrderLeft[3] == 0 && pressOrderLeft[4] == 0) { // 全てのセンサに着地順序が格納されていなかったら
       } else {
         distantTimeLeft = millis();
@@ -308,7 +307,7 @@ void draw() {
       image(landingPointWhite, 601, 660, 90, 90);
     }
     
-    if (!isLandingPoint2_0 && !isLandingPoint2_1 && !isLandingPoint2_2 && !isLandingPoint2_3 && !isLandingPoint2_4) {
+    if (isLandingPoint1_0 || isLandingPoint1_1 || isLandingPoint1_2 || isLandingPoint1_3 || isLandingPoint1_4) {
       if (pressOrderRight[0] == 0 && pressOrderRight[1] == 0 && pressOrderRight[2] == 0 && pressOrderRight[3] == 0 && pressOrderRight[4] == 0) {
       } else {
         distantTimeRight = millis();
@@ -316,8 +315,8 @@ void draw() {
           landingTimeRight = millis();
           diffRight = landingTimeRight- groundTimeRight;
         }
-        outputPressOrder.println(","+","+","+","+","+","+","+(groundTimeRight - distantTimeLeft)*runningSpeed+","+diffRight+","+pressOrderRight[0]+","+pressOrderRight[1]+","+pressOrderRight[2]+","+pressOrderRight[3]+","+pressOrderRight[4]);
-        outputPressOrder.println(","+","+","+","+","+","+","+","+","+peak2_0+","+peak2_1+","+peak2_2+","+peak2_3+","+peak2_4);
+        outputPressOrder.println(","+","+","+","+","+","+","+","+(groundTimeRight - distantTimeLeft)*runningSpeed+","+diffRight+","+pressOrderRight[0]+","+pressOrderRight[1]+","+pressOrderRight[2]+","+pressOrderRight[3]+","+pressOrderRight[4]);
+        outputPressOrder.println(","+","+","+","+","+","+","+","+","+","+peak2_0+","+peak2_1+","+peak2_2+","+peak2_3+","+peak2_4);
         for (int i = 0; i < pressOrderRight.length; i++) {
           pressOrderRight[i] = 0;
         }
