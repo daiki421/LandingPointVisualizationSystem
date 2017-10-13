@@ -21,6 +21,7 @@ long evacuateLeft0 = 0, evacuateLeft1 = 0, evacuateLeft2 = 0, evacuateLeft3 = 0,
 long distantTimeLeft = 0, distantTimeRight = 0; // 足が地面から離れたときの時間
 int runningSpeed = 0; // トレッドミルの速度に応じて変更
 int peak1_0 = 2000, peak1_1 = 2000, peak1_2 = 2000, peak1_3 = 2000, peak1_4 = 2000, peak2_0 = 2000, peak2_1 = 2000, peak2_2 = 2000, peak2_3 = 2000, peak2_4 = 2000; // 各圧力センサ値のピーク
+long peakTime1_0 = 0, peakTime1_1 = 0, peakTime1_2 = 0, peakTime1_3 = 0, peakTime1_4 = 0, peakTime2_0 = 0, peakTime2_1 = 0, peakTime2_2 = 0, peakTime2_3 = 0, peakTime2_4 = 0;
 int pressOrderLeft[] = {0, 0, 0, 0, 0}, pressOrderRight[] = {0, 0, 0, 0, 0}; // 着地点の順番を格納する
 int orderLeft = 1, orderRight = 1; // 着地点の順番
 
@@ -65,6 +66,7 @@ void draw() {
       // 取得したセンサ値が前の値より小さければピークを更新
       if (sensorValueLeft0 <= peak1_0) {
         peak1_0 = sensorValueLeft0;
+        peakTime1_0 = millis() - sensorReactedTimeLeft[0];
       } else if (sensorValueLeft0 > peak1_0) {
       }
       // 着地時に他のセンサが着地判定していたら
@@ -87,6 +89,7 @@ void draw() {
       }
       if (sensorValueLeft1 <= peak1_1) {
         peak1_1 = sensorValueLeft1;
+        peakTime1_1 = millis() - sensorReactedTimeLeft[1];
       } else if (sensorValueLeft1 > peak1_1) {
       }
       if (isLandingPoint1_0 || isLandingPoint1_2 || isLandingPoint1_3 || isLandingPoint1_4) {
@@ -108,6 +111,7 @@ void draw() {
       }
       if (sensorValueLeft2 <= peak1_2) {
         peak1_2 = sensorValueLeft2;
+        peakTime1_2 = millis() - sensorReactedTimeLeft[2];
       } else if (sensorValueLeft2 > peak1_2) {
       }
       if (isLandingPoint1_0 || isLandingPoint1_1 || isLandingPoint1_3 || isLandingPoint1_4) {
@@ -129,6 +133,7 @@ void draw() {
       }
       if (sensorValueLeft3 <= peak1_3) {
         peak1_3 = sensorValueLeft3;
+        peakTime1_3 = millis() - sensorReactedTimeLeft[3];
       } else if (sensorValueLeft3 > peak1_3) {
       }
       if (isLandingPoint1_0 || isLandingPoint1_1 || isLandingPoint1_2 || isLandingPoint1_4) {
@@ -150,6 +155,7 @@ void draw() {
       }
       if (sensorValueLeft4 <= peak1_4) {
         peak1_4 = sensorValueLeft4;
+        peakTime1_4 = millis() - sensorReactedTimeLeft[4];
       } else if (sensorValueLeft4 > peak1_4) {
       }
       if (isLandingPoint1_0 || isLandingPoint1_1 || isLandingPoint1_2 || isLandingPoint1_3) {
@@ -169,7 +175,7 @@ void draw() {
         landingTimeLeft = millis(); // 離地した時間
         diffTime = groundTimeRight - groundTimeLeft; // Calcurate contact time
         outputPressOrder.println(diffTime*runningSpeed+","+diffTime+","+pressOrderLeft[0]+","+pressOrderLeft[1]+","+pressOrderLeft[2]+","+pressOrderLeft[3]+","+pressOrderLeft[4]);
-        outputPressOrder.println(","+","+peak1_0+","+peak1_1+","+peak1_2+","+peak1_3+","+peak1_4);
+        outputPressOrder.println(","+","+peak1_0+","+ peakTime1_0+","+peak1_1+","+ peakTime1_1+","+peak1_2+","+ peakTime1_2+","+peak1_3+","+ peakTime1_3+","+peak1_4+","+ peakTime1_4);
         for (int i = 0; i < pressOrderLeft.length; i++) {
           pressOrderLeft[i] = 0;
         }
@@ -213,6 +219,7 @@ void draw() {
       }
       if (sensorValueRight0 <= peak2_0) {
         peak2_0 = sensorValueRight0;
+        peakTime2_0 = millis() - sensorReactedTimeRight[0];
       } else if (sensorValueRight0 > peak2_0) {
       }
       if (isLandingPoint2_1 || isLandingPoint2_2 || isLandingPoint2_3 || isLandingPoint2_4) {
@@ -234,6 +241,7 @@ void draw() {
       }
       if (sensorValueRight1 <= peak2_1) {
         peak2_1 = sensorValueRight1;
+         peakTime2_1 = millis() - sensorReactedTimeRight[1];
       } else if (sensorValueRight1 > peak2_1) {
       }
       if (isLandingPoint2_0 || isLandingPoint2_2 || isLandingPoint2_3 || isLandingPoint2_4) {
@@ -255,6 +263,7 @@ void draw() {
       }
       if (sensorValueRight2 <= peak2_2) {
         peak2_2 = sensorValueRight2;
+         peakTime2_2 = millis() - sensorReactedTimeRight[2];
       } else if (sensorValueRight2 > peak2_2) {
       }
       if (isLandingPoint2_0 || isLandingPoint2_1 || isLandingPoint2_3 || isLandingPoint2_4) {
@@ -276,6 +285,7 @@ void draw() {
       }
       if (sensorValueRight3 <= peak2_3) {
         peak2_3 = sensorValueRight3;
+         peakTime2_3 = millis() - sensorReactedTimeRight[3];
       } else if (sensorValueRight3 > peak2_3) {
       }
       if (isLandingPoint2_0 || isLandingPoint2_1 || isLandingPoint2_2 || isLandingPoint2_4) {
@@ -297,6 +307,7 @@ void draw() {
       }
       if (sensorValueRight4 <= peak2_4) {
         peak2_4 = sensorValueRight4;
+         peakTime2_4 = millis() - sensorReactedTimeRight[4];
       } else if (sensorValueRight4 > peak2_4) {
       }
       if (isLandingPoint2_0 || isLandingPoint2_1 || isLandingPoint2_2 || isLandingPoint2_3) { 
@@ -316,7 +327,7 @@ void draw() {
         landingTimeRight = millis();
         diffTime = landingTimeRight- groundTimeLeft;
         outputPressOrder.println(","+","+","+","+","+","+","+","+diffTime*runningSpeed+","+diffTime+","+pressOrderRight[0]+","+pressOrderRight[1]+","+pressOrderRight[2]+","+pressOrderRight[3]+","+pressOrderRight[4]);
-        outputPressOrder.println(","+","+","+","+","+","+","+","+","+","+peak2_0+","+peak2_1+","+peak2_2+","+peak2_3+","+peak2_4);
+        outputPressOrder.println(","+","+","+","+","+","+","+","+","+","+peak2_0+","+peakTime2_0+","+peak2_1+","+peakTime2_1+","+peak2_2+","+peakTime2_2+","+peak2_3+","+peakTime2_3+","+peak2_4+","+peakTime2_4);
         for (int i = 0; i < pressOrderRight.length; i++) {
           pressOrderRight[i] = 0;
         }
