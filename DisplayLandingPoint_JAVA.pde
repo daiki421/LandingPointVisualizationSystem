@@ -10,7 +10,11 @@ int winWidth = 800, winHeight = 800;
 PrintWriter output, outputPressOrder; // ファイル変数
 boolean isLandingPoint1_0 = false, isLandingPoint1_1 = false, isLandingPoint1_2 = false, isLandingPoint1_3 = false, isLandingPoint1_4 = false;// 圧力センサの接地判定
 boolean isLandingPoint2_0 = false, isLandingPoint2_1 = false, isLandingPoint2_2 = false, isLandingPoint2_3 = false, isLandingPoint2_4 = false;
-long time1 = 0, time2 = 0, lapTime1 = 0, lapTime2 = 0, groundTimeLeft = 0, landingTimeLeft = 0, groundTimeRight = 0, landingTimeRight = 0, diffLeft = 0, diffRight = 0;
+long time1 = 0, time2 = 0; // Arduinoで取得した時間
+long lapTime1 = 0, lapTime2 = 0; // 時間を加算するための一時保存用
+long groundTimeLeft = 0, groundTimeRight = 0; // 地面に初めて接地した時間 
+long landingTimeRight = 0, landingTimeLeft = 0; // 地面から離れた時間
+long diffTime = 0; // 片足が接地してからもう片足が接地するまでの時間
 long timeIntervalLeft0_1 = 0, timeIntervalLeft1_2 = 0, timeIntervalLeft2_3 = 0, timeIntervalLeft3_4 = 0, timeIntervalRight0_1 = 0, timeIntervalRight1_2 = 0, timeIntervalRight2_3 = 0, timeIntervalRight3_4 = 0; // 各センサ間の設置時間間隔
 long sensorReactedTimeLeft[] = {0, 0, 0, 0, 0}, sensorReactedTimeRight[] = {0, 0, 0, 0, 0}; // 各センサが地面に設置した時間
 long evacuateLeft0 = 0, evacuateLeft1 = 0, evacuateLeft2 = 0, evacuateLeft3 = 0, evacuateLeft4 = 0, evacuateRight0 = 0, evacuateRight1 = 0, evacuateRight2 = 0, evacuateRight3 = 0, evacuateRight4 = 0; //センサが反応した時間を一時保存
@@ -25,7 +29,7 @@ void setup() {
   output = createWriter("Output"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
   //output = createWriter("Testsakuta8.csv");
   //outputPressOrder = createWriter("outputPressOrderTestsakuta8.csv");
-  outputPressOrder = createWriter("OutputOrder"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
+  outputPressOrder = createWriter("OutputPressOrder"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
   output.println("time1,inByte1_0,inByte1_1,inByte1_2,inByte1_3,inByte1_4,time2,inByte2_0,inByte2_1,inByte2_2,inByte2_3,inByte2_4");
   outputPressOrder.println("StrideLeft,ContactTimeLeft,LeftOrder1,LeftOrder2,LeftOrder3,LeftOrder4,LeftOrder5,StrideRight,ContactTimeRight,RightOrder1,RightOrder2,RightOrder3,RightOrder4,RightOrder5");
   myPort1 = new Serial(this, "/dev/tty.HC-06-DevB", 9600);
@@ -157,16 +161,14 @@ void draw() {
       isLandingPoint1_4 = false;
       image(landingPointWhite, 111, 660, 90, 90);
     }
-    // 全てのセンサで離地判定したら→右の足が設置したら
-    if (isLandingPoint2_0 || isLandingPoint2_1 || isLandingPoint2_2 || isLandingPoint2_3 || isLandingPoint2_4) {
+    // 全てのセンサで離地判定したら
+    if (!isLandingPoint1_0 && !isLandingPoint1_1 && !isLandingPoint1_2 && !isLandingPoint1_3 && !isLandingPoint1_4) {
       if (pressOrderLeft[0] == 0 && pressOrderLeft[1] == 0 && pressOrderLeft[2] == 0 && pressOrderLeft[3] == 0 && pressOrderLeft[4] == 0) { // 全てのセンサに着地順序が格納されていなかったら
-      } else {
-        distantTimeLeft = millis();
-        if (groundTimeLeft != 0) {
-          landingTimeLeft = millis();
-          diffLeft = landingTimeLeft - groundTimeLeft; // Calcurate contact time
-        }
-        outputPressOrder.println((groundTimeLeft - distantTimeRight)*runningSpeed+","+diffLeft+","+pressOrderLeft[0]+","+pressOrderLeft[1]+","+pressOrderLeft[2]+","+pressOrderLeft[3]+","+pressOrderLeft[4]);
+      } else { // センサのどれかが格納されていた場合
+        //distantTimeLeft = millis(); // 左足が浮いた時の時間取得
+        landingTimeLeft = millis(); // 離地した時間
+        diffTime = groundTimeRight - groundTimeLeft; // Calcurate contact time
+        outputPressOrder.println(diffTime*runningSpeed+","+diffTime+","+pressOrderLeft[0]+","+pressOrderLeft[1]+","+pressOrderLeft[2]+","+pressOrderLeft[3]+","+pressOrderLeft[4]);
         outputPressOrder.println(","+","+peak1_0+","+peak1_1+","+peak1_2+","+peak1_3+","+peak1_4);
         for (int i = 0; i < pressOrderLeft.length; i++) {
           pressOrderLeft[i] = 0;
@@ -190,7 +192,7 @@ void draw() {
           }
         }
         // Calcurate timeInterval
-        outputPressOrder.println("IntervalLeft"+","+","+timeIntervalLeft0_1+timeIntervalLeft1_2+timeIntervalLeft2_3+timeIntervalLeft3_4);
+        outputPressOrder.println("IntervalLeft"+","+timeIntervalLeft0_1+timeIntervalLeft1_2+timeIntervalLeft2_3+timeIntervalLeft3_4);
         peak1_0 = 2000;
         peak1_1 = 2000;
         peak1_2 = 2000;
@@ -310,12 +312,10 @@ void draw() {
     if (isLandingPoint1_0 || isLandingPoint1_1 || isLandingPoint1_2 || isLandingPoint1_3 || isLandingPoint1_4) {
       if (pressOrderRight[0] == 0 && pressOrderRight[1] == 0 && pressOrderRight[2] == 0 && pressOrderRight[3] == 0 && pressOrderRight[4] == 0) {
       } else {
-        distantTimeRight = millis();
-        if (groundTimeLeft != 0) {
-          landingTimeRight = millis();
-          diffRight = landingTimeRight- groundTimeRight;
-        }
-        outputPressOrder.println(","+","+","+","+","+","+","+","+(groundTimeRight - distantTimeLeft)*runningSpeed+","+diffRight+","+pressOrderRight[0]+","+pressOrderRight[1]+","+pressOrderRight[2]+","+pressOrderRight[3]+","+pressOrderRight[4]);
+        //distantTimeRight = millis();
+        landingTimeRight = millis();
+        diffTime = landingTimeRight- groundTimeLeft;
+        outputPressOrder.println(","+","+","+","+","+","+","+","+diffTime*runningSpeed+","+diffTime+","+pressOrderRight[0]+","+pressOrderRight[1]+","+pressOrderRight[2]+","+pressOrderRight[3]+","+pressOrderRight[4]);
         outputPressOrder.println(","+","+","+","+","+","+","+","+","+","+peak2_0+","+peak2_1+","+peak2_2+","+peak2_3+","+peak2_4);
         for (int i = 0; i < pressOrderRight.length; i++) {
           pressOrderRight[i] = 0;
@@ -416,7 +416,7 @@ void serialEvent(Serial port) {
     }
   }
   if (sensorValueLeft0 > 0 && sensorValueLeft1 > 0 && sensorValueLeft2 > 0 && sensorValueLeft3 > 0 && sensorValueLeft4 > 0 && sensorValueRight0 > 0 && sensorValueRight1 > 0 && sensorValueRight2 > 0 && sensorValueRight3 > 0 && sensorValueRight4 > 0) {
-    output.println(time1+","+sensorValueLeft0+","+sensorValueLeft1+","+sensorValueLeft2+","+sensorValueLeft3+","+sensorValueLeft4+","+time2+","+sensorValueRight0+","+sensorValueRight1+","+sensorValueRight2+","+sensorValueRight3+","+sensorValueRight4);
+    output.println(time1/1000000+","+sensorValueLeft0+","+sensorValueLeft1+","+sensorValueLeft2+","+sensorValueLeft3+","+sensorValueLeft4+","+time2/1000000+","+sensorValueRight0+","+sensorValueRight1+","+sensorValueRight2+","+sensorValueRight3+","+sensorValueRight4);
   }
   println("time1="+time1+"inByte1_0="+sensorValueLeft0+", inByte1_1="+sensorValueLeft1+", inByte1_2="+sensorValueLeft2+", inByte1_3="+sensorValueLeft3+", inByte1_4="+sensorValueLeft4);
   println("time2="+time2+"inByte2_0="+sensorValueRight0+", inByte2_1="+sensorValueRight1+", inByte2_2="+sensorValueRight2+", inByte2_3="+sensorValueRight3+", inByte2_4="+sensorValueRight4);
