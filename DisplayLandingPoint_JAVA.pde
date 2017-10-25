@@ -14,11 +14,11 @@ long time1 = 0, time2 = 0; // Arduinoで取得した時間
 long lapTime1 = 0, lapTime2 = 0; // 時間を加算するための一時保存用
 long groundTimeLeft = 0, groundTimeRight = 0; // 地面に初めて接地した時間 
 long landingTimeRight = 0, landingTimeLeft = 0; // 地面から離れた時間
-long diffTime = 0; // 片足が接地してからもう片足が接地するまでの時間
+long diffTimeLeft = 0, diffTimeRight = 0; // 片足が接地してからもう片足が接地するまでの時間
 long timeIntervalLeft0_1 = 0, timeIntervalLeft1_2 = 0, timeIntervalLeft2_3 = 0, timeIntervalLeft3_4 = 0, timeIntervalRight0_1 = 0, timeIntervalRight1_2 = 0, timeIntervalRight2_3 = 0, timeIntervalRight3_4 = 0; // 各センサ間の設置時間間隔
 long sensorReactedTimeLeft[] = {0, 0, 0, 0, 0}, sensorReactedTimeRight[] = {0, 0, 0, 0, 0}; // 各センサが地面に設置した時間
 long evacuateLeft0 = 0, evacuateLeft1 = 0, evacuateLeft2 = 0, evacuateLeft3 = 0, evacuateLeft4 = 0, evacuateRight0 = 0, evacuateRight1 = 0, evacuateRight2 = 0, evacuateRight3 = 0, evacuateRight4 = 0; //センサが反応した時間を一時保存
-int runningSpeed = 0; // トレッドミルの速度に応じて変更
+int runningSpeed = 2; // トレッドミルの速度(km/h)に応じて変更
 int peak1_0 = 2000, peak1_1 = 2000, peak1_2 = 2000, peak1_3 = 2000, peak1_4 = 2000, peak2_0 = 2000, peak2_1 = 2000, peak2_2 = 2000, peak2_3 = 2000, peak2_4 = 2000; // 各圧力センサ値のピーク
 long peakTime1_0 = 0, peakTime1_1 = 0, peakTime1_2 = 0, peakTime1_3 = 0, peakTime1_4 = 0, peakTime2_0 = 0, peakTime2_1 = 0, peakTime2_2 = 0, peakTime2_3 = 0, peakTime2_4 = 0;
 int pressOrderLeft[] = {0, 0, 0, 0, 0}, pressOrderRight[] = {0, 0, 0, 0, 0}; // 着地点の順番を格納する
@@ -31,7 +31,7 @@ void setup() {
   //outputPressOrder = createWriter("outputPressOrderTestsakuta8.csv");
   outputPressOrder = createWriter("OutputPressOrder"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
   output.println("time1,inByte1_0,inByte1_1,inByte1_2,inByte1_3,inByte1_4,time2,inByte2_0,inByte2_1,inByte2_2,inByte2_3,inByte2_4");
-  outputPressOrder.println("StrideLeft,ContactTimeLeft,LeftOrder1,LeftOrder2,LeftOrder3,LeftOrder4,LeftOrder5,LPeak1,LPeakTime1,LPeak2,LPeakTime2,LPeak3,LPeakTime3,LPeak4,LPeakTime4,LPeak5,LPeakTime5,TIL0_1,TIL1_2,TIL2_3,TIL3_4,,StrideRight,ContactTimeRight,RightOrder1,RightOrder2,RightOrder3,RightOrder4,RightOrder5,RPeak1,RPeakTime1,RPeak2,RPeakTime2,RPeak3,RPeakTime3,RPeak4,RPeakTime4,RPeak5,RPeakTime5,TIR0_1,TIR1_2,TIR2_3,TIR3_4");
+  outputPressOrder.println("StrideLeft,ContactTimeLeft,LeftOrder1,LeftOrder2,LeftOrder3,LeftOrder4,LeftOrder5,LPeak1,LPeak2,LPeak3,LPeak4,LPeak5,TIL0_1,TIL1_2,TIL2_3,TIL3_4,,StrideRight,ContactTimeRight,RightOrder1,RightOrder2,RightOrder3,RightOrder4,RightOrder5,RPeak1,RPeak2,RPeak3,RPeak4,RPeak5,TIR0_1,TIR1_2,TIR2_3,TIR3_4");
   // システム1号機
   myPort1 = new Serial(this, "/dev/tty.HC-06-DevB", 9600);
   myPort2 = new Serial(this, "/dev/tty.HC-06-DevB-2", 9600);
@@ -69,7 +69,6 @@ void draw() {
       // 取得したセンサ値が前の値より小さければピークを更新
       if (sensorValueLeft0 <= peak1_0) {
         peak1_0 = sensorValueLeft0;
-        peakTime1_0 = millis() - sensorReactedTimeLeft[0];
       } else if (sensorValueLeft0 > peak1_0) {
       }
       // 着地時に他のセンサが着地判定していたら
@@ -92,7 +91,6 @@ void draw() {
       }
       if (sensorValueLeft1 <= peak1_1) {
         peak1_1 = sensorValueLeft1;
-        peakTime1_1 = millis() - sensorReactedTimeLeft[1];
       } else if (sensorValueLeft1 > peak1_1) {
       }
       if (isLandingPoint1_0 || isLandingPoint1_2 || isLandingPoint1_3 || isLandingPoint1_4) {
@@ -136,7 +134,6 @@ void draw() {
       }
       if (sensorValueLeft3 <= peak1_3) {
         peak1_3 = sensorValueLeft3;
-        peakTime1_3 = millis() - sensorReactedTimeLeft[3];
       } else if (sensorValueLeft3 > peak1_3) {
       }
       if (isLandingPoint1_0 || isLandingPoint1_1 || isLandingPoint1_2 || isLandingPoint1_4) {
@@ -158,7 +155,6 @@ void draw() {
       }
       if (sensorValueLeft4 <= peak1_4) {
         peak1_4 = sensorValueLeft4;
-        peakTime1_4 = millis() - sensorReactedTimeLeft[4];
       } else if (sensorValueLeft4 > peak1_4) {
       }
       if (isLandingPoint1_0 || isLandingPoint1_1 || isLandingPoint1_2 || isLandingPoint1_3) {
@@ -178,13 +174,7 @@ void draw() {
       } else { 
         // 一箇所でもセンサが反応していた場合
         landingTimeLeft = millis(); // 離地した時間
-        diffTime = groundTimeRight - groundTimeLeft; // 左足を離してから右足が着くまでの時間
-        // オーダーリセット
-        for (int i = 0; i < pressOrderLeft.length; i++) {
-          pressOrderLeft[i] = 0;
-        }
-        // 順番の変数リセット
-        orderLeft = 1;
+        diffTimeLeft = Math.abs(groundTimeRight - groundTimeLeft); // 左足を離してから右足が着くまでの時間
         for (int i = 0; i < 5; i++) {
           if (pressOrderLeft[i] == 2) {
             timeIntervalLeft0_1 = sensorReactedTimeLeft[i] - groundTimeLeft;
@@ -203,12 +193,18 @@ void draw() {
           }
         }
         // 計算したものをファイルに保存
-        outputPressOrder.println(diffTime*runningSpeed+","+(landingTimeLeft - groundTimeLeft)+","+pressOrderLeft[0]+","+pressOrderLeft[1]+","+pressOrderLeft[2]+","+pressOrderLeft[3]+","+pressOrderLeft[4]+peak1_0+","+ peakTime1_0+","+peak1_1+","+ peakTime1_1+","+peak1_2+","+ peakTime1_2+","+peak1_3+","+ peakTime1_3+","+peak1_4+","+ peakTime1_4+timeIntervalLeft0_1+timeIntervalLeft1_2+timeIntervalLeft2_3+timeIntervalLeft3_4);
+        outputPressOrder.println(diffTimeLeft/1000*runningSpeed*1000/3600+","+(landingTimeLeft - groundTimeLeft)+","+pressOrderLeft[0]+","+pressOrderLeft[1]+","+pressOrderLeft[2]+","+pressOrderLeft[3]+","+pressOrderLeft[4]+","+peak1_0+","+peak1_1+","+peak1_2+","+peak1_3+","+peak1_4+","+timeIntervalLeft0_1+","+timeIntervalLeft1_2+","+timeIntervalLeft2_3+","+timeIntervalLeft3_4);
         peak1_0 = 2000;
         peak1_1 = 2000;
         peak1_2 = 2000;
         peak1_3 = 2000;
         peak1_4 = 2000;
+        // オーダーリセット
+        for (int i = 0; i < pressOrderLeft.length; i++) {
+          pressOrderLeft[i] = 0;
+        }
+        // 順番の変数リセット
+        orderLeft = 1;
       }
     }
   }
@@ -224,7 +220,6 @@ void draw() {
       }
       if (sensorValueRight0 <= peak2_0) {
         peak2_0 = sensorValueRight0;
-        peakTime2_0 = millis() - sensorReactedTimeRight[0];
       } else if (sensorValueRight0 > peak2_0) {
       }
       if (isLandingPoint2_1 || isLandingPoint2_2 || isLandingPoint2_3 || isLandingPoint2_4) {
@@ -246,7 +241,6 @@ void draw() {
       }
       if (sensorValueRight1 <= peak2_1) {
         peak2_1 = sensorValueRight1;
-         peakTime2_1 = millis() - sensorReactedTimeRight[1];
       } else if (sensorValueRight1 > peak2_1) {
       }
       if (isLandingPoint2_0 || isLandingPoint2_2 || isLandingPoint2_3 || isLandingPoint2_4) {
@@ -268,7 +262,6 @@ void draw() {
       }
       if (sensorValueRight2 <= peak2_2) {
         peak2_2 = sensorValueRight2;
-         peakTime2_2 = millis() - sensorReactedTimeRight[2];
       } else if (sensorValueRight2 > peak2_2) {
       }
       if (isLandingPoint2_0 || isLandingPoint2_1 || isLandingPoint2_3 || isLandingPoint2_4) {
@@ -290,7 +283,6 @@ void draw() {
       }
       if (sensorValueRight3 <= peak2_3) {
         peak2_3 = sensorValueRight3;
-         peakTime2_3 = millis() - sensorReactedTimeRight[3];
       } else if (sensorValueRight3 > peak2_3) {
       }
       if (isLandingPoint2_0 || isLandingPoint2_1 || isLandingPoint2_2 || isLandingPoint2_4) {
@@ -312,7 +304,6 @@ void draw() {
       }
       if (sensorValueRight4 <= peak2_4) {
         peak2_4 = sensorValueRight4;
-         peakTime2_4 = millis() - sensorReactedTimeRight[4];
       } else if (sensorValueRight4 > peak2_4) {
       }
       if (isLandingPoint2_0 || isLandingPoint2_1 || isLandingPoint2_2 || isLandingPoint2_3) { 
@@ -329,11 +320,7 @@ void draw() {
       if (pressOrderRight[0] == 0 && pressOrderRight[1] == 0 && pressOrderRight[2] == 0 && pressOrderRight[3] == 0 && pressOrderRight[4] == 0) {
       } else {
         landingTimeRight = millis();
-        diffTime = landingTimeRight- groundTimeLeft;
-        for (int i = 0; i < pressOrderRight.length; i++) {
-          pressOrderRight[i] = 0;
-        }
-        orderRight = 1;
+        diffTimeRight = Math.abs(landingTimeRight- groundTimeLeft);
         for (int i = 0; i < 5; i++) {
           if (pressOrderRight[i] == 2) {
             timeIntervalRight0_1 = sensorReactedTimeRight[i] - groundTimeRight;
@@ -351,13 +338,17 @@ void draw() {
             timeIntervalRight3_4 = sensorReactedTimeRight[i] - evacuateRight4;
           }
         }
-         outputPressOrder.println(","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+diffTime*runningSpeed+","+diffTime+","+pressOrderRight[0]+","+pressOrderRight[1]+","+pressOrderRight[2]+","+pressOrderRight[3]+","+pressOrderRight[4]+peak2_0+","+peakTime2_0+","+peak2_1+","+peakTime2_1+","+peak2_2+","+peakTime2_2+","+peak2_3+","+peakTime2_3+","+peak2_4+","+peakTime2_4+timeIntervalRight0_1+timeIntervalRight1_2+timeIntervalRight2_3+timeIntervalRight3_4);
+         outputPressOrder.println(","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+diffTimeRight/1000*runningSpeed*1000/3600+","+(landingTimeRight - groundTimeRight)+","+pressOrderRight[0]+","+pressOrderRight[1]+","+pressOrderRight[2]+","+pressOrderRight[3]+","+pressOrderRight[4]+","+peak2_0+","+peak2_1+","+peak2_2+","+peak2_3+","+peak2_4+","+timeIntervalRight0_1+","+timeIntervalRight1_2+","+timeIntervalRight2_3+","+timeIntervalRight3_4);
       }
       peak2_0 = 2000;
       peak2_1 = 2000;
       peak2_2 = 2000;
       peak2_3 = 2000;
       peak2_4 = 2000;
+      for (int i = 0; i < pressOrderRight.length; i++) {
+          pressOrderRight[i] = 0;
+      }
+      orderRight = 1;
     }
     // 比較アルゴリズム
     // 着地順
@@ -429,7 +420,8 @@ void serialEvent(Serial port) {
     }
   }
   if (sensorValueLeft0 > 0 && sensorValueLeft1 > 0 && sensorValueLeft2 > 0 && sensorValueLeft3 > 0 && sensorValueLeft4 > 0 && sensorValueRight0 > 0 && sensorValueRight1 > 0 && sensorValueRight2 > 0 && sensorValueRight3 > 0 && sensorValueRight4 > 0) {
-    output.println(time1/1000000+","+sensorValueLeft0+","+sensorValueLeft1+","+sensorValueLeft2+","+sensorValueLeft3+","+sensorValueLeft4+","+time2/1000000+","+sensorValueRight0+","+sensorValueRight1+","+sensorValueRight2+","+sensorValueRight3+","+sensorValueRight4);
+    output.println(time1+","+sensorValueLeft0+","+sensorValueLeft1+","+sensorValueLeft2+","+sensorValueLeft3+","+sensorValueLeft4+","+time2+","+sensorValueRight0+","+sensorValueRight1+","+sensorValueRight2+","+sensorValueRight3+","+sensorValueRight4);
+      //output.println(time1+","+sensorValueLeft0+","+sensorValueLeft1+","+sensorValueLeft2+","+sensorValueLeft3+","+sensorValueLeft4);
   }
   println("time1="+time1+"inByte1_0="+sensorValueLeft0+", inByte1_1="+sensorValueLeft1+", inByte1_2="+sensorValueLeft2+", inByte1_3="+sensorValueLeft3+", inByte1_4="+sensorValueLeft4);
   println("time2="+time2+"inByte2_0="+sensorValueRight0+", inByte2_1="+sensorValueRight1+", inByte2_2="+sensorValueRight2+", inByte2_3="+sensorValueRight3+", inByte2_4="+sensorValueRight4);
