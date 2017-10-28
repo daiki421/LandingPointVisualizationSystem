@@ -27,40 +27,46 @@ int orderLeft = 1, orderRight = 1; // 着地点の順番
 void setup() {
   size(800, 800);
   output = createWriter("Output"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
-  //output = createWriter("Testsakuta8.csv");
-  //outputPressOrder = createWriter("outputPressOrderTestsakuta8.csv");
+  output = createWriter("Testsakuta8.csv");
+  outputPressOrder = createWriter("outputPressOrderTestsakuta8.csv");
   outputPressOrder = createWriter("OutputPressOrder"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
   output.println("time1,inByte1_0,inByte1_1,inByte1_2,inByte1_3,inByte1_4,time2,inByte2_0,inByte2_1,inByte2_2,inByte2_3,inByte2_4");
   outputPressOrder.println("StrideLeft,ContactTimeLeft,LeftOrder1,LeftOrder2,LeftOrder3,LeftOrder4,LeftOrder5,LPeak1,LPeak2,LPeak3,LPeak4,LPeak5,TIL0_1,TIL1_2,TIL2_3,TIL3_4,,StrideRight,ContactTimeRight,RightOrder1,RightOrder2,RightOrder3,RightOrder4,RightOrder5,RPeak1,RPeak2,RPeak3,RPeak4,RPeak5,TIR0_1,TIR1_2,TIR2_3,TIR3_4");
   // システム1号機
-  myPort1 = new Serial(this, "/dev/tty.HC-06-DevB", 9600);
-  myPort2 = new Serial(this, "/dev/tty.HC-06-DevB-2", 9600);
+  //myPort1 = new Serial(this, "/dev/tty.HC-06-DevB", 9600);
+  //myPort2 = new Serial(this, "/dev/tty.HC-06-DevB-2", 9600);
   // システム2号機
-  //myPort1 = new Serial(this, "/dev/tty.HC-06-DevB-1", 9600);
-  //myPort2 = new Serial(this, "/dev/tty.HC-06-DevB-3", 9600);
+  myPort1 = new Serial(this, "/dev/tty.HC-06-DevB-1", 9600);
+  myPort2 = new Serial(this, "/dev/tty.HC-06-DevB-3", 9600);
   foot_img = loadImage("foot_sole900.jpeg");
   landingPoint_img = loadImage("Landing_Point.png");
   landingPointWhite = loadImage("white.png");
   image(foot_img, 0, 0, 800, 800);
+  //PFont font = createFont("MS Gothic",48,true);
+  //fill(0);
+  //textFont(font);
+  //textSize(55);
+  //textAlign(CENTER);
+  //text("歩幅: 0.6m", 480, 160);
+  //text("接地時間: 2秒", 480, 400);
 }
 
 void draw() {
   if (mousePressed) {
     if (mouseX>=0 && mouseX<800 && mouseY>=0 && mouseY<=800) {
-      output.flush(); // Record press sensor
-      output.close();
-      outputPressOrder.flush(); // Record press order and contact time
+      output.flush(); // データ書き込み
+      output.close(); // ファイル閉じる
+      outputPressOrder.flush();
       outputPressOrder.close();
       println("File Close");
     }
   }
-  
   //Left
   if(myPort1.available()>0){
     if (sensorValueLeft0 <= 1000) {
       isLandingPoint1_0 = true;
       // センサーが反応した時間取得
-      sensorReactedTimeLeft[0] = millis();
+      sensorReactedTimeLeft[0] = System.nanoTime();
       // 着地した順が格納されてなかったら着地順を入れる
       if (pressOrderLeft[0] == 0) {
         pressOrderLeft[0] = orderLeft;
@@ -69,12 +75,14 @@ void draw() {
       // 取得したセンサ値が前の値より小さければピークを更新
       if (sensorValueLeft0 <= peak1_0) {
         peak1_0 = sensorValueLeft0;
+        peakTime1_0 = System.nanoTime() - sensorReactedTimeLeft[0];
       } else if (sensorValueLeft0 > peak1_0) {
       }
       // 着地時に他のセンサが着地判定していたら
       if (isLandingPoint1_1 || isLandingPoint1_2 || isLandingPoint1_3 || isLandingPoint1_4) { 
       } else {
-        groundTimeLeft = millis(); // 着地時間記録
+        groundTimeLeft = System.nanoTime(); // 着地時間記録
+        diffTimeLeft = landingTimeRight - groundTimeLeft; // 左足を離してから右足が着くまでの時間
       }
       image(landingPoint_img, 190, 0, 180, 180);
     } else {
@@ -84,18 +92,20 @@ void draw() {
     
     if (sensorValueLeft1 <= 1000) {
       isLandingPoint1_1 = true;
-      sensorReactedTimeLeft[1] = millis();
+      sensorReactedTimeLeft[1] = System.nanoTime();
       if (pressOrderLeft[1] == 0) {
         pressOrderLeft[1] = orderLeft;
         orderLeft++;
       }
       if (sensorValueLeft1 <= peak1_1) {
         peak1_1 = sensorValueLeft1;
+        peakTime1_1 = System.nanoTime() - sensorReactedTimeLeft[1];
       } else if (sensorValueLeft1 > peak1_1) {
       }
       if (isLandingPoint1_0 || isLandingPoint1_2 || isLandingPoint1_3 || isLandingPoint1_4) {
       } else {
-        groundTimeLeft = millis();
+        groundTimeLeft = System.nanoTime();
+        diffTimeLeft = landingTimeRight - groundTimeLeft;
       }
       image(landingPoint_img, 9, winHeight*4/25, 100, 100);
     } else {
@@ -105,19 +115,20 @@ void draw() {
     
     if (sensorValueLeft2 <= 1000) {
       isLandingPoint1_2 = true;
-      sensorReactedTimeLeft[2] = millis();
+      sensorReactedTimeLeft[2] = System.nanoTime();
       if (pressOrderLeft[2] == 0) {
         pressOrderLeft[2] = orderLeft;
         orderLeft++;
       }
       if (sensorValueLeft2 <= peak1_2) {
         peak1_2 = sensorValueLeft2;
-        peakTime1_2 = millis() - sensorReactedTimeLeft[2];
+        peakTime1_2 = System.nanoTime() - sensorReactedTimeLeft[2];
       } else if (sensorValueLeft2 > peak1_2) {
       }
       if (isLandingPoint1_0 || isLandingPoint1_1 || isLandingPoint1_3 || isLandingPoint1_4) {
       } else {
-        groundTimeLeft = millis();
+        groundTimeLeft = System.nanoTime();
+        diffTimeLeft = landingTimeRight - groundTimeLeft;
       }
       image(landingPoint_img, 170, 120, 210, 210);
     } else {
@@ -127,18 +138,20 @@ void draw() {
     
     if (sensorValueLeft3 <= 1000) {
       isLandingPoint1_3 = true;
-      sensorReactedTimeLeft[3] = millis();
+      sensorReactedTimeLeft[3] = System.nanoTime();
       if (pressOrderLeft[3] == 0) {
         pressOrderLeft[3] = orderLeft;
         orderLeft++;
       }
       if (sensorValueLeft3 <= peak1_3) {
         peak1_3 = sensorValueLeft3;
+        peakTime1_3 = System.nanoTime() - sensorReactedTimeLeft[3];
       } else if (sensorValueLeft3 > peak1_3) {
       }
       if (isLandingPoint1_0 || isLandingPoint1_1 || isLandingPoint1_2 || isLandingPoint1_4) {
       } else {
-        groundTimeLeft = millis();
+        groundTimeLeft = System.nanoTime();
+        diffTimeLeft = landingTimeRight - groundTimeLeft;
       }
       image(landingPoint_img, 5, winHeight*6/25, 170, 170);
     } else {
@@ -148,18 +161,20 @@ void draw() {
     
     if (sensorValueLeft4 <= 1000) {
       isLandingPoint1_4 = true;
-      sensorReactedTimeLeft[4] = millis();
+      sensorReactedTimeLeft[4] = System.nanoTime();
       if (pressOrderLeft[4] == 0) {
         pressOrderLeft[4] = orderLeft;
         orderLeft++;
       }
       if (sensorValueLeft4 <= peak1_4) {
         peak1_4 = sensorValueLeft4;
+        peakTime1_4 = System.nanoTime() - sensorReactedTimeLeft[4];
       } else if (sensorValueLeft4 > peak1_4) {
       }
       if (isLandingPoint1_0 || isLandingPoint1_1 || isLandingPoint1_2 || isLandingPoint1_3) {
       } else {
-        groundTimeLeft = millis();
+        groundTimeLeft = System.nanoTime();
+        diffTimeLeft = landingTimeRight - groundTimeLeft;
       }
       image(landingPoint_img, 70, winHeight*18/25, 220, 220);
     } else {
@@ -173,8 +188,7 @@ void draw() {
       if (pressOrderLeft[0] == 0 && pressOrderLeft[1] == 0 && pressOrderLeft[2] == 0 && pressOrderLeft[3] == 0 && pressOrderLeft[4] == 0) { 
       } else { 
         // 一箇所でもセンサが反応していた場合
-        landingTimeLeft = millis(); // 離地した時間
-        diffTimeLeft = Math.abs(groundTimeRight - groundTimeLeft); // 左足を離してから右足が着くまでの時間
+        landingTimeLeft = System.nanoTime(); // 離地した時間
         for (int i = 0; i < 5; i++) {
           if (pressOrderLeft[i] == 2) {
             timeIntervalLeft0_1 = sensorReactedTimeLeft[i] - groundTimeLeft;
@@ -193,7 +207,7 @@ void draw() {
           }
         }
         // 計算したものをファイルに保存
-        outputPressOrder.println(diffTimeLeft/1000*runningSpeed*1000/3600+","+(landingTimeLeft - groundTimeLeft)+","+pressOrderLeft[0]+","+pressOrderLeft[1]+","+pressOrderLeft[2]+","+pressOrderLeft[3]+","+pressOrderLeft[4]+","+peak1_0+","+peak1_1+","+peak1_2+","+peak1_3+","+peak1_4+","+timeIntervalLeft0_1+","+timeIntervalLeft1_2+","+timeIntervalLeft2_3+","+timeIntervalLeft3_4);
+        outputPressOrder.println(diffTimeLeft/1000000000*runningSpeed*1000/3600+","+(landingTimeLeft - groundTimeLeft)/1000000000+","+pressOrderLeft[0]+","+pressOrderLeft[1]+","+pressOrderLeft[2]+","+pressOrderLeft[3]+","+pressOrderLeft[4]+","+peak1_0+","+peak1_1+","+peak1_2+","+peak1_3+","+peak1_4+","+Math.abs(timeIntervalLeft0_1/1000)+","+timeIntervalLeft1_2/1000000000+","+timeIntervalLeft2_3/1000000000+","+timeIntervalLeft3_4/1000000000);
         peak1_0 = 2000;
         peak1_1 = 2000;
         peak1_2 = 2000;
@@ -213,18 +227,20 @@ void draw() {
   if(myPort2.available()>0){
     if (sensorValueRight0 <= 1000) {
       isLandingPoint2_0 = true;
-      sensorReactedTimeRight[0] = millis();
+      sensorReactedTimeRight[0] = System.nanoTime();
       if (pressOrderRight[0] == 0) {
         pressOrderRight[0] = orderRight;
         orderRight++;
       }
       if (sensorValueRight0 <= peak2_0) {
         peak2_0 = sensorValueRight0;
+        peakTime2_0 = System.nanoTime() - sensorReactedTimeLeft[0];
       } else if (sensorValueRight0 > peak2_0) {
       }
       if (isLandingPoint2_1 || isLandingPoint2_2 || isLandingPoint2_3 || isLandingPoint2_4) {
       } else {
-        groundTimeRight = millis();
+        groundTimeRight = System.nanoTime();
+        diffTimeRight = landingTimeLeft - groundTimeRight;
       }
       image(landingPoint_img, 468, 0, 180, 180);
     } else {
@@ -234,18 +250,20 @@ void draw() {
     
     if (sensorValueRight1 <= 1000) {
       isLandingPoint2_1 = true;
-      sensorReactedTimeRight[1] = millis();
+      sensorReactedTimeRight[1] = System.nanoTime();
       if (pressOrderRight[1] == 0) {
         pressOrderRight[1] = orderRight;
         orderRight++;
       }
       if (sensorValueRight1 <= peak2_1) {
         peak2_1 = sensorValueRight1;
+        peakTime2_1 = System.nanoTime() - sensorReactedTimeLeft[1];
       } else if (sensorValueRight1 > peak2_1) {
       }
       if (isLandingPoint2_0 || isLandingPoint2_2 || isLandingPoint2_3 || isLandingPoint2_4) {
       } else {
-        groundTimeRight = millis();
+        groundTimeRight = System.nanoTime();
+        diffTimeRight = landingTimeLeft - groundTimeRight;
       }
       image(landingPoint_img, 715, winHeight*4/25, 100, 100);
     } else {
@@ -255,18 +273,20 @@ void draw() {
     
     if (sensorValueRight2 <= 1000) {
       isLandingPoint2_2 = true;
-      sensorReactedTimeRight[2] = millis();
+      sensorReactedTimeRight[2] = System.nanoTime();
       if (pressOrderRight[2] == 0) {
         pressOrderRight[2] = orderRight;
         orderRight++;
       }
       if (sensorValueRight2 <= peak2_2) {
         peak2_2 = sensorValueRight2;
+        peakTime2_2 = System.nanoTime() - sensorReactedTimeLeft[2];
       } else if (sensorValueRight2 > peak2_2) {
       }
       if (isLandingPoint2_0 || isLandingPoint2_1 || isLandingPoint2_3 || isLandingPoint2_4) {
       } else {
-        groundTimeRight = millis();
+        groundTimeRight = System.nanoTime();
+        diffTimeRight = landingTimeLeft - groundTimeRight;
       }
       image(landingPoint_img, winWidth*29/50, 120, 210, 210);
     } else {
@@ -276,18 +296,20 @@ void draw() {
     
     if (sensorValueRight3 <= 900) {
       isLandingPoint2_3 = true;
-      sensorReactedTimeRight[3] = millis();
+      sensorReactedTimeRight[3] = System.nanoTime();
       if (pressOrderRight[3] == 0) {
         pressOrderRight[3] = orderRight;
         orderRight++;
       }
       if (sensorValueRight3 <= peak2_3) {
         peak2_3 = sensorValueRight3;
+        peakTime2_3 = System.nanoTime() - sensorReactedTimeLeft[3];
       } else if (sensorValueRight3 > peak2_3) {
       }
       if (isLandingPoint2_0 || isLandingPoint2_1 || isLandingPoint2_2 || isLandingPoint2_4) {
       } else {
-        groundTimeRight = millis();
+        groundTimeRight = System.nanoTime();
+        diffTimeRight = landingTimeLeft - groundTimeRight;
       }
       image(landingPoint_img, winWidth*21/25, winHeight*6/25, 170, 170);
     } else {
@@ -297,18 +319,20 @@ void draw() {
     
     if (sensorValueRight4 <= 900) {
       isLandingPoint2_4 = true;
-      sensorReactedTimeRight[4] = millis();
+      sensorReactedTimeRight[4] = System.nanoTime();
       if (pressOrderRight[4] == 0) {
         pressOrderRight[4] = orderRight;
         orderRight++;
       }
       if (sensorValueRight4 <= peak2_4) {
         peak2_4 = sensorValueRight4;
+        peakTime2_4 = System.nanoTime() - sensorReactedTimeLeft[4];
       } else if (sensorValueRight4 > peak2_4) {
       }
       if (isLandingPoint2_0 || isLandingPoint2_1 || isLandingPoint2_2 || isLandingPoint2_3) { 
       } else {
-        groundTimeRight = millis();
+        groundTimeRight = System.nanoTime();
+        diffTimeRight = landingTimeLeft - groundTimeRight;
       }
       image(landingPoint_img, winWidth*17.5/25, winHeight*18/25, 220, 220);
     } else {
@@ -319,8 +343,7 @@ void draw() {
     if (!isLandingPoint2_0 && !isLandingPoint2_1 && !isLandingPoint2_2 && !isLandingPoint2_3 && !isLandingPoint2_4) {
       if (pressOrderRight[0] == 0 && pressOrderRight[1] == 0 && pressOrderRight[2] == 0 && pressOrderRight[3] == 0 && pressOrderRight[4] == 0) {
       } else {
-        landingTimeRight = millis();
-        diffTimeRight = Math.abs(landingTimeRight- groundTimeLeft);
+        landingTimeRight = System.nanoTime();
         for (int i = 0; i < 5; i++) {
           if (pressOrderRight[i] == 2) {
             timeIntervalRight0_1 = sensorReactedTimeRight[i] - groundTimeRight;
@@ -338,7 +361,7 @@ void draw() {
             timeIntervalRight3_4 = sensorReactedTimeRight[i] - evacuateRight4;
           }
         }
-         outputPressOrder.println(","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+diffTimeRight/1000*runningSpeed*1000/3600+","+(landingTimeRight - groundTimeRight)+","+pressOrderRight[0]+","+pressOrderRight[1]+","+pressOrderRight[2]+","+pressOrderRight[3]+","+pressOrderRight[4]+","+peak2_0+","+peak2_1+","+peak2_2+","+peak2_3+","+peak2_4+","+timeIntervalRight0_1+","+timeIntervalRight1_2+","+timeIntervalRight2_3+","+timeIntervalRight3_4);
+         outputPressOrder.println(","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+diffTimeRight/1000000000*runningSpeed*1000/3600+","+(landingTimeRight - groundTimeRight)/1000000000+","+pressOrderRight[0]+","+pressOrderRight[1]+","+pressOrderRight[2]+","+pressOrderRight[3]+","+pressOrderRight[4]+","+peak2_0+","+peak2_1+","+peak2_2+","+peak2_3+","+peak2_4+","+timeIntervalRight0_1/1000000000+","+timeIntervalRight1_2/1000000000+","+timeIntervalRight2_3/1000000000+","+timeIntervalRight3_4/1000000000);
       }
       peak2_0 = 2000;
       peak2_1 = 2000;
@@ -421,8 +444,8 @@ void serialEvent(Serial port) {
   }
   if (sensorValueLeft0 > 0 && sensorValueLeft1 > 0 && sensorValueLeft2 > 0 && sensorValueLeft3 > 0 && sensorValueLeft4 > 0 && sensorValueRight0 > 0 && sensorValueRight1 > 0 && sensorValueRight2 > 0 && sensorValueRight3 > 0 && sensorValueRight4 > 0) {
     output.println(time1+","+sensorValueLeft0+","+sensorValueLeft1+","+sensorValueLeft2+","+sensorValueLeft3+","+sensorValueLeft4+","+time2+","+sensorValueRight0+","+sensorValueRight1+","+sensorValueRight2+","+sensorValueRight3+","+sensorValueRight4);
-      //output.println(time1+","+sensorValueLeft0+","+sensorValueLeft1+","+sensorValueLeft2+","+sensorValueLeft3+","+sensorValueLeft4);
+    //output.println(time2+","+sensorValueRight0+","+sensorValueRight1+","+sensorValueRight2+","+sensorValueRight3+","+sensorValueRight4);
   }
-  println("time1="+time1+"inByte1_0="+sensorValueLeft0+", inByte1_1="+sensorValueLeft1+", inByte1_2="+sensorValueLeft2+", inByte1_3="+sensorValueLeft3+", inByte1_4="+sensorValueLeft4);
-  println("time2="+time2+"inByte2_0="+sensorValueRight0+", inByte2_1="+sensorValueRight1+", inByte2_2="+sensorValueRight2+", inByte2_3="+sensorValueRight3+", inByte2_4="+sensorValueRight4);
+  //println("time1="+time1+"inByte1_0="+sensorValueLeft0+", inByte1_1="+sensorValueLeft1+", inByte1_2="+sensorValueLeft2+", inByte1_3="+sensorValueLeft3+", inByte1_4="+sensorValueLeft4);
+  //println("time2="+time2+"inByte2_0="+sensorValueRight0+", inByte2_1="+sensorValueRight1+", inByte2_2="+sensorValueRight2+", inByte2_3="+sensorValueRight3+", inByte2_4="+sensorValueRight4);
 }
