@@ -60,6 +60,8 @@ void setup() {
   background(255);
   image(left_foot, 25, 150, 250, 600);
   image(right_foot, 520, 150, 250, 600);
+  line(300, 130, 500, 130);
+  line(300, 230, 500, 230);
   fill(100, 100, 255);
   rect(325, 0, 150, 800);
   //image(landingPoint20, 200, 180, 60, 60);
@@ -87,7 +89,7 @@ void setup() {
 
 void draw() {
   if (mousePressed) {
-    if (mouseX>=0 && mouseX<800 && mouseY>=0 && mouseY<=800) {
+    if (mouseX >= 0 && mouseX < 800 && mouseY >= 0 && mouseY <= 800) {
       output.flush(); // データ書き込み
       output.close(); // ファイル閉じる
       outputPressOrder.flush();
@@ -95,10 +97,38 @@ void draw() {
       println("File Close");
     }
   }
-  //println(System.nanoTime() - timeTest);
+  delay(200);
+  double rand = random(0, 400);
+  fill(255, 255, 255);
+  rect(325, 0, 150, 800);
+  if (rand >= 130 && rand <= 230) {
+    fill(255, 100, 100);
+  } else {
+    fill(100, 100, 255);
+  }
+  
+  rect(325, (float)rand, 150, 800 - (float)rand);
+  
+  //triangle(400, 0, 475, 150, 325, 150);
+  //triangle(400, 50, 475, 200, 325, 200);
+  //triangle(400, 100, 475, 250, 325, 250);
+  //triangle(400, 150, 475, 300, 325, 300);
+  //triangle(400, 200, 475, 350, 325, 350);
+  //fill(100, 100, 255);
+  //triangle(400, 250, 475, 400, 325, 400);
+  //fill(255, 255, 255);
+  //triangle(400, 300, 475, 450, 325, 450);
+  //triangle(400, 350, 475, 500, 325, 500);
+  //triangle(400, 400, 475, 550, 325, 550);
+  //triangle(400, 450, 475, 600, 325, 600);
+  //triangle(400, 500, 475, 650, 325, 650);
+  //triangle(400, 550, 475, 700, 325, 700);
+  //triangle(400, 600, 475, 750, 325, 750);
+  //triangle(400, 650, 475, 800, 325, 800);
+  
   //Left
   if (myPort1.available()>0) {
-    if (sensorValueLeft0 <= 1000) {  
+    if (sensorValueLeft0 <= 1000) {
       isLandingPoint1_0 = true;
       // センサーが反応した時間取得
       sensorReactedTimeLeft[0] = System.nanoTime();
@@ -121,7 +151,7 @@ void draw() {
         } else {
           groundTimeLeft = System.nanoTime(); // 着地時間記録
           diffGroundTimeLeft = groundTimeLeft - startTime; // スタートから接地までの時間
-          diffTimeLeft = diffGroundTimeLeft - diffGroundTimeRight; // 左足を離してから右足が着くまでの時間
+          diffTimeLeft = diffGroundTimeLeft - diffGroundTimeRight; // 左足が接地してから右足が接地するまでの時間
           println("DiffTimeLeft="+diffTimeLeft);
           fill(255,255,255);
           rect(325, 0, 150, 800);
@@ -174,7 +204,7 @@ void draw() {
         } else {
           groundTimeLeft = System.nanoTime(); // 着地時間記録
           diffGroundTimeLeft = groundTimeLeft - startTime; // スタートから接地までの時間
-          diffTimeLeft = diffGroundTimeLeft - diffLandingTimeRight; // 左足を離してから右足が着くまでの時間
+          diffTimeLeft = diffGroundTimeLeft - diffGroundTimeRight; // 左足を離してから右足が着くまでの時間
           println("DiffTimeLeft="+diffTimeLeft);
           fill(255,255,255);
           rect(325, 0, 150, 800);
@@ -278,7 +308,7 @@ void draw() {
         } else {
           groundTimeLeft = System.nanoTime(); // 着地時間記録
           diffGroundTimeLeft = groundTimeLeft - startTime; // スタートから接地までの時間
-          diffTimeLeft = diffGroundTimeLeft - diffLandingTimeRight; // 左足を離してから右足が着くまでの時間
+          diffTimeLeft = diffGroundTimeLeft - diffGroundTimeRight; // 左足を離してから右足が着くまでの時間
           println("DiffTimeLeft="+diffTimeLeft/1000000000);
           fill(255,255,255);
           rect(325, 0, 150, 800);
@@ -633,7 +663,7 @@ void draw() {
       //image(landingPointWhite, 500, winHeight*12.2/50, 90, 90);
     }
 
-    if (sensorValueRight3 <= 900) {
+    if (sensorValueRight3 <= 1000) { // システム1：900, システム2：1000
       isLandingPoint2_3 = true;
       sensorReactedTimeRight[3] = System.nanoTime();
       if (pressOrderRight[3] == 0) {
@@ -686,7 +716,7 @@ void draw() {
       //image(landingPointWhite, winWidth*21.9/25, winHeight*8/25, 75, 75);
     }
 
-    if (sensorValueRight4 <= 900) {
+    if (sensorValueRight4 <= 1000) { // システム1：900, システム2：1000
       isLandingPoint2_4 = true;
       sensorReactedTimeRight[4] = System.nanoTime();
       if (pressOrderRight[4] == 0) {
