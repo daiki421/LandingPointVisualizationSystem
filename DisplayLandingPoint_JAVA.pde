@@ -35,19 +35,22 @@ void setup() {
   size(800, 800);
   //output = createWriter("Test1.csv");
   //outputPressOrder = createWriter("TestOrder1.csv");
-  output = createWriter("SensorData1"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
-  output2 = createWriter("SensorData2"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
-  output3 = createWriter("SensorData3"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
-  output4 = createWriter("SensorData4"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
-  outputPressOrder = createWriter("PressOrder"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
-  output.println("time1,Left0,,Left1,,Left2,,Left3,,Left4,,time2,Right0,,Right1,,Right2,,Right3,,Right4");
-  outputPressOrder.println("TimeLeft,StrideLeft(cm),ContactTimeLeft(s),Left0,Left1,Left2,Left3,Left4,LPeak1,LPTime1,LPeak2,LPTime2,LPeak3,LPTime3,LPeak4,LPTime4,LPeak5,LPTime5,TIL0_1,TIL1_2,TIL2_3,TIL3_4,,TimeRight,StrideRight,ContactTimeRight,Right0,Right1,Right2,Right3,Right4,RPeak1,RPTime1,RPeak2,RPTime2,RPeak3,RPTime3,RPeak4,RPTime4,RPeak5,RPTime5,TIR0_1,TIR1_2,TIR2_3,TIR3_4");
-  // システム1号機
+  //output = createWriter("SensorData1"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
+  //output2 = createWriter("SensorData2"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
+  //output3 = createWriter("SensorData3"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
+  //output4 = createWriter("SensorData4"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
+  //outputPressOrder = createWriter("PressOrder"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
+  //output.println("time1,左足親指,,左足小指,,左足親指下,,左足小指下,,左足かかと,,time2,右足親指,,右足小指,,右足親指下,,右足小指下,,右足かかと");
+  //output2.println("time1,左足親指,,左足小指,,左足親指下,,左足小指下,,左足かかと,,time2,右足親指,,右足小指,,右足親指下,,右足小指下,,右足かかと");
+  //output3.println("time1,左足親指,,左足小指,,左足親指下,,左足小指下,,左足かかと,,time2,右足親指,,右足小指,,右足親指下,,右足小指下,,右足かかと");
+  //output4.println("time1,左足親指,,左足小指,,左足親指下,,左足小指下,,左足かかと,,time2,右足親指,,右足小指,,右足親指下,,右足小指下,,右足かかと");
+  //outputPressOrder.println("TimeLeft,StrideLeft(cm),ContactTimeLeft(s),左足親指,左足小指,左足親指下,左足小指下,左足かかと,LPeak1,LPTime1,LPeak2,LPTime2,LPeak3,LPTime3,LPeak4,LPTime4,LPeak5,LPTime5,TIL0_1,TIL1_2,TIL2_3,TIL3_4,,TimeRight,StrideRight,ContactTimeRight,右足親指,右足小指,右足親指下,右足小指下,右足かかと,RPeak1,RPTime1,RPeak2,RPTime2,RPeak3,RPTime3,RPeak4,RPTime4,RPeak5,RPTime5,TIR0_1,TIR1_2,TIR2_3,TIR3_4");
+   //システム1号機
   //myPort1 = new Serial(this, "/dev/tty.HC-06-DevB", 9600);
   //myPort2 = new Serial(this, "/dev/tty.HC-06-DevB-2", 9600);
   // システム2号機
-  myPort1 = new Serial(this, "/dev/tty.HC-06-DevB-1", 9600);
-  myPort2 = new Serial(this, "/dev/tty.HC-06-DevB-3", 9600);
+  //myPort1 = new Serial(this, "/dev/tty.HC-06-DevB-1", 9600);
+  //myPort2 = new Serial(this, "/dev/tty.HC-06-DevB-3", 9600);
   foot_img = loadImage("foot_sole900.jpeg");
   left_foot = loadImage("left_foot.jpg");
   right_foot = loadImage("right_foot.jpg");
@@ -58,40 +61,59 @@ void setup() {
   landingPoint20 = loadImage("LandingPoint_a20.png");
   landingPointWhite = loadImage("white.png");
   runningSpeed = 9; // トレッドミルの時速を指定
-  //image(foot_img, 0, 0, 400, 400);
   background(255);
   image(left_foot, 25, 150, 250, 600);
   image(right_foot, 520, 150, 250, 600);
-  line(300, 130, 500, 130);
-  line(300, 230, 500, 230);
   fill(100, 100, 255);
   rect(325, 0, 150, 800);
-  //textSize(50);
-  //fill(0);
-  //text("1", 130, 700);
-  //text("4", 40, 290);
-  //text("3", 220, 330);
-  //text("2", 40, 390);
-  //text("5", 220, 220);
+  // 左足サークル
+  noFill();
+  ellipse(144, 674, 75, 75);
+  ellipse(230, 210, 65, 65);
+  ellipse(55, 280, 65, 65);
+  ellipse(230, 330, 65, 65);
+  ellipse(70, 380, 65, 65);
+  // 右足サークル
+  ellipse(650, 675, 75, 75);
+  ellipse(565, 210, 65, 65);
+  ellipse(740, 280, 65, 65);
+  ellipse(565, 330, 65, 65);
+  ellipse(725, 370, 65, 65);
+  // 左足テキスト
+  textSize(50);
+  fill(0);
+  text("1", 128, 690);
+  text("4", 40, 300);
+  text("3", 215, 350);
+  text("2", 55, 400);
+  text("5", 215, 225);
+  // 右足テキスト
+  textSize(50);
+  fill(0);
+  text("1", 633, 695);
+  text("2", 710, 390);
+  text("3", 550, 350);
+  text("4", 725, 297);
+  text("5", 550, 225);
 }
 
 void draw() {
-  if (mousePressed) {
-    if (mouseX >= 0 && mouseX < 800 && mouseY >= 0 && mouseY <= 800) {
-      output.flush(); // データ書き込み
-      output.close(); // ファイル閉じる
-      output2.flush(); // データ書き込み
-      output2.close(); // ファイル閉じる
-      output3.flush(); // データ書き込み
-      output3.close(); // ファイル閉じる
-      output4.flush(); // データ書き込み
-      output4.close(); // ファイル閉じる
-      outputPressOrder.flush();
-      outputPressOrder.close();
-      println("File Close");
-    }
-  }
-  //delay(200);
+  //if (mousePressed) {
+  //  if (mouseX >= 0 && mouseX < 800 && mouseY >= 0 && mouseY <= 800) {
+  //    output.flush(); // データ書き込み
+  //    output.close(); // ファイル閉じる
+  //    output2.flush(); // データ書き込み
+  //    output2.close(); // ファイル閉じる
+  //    output3.flush(); // データ書き込み
+  //    output3.close(); // ファイル閉じる
+  //    output4.flush(); // データ書き込み
+  //    output4.close(); // ファイル閉じる
+  //    outputPressOrder.flush();
+  //    outputPressOrder.close();
+  //    println("File Close");
+  //  }
+  //}
+
   //double rand = random(0, 400);
   //fill(255, 255, 255);
   //rect(325, 0, 150, 800);
@@ -100,11 +122,10 @@ void draw() {
   //} else {
   //  fill(100, 100, 255);
   //}
-  
-  
+
   // Left
   if (myPort1.available()>0) {
-    if (sensorValueLeft0 <= 1010) {
+    if (sensorValueLeft0 <= 1000) {
       isLandingPoint1_0 = true;
       // センサーが反応した時間取得
       sensorReactedTimeLeft[0] = System.nanoTime() - startTime;
@@ -128,32 +149,40 @@ void draw() {
           groundTimeLeft = System.nanoTime(); // 着地時間記録
           diffGroundTimeLeft = groundTimeLeft - startTime; // スタートから接地までの時間
           diffTime = diffGroundTimeLeft - diffGroundTimeRight; // 右足が接地してから左足が接地するまでの時間
-          println("DiffTimeLeft="+nf((float)(diffTime/1000000000),3,3));
-          fill(255,255,255);
+          println("DiffTimeLeft="+nf((float)(diffTime/1000000000), 3, 3));
+          fill(255, 255, 255);
           rect(325, 0, 150, 800);
           double stride = diffTime/1000000000*runningSpeed*1000*100/3600; // 秒 * cm/s
-          fill(100,100,255);
+          fill(100, 100, 255);
           rect(325, (float)stride, 150, 800 - (float)stride);
-          println("Stride="+nf((float)stride,3,3)+"cm");
+          fill(255);
+          //println("Stride="+nf((float)stride, 3, 3)+"cm");
         }
       }
       if (isDrawLeft0) {
       } else {
         if (pressOrderLeft[0] == 1) {
           isDrawLeft0 = true;
-          image(landingPoint20, 200, 180, 60, 60);
+          //image(landingPoint20, 200, 180, 60, 60);
+          image(landingPoint100, 200, 180, 60, 60);
         } else if (pressOrderLeft[0] == 2) {
           isDrawLeft0 = true;
-          image(landingPoint40, 200, 180, 60, 60);
+          //image(landingPoint40, 200, 180, 60, 60);
+          image(landingPoint100, 200, 180, 60, 60);
         } else if (pressOrderLeft[0] == 3) {
           isDrawLeft0 = true;
-          image(landingPoint60, 200, 180, 60, 60);
+          //image(landingPoint60, 200, 180, 60, 60);
+          image(landingPoint100, 200, 180, 60, 60);
         } else if (pressOrderLeft[0] == 4) {
           isDrawLeft0 = true;
-          image(landingPoint80, 200, 180, 60, 60);
+          //image(landingPoint80, 200, 180, 60, 60);
+          image(landingPoint100, 200, 180, 60, 60);
         } else if (pressOrderLeft[0] == 5) {
           isDrawLeft0 = true;
-          image(landingPoint100, 200, 180, 60, 60);
+          //image(landingPoint100, 200, 180, 60, 60);
+          noStroke();
+          fill(255);
+          ellipse(230, 210, 60, 60);
         }
       }
     } else {
@@ -180,31 +209,35 @@ void draw() {
           diffGroundTimeLeft = groundTimeLeft - startTime; // スタートから接地までの時間
           diffTime = diffGroundTimeLeft - diffGroundTimeRight; // 右足を離してから左足が着くまでの時間
           println("DiffTimeLeft="+diffTime/1000000000);
-          fill(255,255,255);
+          fill(255, 255, 255);
           rect(325, 0, 150, 800);
           double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
           fill(100, 100, 255);
           rect(325, (float)stride, 150, 800 - (float)stride);
-          println("Stride="+nf((float)stride,3,3)+"cm");
+          fill(255);
+          //println("Stride="+nf((float)stride, 3, 3)+"cm");
         }
       }
       if (isDrawLeft1) {
       } else {
         if (pressOrderLeft[1] == 1) {
           isDrawLeft1 = true;
-          image(landingPoint20, 40, 270, 30, 30);
+          image(landingPoint100, 35, 263, 40, 40);
         } else if (pressOrderLeft[1] == 2) {
           isDrawLeft1 = true;
-          image(landingPoint40, 40, 270, 30, 30);
+          image(landingPoint100, 35, 263, 40, 40);
         } else if (pressOrderLeft[1] == 3) {
           isDrawLeft1 = true;
-          image(landingPoint60, 40, 270, 30, 30);
+          image(landingPoint100, 35, 263, 40, 40);
         } else if (pressOrderLeft[1] == 4) {
           isDrawLeft1 = true;
-          image(landingPoint80, 40, 270, 30, 30);
+          //image(landingPoint80, 40, 270, 30, 30);
+          noStroke();
+          fill(255);
+          ellipse(55, 283, 40, 40);
         } else if (pressOrderLeft[1] == 5) {
           isDrawLeft1 = true;
-          image(landingPoint100, 40, 270, 30, 30);
+          image(landingPoint100, 35, 263, 40, 40);
         }
       }
     } else {
@@ -231,12 +264,13 @@ void draw() {
           diffGroundTimeLeft = groundTimeLeft - startTime; // スタートから接地までの時間
           diffTime = diffGroundTimeLeft - diffGroundTimeRight; // 左足を離してから右足が着くまでの時間
           println("DiffTimeLeft="+diffTime/1000000000);
-          fill(255,255,255);
+          fill(255, 255, 255);
           rect(325, 0, 150, 800);
           double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
           fill(100, 100, 255);
           rect(325, (float)stride, 150, 800 - (float)stride);
-          println("Stride="+nf((float)stride,3,3)+"cm");
+          fill(255);
+          //println("Stride="+nf((float)stride, 3, 3)+"cm");
         }
       }
       if (isDrawLeft2) {
@@ -249,7 +283,10 @@ void draw() {
           image(landingPoint40, 200, 300, 60, 60);
         } else if (pressOrderLeft[2] == 3) {
           isDrawLeft2 = true;
-          image(landingPoint60, 200, 300, 60, 60);
+          //image(landingPoint60, 200, 300, 60, 60);
+          noStroke();
+          fill(255);
+          ellipse(230, 330, 60, 60);
         } else if (pressOrderLeft[2] == 4) {
           isDrawLeft2 = true;
           image(landingPoint80, 200, 300, 60, 60);
@@ -282,12 +319,13 @@ void draw() {
           diffGroundTimeLeft = groundTimeLeft - startTime; // スタートから接地までの時間
           diffTime = diffGroundTimeLeft - diffGroundTimeRight; // 左足を離してから右足が着くまでの時間
           println("DiffTimeLeft="+diffTime/1000000000);
-          fill(255,255,255);
+          fill(255, 255, 255);
           rect(325, 0, 150, 800);
           double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
           fill(100, 100, 255);
           rect(325, (float)stride, 150, 800 - (float)stride);
-          println("Stride="+nf((float)stride,3,3)+"cm");
+          fill(255);
+          //println("Stride="+nf((float)stride, 3, 3)+"cm");
         }
       }
       if (isDrawLeft3) {
@@ -297,7 +335,10 @@ void draw() {
           image(landingPoint20, 40, 350, 60, 60);
         } else if (pressOrderLeft[3] == 2) {
           isDrawLeft3 = true;
-          image(landingPoint40, 40, 350, 60, 60);
+          //image(landingPoint40, 40, 350, 60, 60);
+          noStroke();
+          fill(255);
+          ellipse(70, 380, 60, 60);
         } else if (pressOrderLeft[3] == 3) {
           isDrawLeft3 = true;
           image(landingPoint60, 40, 350, 60, 60);
@@ -313,7 +354,7 @@ void draw() {
       isLandingPoint1_3 = false;
     }
 
-    if (sensorValueLeft4 <= 1000) {
+    if (sensorValueLeft4 <= 1010) {
       isLandingPoint1_4 = true;
       sensorReactedTimeLeft[4] = System.nanoTime() - startTime;
 
@@ -334,19 +375,23 @@ void draw() {
           diffGroundTimeLeft = groundTimeLeft - startTime; // スタートから接地までの時間
           diffTime = diffGroundTimeLeft - diffGroundTimeRight; // 左足を離してから右足が着くまでの時間
           println("DiffTimeLeft="+diffTime/1000000000);
-          fill(255,255,255);
+          fill(255, 255, 255);
           rect(325, 0, 150, 800);
           double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
           fill(100, 100, 255);
           rect(325, (float)stride, 150, 800 - (float)stride);
-          println("Stride="+nf((float)stride,3,3)+"cm");
+          fill(255);
+          //println("Stride="+nf((float)stride, 3, 3)+"cm");
         }
       }
       if (isDrawLeft4) {
       } else {
         if (pressOrderLeft[4] == 1) {
           isDrawLeft4 = true;
-          image(landingPoint20, 110, 640, 70, 70);
+          //image(landingPoint20, 110, 640, 70, 70);
+          noStroke();
+          fill(255);
+          ellipse(145, 675, 70, 70);
         } else if (pressOrderLeft[4] == 2) {
           isDrawLeft4 = true;
           image(landingPoint40, 110, 640, 70, 70);
@@ -370,11 +415,25 @@ void draw() {
       // そもそも踏まれてない時
       if (pressOrderLeft[0] == 0 && pressOrderLeft[1] == 0 && pressOrderLeft[2] == 0 && pressOrderLeft[3] == 0 && pressOrderLeft[4] == 0) {
       } else { 
-        image(landingPointWhite, 200, 180, 60, 60);
-        image(landingPointWhite, 40, 270, 30, 30);
-        image(landingPointWhite, 200, 300, 60, 60);
-        image(landingPointWhite, 40, 350, 60, 60);
-        image(landingPointWhite, 110, 640, 70, 70);
+        //image(landingPointWhite, 200, 180, 60, 60);
+        //image(landingPointWhite, 40, 270, 30, 30);
+        //image(landingPointWhite, 200, 300, 60, 60);
+        //image(landingPointWhite, 40, 350, 60, 60);
+        //image(landingPointWhite, 110, 640, 70, 70);
+        noStroke();
+        fill(255);
+        ellipse(230, 210, 60, 60);
+        ellipse(55, 283, 40, 40);
+        ellipse(230, 330, 60, 60);
+        ellipse(70, 380, 60, 60);
+        ellipse(145, 675, 70, 70);
+        textSize(50);
+        fill(0);
+        text("1", 128, 690);
+        text("2", 55, 400);
+        text("3", 215, 350);
+        text("4", 40, 300);
+        text("5", 215, 225);
         isDrawLeft0 = false;
         isDrawLeft1 = false;
         isDrawLeft2 = false;
@@ -403,7 +462,7 @@ void draw() {
           }
         }
         // 計算したものをファイルに保存
-        outputPressOrder.println((System.nanoTime() - startTime)/1000000000+","+diffTime/1000000000*runningSpeed*1000*100/3600+","+(diffLandingTimeLeft - diffGroundTimeLeft)/1000000000+","+pressOrderLeft[0]+","+pressOrderLeft[1]+","+pressOrderLeft[2]+","+pressOrderLeft[3]+","+pressOrderLeft[4]+","+peak1_0+","+peakTime1_0/1000000000+","+peak1_1+","+peakTime1_1/1000000000+","+peak1_2+","+peakTime1_2/1000000000+","+peak1_3+","+peakTime1_3/1000000000+","+peak1_4+","+peakTime1_4/1000000000+","+timeIntervalLeft0_1/1000000000+","+timeIntervalLeft1_2/1000000000+","+timeIntervalLeft2_3/1000000000+","+timeIntervalLeft3_4/1000000000+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+",");
+        //outputPressOrder.println((System.nanoTime() - startTime)/1000000000+","+diffTime/1000000000*runningSpeed*1000*100/3600+","+(diffLandingTimeLeft - diffGroundTimeLeft)/1000000000+","+pressOrderLeft[0]+","+pressOrderLeft[1]+","+pressOrderLeft[2]+","+pressOrderLeft[3]+","+pressOrderLeft[4]+","+peak1_0+","+peakTime1_0/1000000000+","+peak1_1+","+peakTime1_1/1000000000+","+peak1_2+","+peakTime1_2/1000000000+","+peak1_3+","+peakTime1_3/1000000000+","+peak1_4+","+peakTime1_4/1000000000+","+timeIntervalLeft0_1/1000000000+","+timeIntervalLeft1_2/1000000000+","+timeIntervalLeft2_3/1000000000+","+timeIntervalLeft3_4/1000000000+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+",");
       }
 
       // 比較アルゴリズム
@@ -471,7 +530,11 @@ void draw() {
       landingTimeLeft = 0;
     }
   }
-
+  //image(landingPoint20, 535, 180, 60, 60);
+  //image(landingPoint20, 720, 260, 40, 40);
+  //image(landingPoint20, 535, 300, 60, 60);
+  //image(landingPoint20, 695, 340, 60, 60);
+  //image(landingPoint20, 615, 640, 70, 70);
   // Right
   if (myPort2.available()>0) {
     if (sensorValueRight0 <= 1000) {
@@ -494,31 +557,35 @@ void draw() {
           diffGroundTimeRight = groundTimeRight - startTime;
           diffTime = diffGroundTimeRight - diffGroundTimeLeft;
           println("DiffTimeRight="+diffTime/1000000000);
-          fill(255,255,255);
+          fill(255, 255, 255);
           rect(325, 0, 150, 800);
           double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
           fill(100, 100, 255);
           rect(325, 800 - (float)stride * 8, 150, (float)stride * 8);
-          println("Stride="+nf((float)stride,3,3)+"cm");
+          fill(255);
+          //println("Stride="+nf((float)stride, 3, 3)+"cm");
         }
       }
       if (isDrawRight0) {
       } else {
         if (pressOrderRight[0] == 1) {
           isDrawRight0 = true;
-          image(landingPoint20, 535, 180, 60, 60);
+          image(landingPoint100, 535, 180, 60, 60);
         } else if (pressOrderRight[0] == 2) {
           isDrawRight0 = true;
-          image(landingPoint40, 535, 180, 60, 60);
+          image(landingPoint100, 535, 180, 60, 60);
         } else if (pressOrderRight[0] == 3) {
           isDrawRight0 = true;
-          image(landingPoint60, 535, 180, 60, 60);
+          image(landingPoint100, 535, 180, 60, 60);
         } else if (pressOrderRight[0] == 4) {
           isDrawRight0 = true;
-          image(landingPoint80, 535, 180, 60, 60);
+          image(landingPoint100, 535, 180, 60, 60);
         } else if (pressOrderRight[0] == 5) {
           isDrawRight0 = true;
-          image(landingPoint100, 535, 180, 60, 60);
+          //image(landingPoint100, 535, 180, 60, 60);
+          noStroke();
+          fill(255);
+          ellipse(565, 210, 60, 60);
         }
       }
     } else {
@@ -545,38 +612,42 @@ void draw() {
           diffGroundTimeRight = groundTimeRight - startTime;
           diffTime = diffGroundTimeRight - diffGroundTimeLeft;
           println("DiffTimeRight="+diffTime/1000000000);
-          fill(255,255,255);
+          fill(255, 255, 255);
           rect(325, 0, 150, 800);
           double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
           fill(100, 100, 255);
           rect(325, (float)stride, 150, 800 - (float)stride);
-          println("Stride="+nf((float)stride,3,3)+"cm");
+          fill(255);
+          //println("Stride="+nf((float)stride, 3, 3)+"cm");
         }
       }
       if (isDrawRight1) {
       } else {
         if (pressOrderRight[1] == 1) {
           isDrawRight1 = true;
-          image(landingPoint20, 725, 270, 30, 30);
+          image(landingPoint100, 720, 260, 40, 40);
         } else if (pressOrderRight[1] == 2) {
           isDrawRight1 = true;
-          image(landingPoint40, 725, 270, 30, 30);
+          image(landingPoint100, 720, 260, 40, 40);
         } else if (pressOrderRight[1] == 3) {
           isDrawRight1 = true;
-          image(landingPoint60, 725, 270, 30, 30);
+          image(landingPoint100, 720, 260, 40, 40);
         } else if (pressOrderRight[1] == 4) {
           isDrawRight1 = true;
-          image(landingPoint80, 725, 270, 30, 30);
+          //image(landingPoint80, 725, 260, 40, 40);
+          noStroke();
+          fill(255);
+          ellipse(565, 210, 60, 60);
         } else if (pressOrderRight[1] == 5) {
           isDrawRight1 = true;
-          image(landingPoint100, 725, 270, 30, 30);
+          image(landingPoint100, 720, 260, 40, 40);
         }
       }
     } else {
       isLandingPoint2_1 = false;
     }
 
-    if (sensorValueRight2 <= 1000) {
+    if (sensorValueRight2 <= 1010) {
       isLandingPoint2_2 = true;
       sensorReactedTimeRight[2] = System.nanoTime() - startTime;
       if (pressOrderRight[2] == 0) {
@@ -596,28 +667,32 @@ void draw() {
           diffGroundTimeRight = groundTimeRight - startTime;
           diffTime = diffGroundTimeRight - diffGroundTimeLeft;
           println("DiffTimeRight="+diffTime/1000000000);
-          fill(255,255,255);
+          fill(255, 255, 255);
           rect(325, 0, 150, 800);
           double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
           fill(100, 100, 255);
           rect(325, (float)stride, 150, 800 - (float)stride);
-          println("Stride="+nf((float)stride,3,3)+"cm");
+          fill(255);
+          //println("Stride="+nf((float)stride, 3, 3)+"cm");
         }
       }
       if (isDrawRight2) {
       } else {
         if (pressOrderRight[2] == 1) {
           isDrawRight2 = true;
-          image(landingPoint20, 535, 300, 60, 60);
+          image(landingPoint100, 535, 300, 60, 60);
         } else if (pressOrderRight[2] == 2) {
           isDrawRight2 = true;
-          image(landingPoint40, 535, 300, 60, 60);
+          image(landingPoint100, 535, 300, 60, 60);
         } else if (pressOrderRight[2] == 3) {
           isDrawRight2 = true;
-          image(landingPoint60, 535, 300, 60, 60);
+          //image(landingPoint60, 535, 300, 60, 60);
+          noStroke();
+          fill(255);
+          ellipse(565, 330, 60, 60);
         } else if (pressOrderRight[2] == 4) {
           isDrawRight2 = true;
-          image(landingPoint80, 535, 300, 60, 60);
+          image(landingPoint100, 535, 300, 60, 60);
         } else if (pressOrderRight[2] == 5) {
           isDrawRight2 = true;
           image(landingPoint100, 535, 300, 60, 60);
@@ -648,28 +723,32 @@ void draw() {
           diffTime = diffGroundTimeRight - diffGroundTimeLeft;
           //println("DiffTimeRight="+diffTimeRight/1000000000);
           println("DiffTimeRight="+diffTime/1000000000);
-          fill(255,255,255);
+          fill(255, 255, 255);
           rect(325, 0, 150, 800);
           double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
           fill(100, 100, 255);
           rect(325, (float)stride, 150, 800 - (float)stride);
-          println("Stride="+nf((float)stride,3,3)+"cm");
+          fill(255);
+          //println("Stride="+nf((float)stride, 3, 3)+"cm");
         }
       }
       if (isDrawRight3) {
       } else {
         if (pressOrderRight[3] == 1) {
           isDrawRight3 = true;
-          image(landingPoint20, 695, 340, 60, 60);
+          image(landingPoint100, 695, 340, 60, 60);
         } else if (pressOrderRight[3] == 2) {
           isDrawRight3 = true;
-          image(landingPoint40, 695, 340, 60, 60);
+          //image(landingPoint40, 695, 340, 60, 60);
+          noStroke();
+          fill(255);
+          ellipse(565, 330, 60, 60);
         } else if (pressOrderRight[3] == 3) {
           isDrawRight3 = true;
-          image(landingPoint60, 695, 340, 60, 60);
+          image(landingPoint100, 695, 340, 60, 60);
         } else if (pressOrderRight[3] == 4) {
           isDrawRight3 = true;
-          image(landingPoint80, 695, 340, 60, 60);
+          image(landingPoint100, 695, 340, 60, 60);
         } else if (pressOrderRight[3] == 5) {
           isDrawRight3 = true;
           image(landingPoint100, 695, 340, 60, 60);
@@ -700,28 +779,32 @@ void draw() {
           diffTime = diffGroundTimeRight - diffGroundTimeLeft;
           //println("DiffTimeRight="+diffTimeRight/1000000000);
           println("DiffTimeRight="+diffTime/1000000000);
-          fill(255,255,255);
+          fill(255, 255, 255);
           rect(325, 0, 150, 800);
           double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
           fill(100, 100, 255);
           rect(325, (float)stride, 150, 800 - (float)stride);
-          println("Stride="+nf((float)stride,3,3)+"cm");
+          fill(255);
+          //println("Stride="+nf((float)stride, 3, 3)+"cm");
         }
       }
       if (isDrawRight4) {
       } else {
         if (pressOrderRight[4] == 1) {
           isDrawRight4 = true;
-          image(landingPoint20, 615, 640, 70, 70);
+          //image(landingPoint20, 615, 640, 70, 70);
+          noStroke();
+          fill(255);
+          ellipse(650, 675, 70, 70);
         } else if (pressOrderRight[4] == 2) {
           isDrawRight4 = true;
-          image(landingPoint40, 615, 640, 70, 70);
+          image(landingPoint100, 615, 640, 70, 70);
         } else if (pressOrderRight[4] == 3) {
           isDrawRight4 = true;
-          image(landingPoint60, 615, 640, 70, 70);
+          image(landingPoint100, 615, 640, 70, 70);
         } else if (pressOrderRight[4] == 4) {
           isDrawRight4 = true;
-          image(landingPoint80, 615, 640, 70, 70);
+          image(landingPoint100, 615, 640, 70, 70);
         } else if (pressOrderRight[4] == 5) {
           isDrawRight4 = true;
           image(landingPoint100, 615, 640, 70, 70);
@@ -734,11 +817,23 @@ void draw() {
     if (!isLandingPoint2_0 && !isLandingPoint2_1 && !isLandingPoint2_2 && !isLandingPoint2_3 && !isLandingPoint2_4) {
       if (pressOrderRight[0] == 0 && pressOrderRight[1] == 0 && pressOrderRight[2] == 0 && pressOrderRight[3] == 0 && pressOrderRight[4] == 0) {
       } else {
-        image(landingPointWhite, 535, 180, 60, 60);
-        image(landingPointWhite, 725, 270, 30, 30);
-        image(landingPointWhite, 535, 300, 60, 60);
-        image(landingPointWhite, 695, 340, 60, 60);
-        image(landingPointWhite, 615, 640, 70, 70);
+        //image(landingPointWhite, 535, 180, 60, 60);
+        //image(landingPointWhite, 725, 270, 30, 30);
+        //image(landingPointWhite, 535, 300, 60, 60);
+        //image(landingPointWhite, 695, 340, 60, 60);
+        //image(landingPointWhite, 615, 640, 70, 70);
+        ellipse(565, 210, 60, 60);
+        ellipse(740, 280, 40, 40);
+        ellipse(565, 330, 60, 60);
+        ellipse(725, 370, 60, 60);
+        ellipse(650, 675, 70, 70);
+        textSize(50);
+        fill(0);
+        text("1", 633, 695);
+        text("2", 710, 390);
+        text("3", 550, 350);
+        text("4", 725, 297);
+        text("5", 550, 225);
         isDrawRight0 = false;
         isDrawRight1 = false;
         isDrawRight2 = false;
@@ -765,7 +860,7 @@ void draw() {
             timeIntervalRight3_4 = sensorReactedTimeRight[i] - evacuateRight4;
           }
         }
-        outputPressOrder.println(","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+(System.nanoTime() - startTime)/1000000000+","+diffTime/1000000000*runningSpeed*1000*100/3600+","+((landingTimeRight - startTime) - (groundTimeRight - startTime))/1000000000+","+pressOrderRight[0]+","+pressOrderRight[1]+","+pressOrderRight[2]+","+pressOrderRight[3]+","+pressOrderRight[4]+","+peak2_0+","+peakTime2_0/1000000000+","+peak2_1+","+peakTime2_1/1000000000+","+peak2_2+","+peakTime2_2/1000000000+","+peak2_3+","+peakTime2_3/1000000000+","+peak2_4+","+peakTime2_4/1000000000+","+timeIntervalRight0_1/1000000000+","+timeIntervalRight1_2/1000000000+","+timeIntervalRight2_3/1000000000+","+timeIntervalRight3_4/1000000000);
+        //outputPressOrder.println(","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+(System.nanoTime() - startTime)/1000000000+","+diffTime/1000000000*runningSpeed*1000*100/3600+","+((landingTimeRight - startTime) - (groundTimeRight - startTime))/1000000000+","+pressOrderRight[0]+","+pressOrderRight[1]+","+pressOrderRight[2]+","+pressOrderRight[3]+","+pressOrderRight[4]+","+peak2_0+","+peakTime2_0/1000000000+","+peak2_1+","+peakTime2_1/1000000000+","+peak2_2+","+peakTime2_2/1000000000+","+peak2_3+","+peakTime2_3/1000000000+","+peak2_4+","+peakTime2_4/1000000000+","+timeIntervalRight0_1/1000000000+","+timeIntervalRight1_2/1000000000+","+timeIntervalRight2_3/1000000000+","+timeIntervalRight3_4/1000000000);
         // 比較アルゴリズム
         // 着地順
         if (pressOrderRight[3] == 1) {
@@ -877,31 +972,30 @@ void serialEvent(Serial port) {
       }
     }
   }
-  if ((System.nanoTime() - startTime)/1000000000 >= 0 && (System.nanoTime() - startTime)/1000000000 < 550) {
-    if (sensorValueLeft0 > 0 && sensorValueLeft1 > 0 && sensorValueLeft2 > 0 && sensorValueLeft3 > 0 && sensorValueLeft4 > 0 && sensorValueRight0 > 0 && sensorValueRight1 > 0 && sensorValueRight2 > 0 && sensorValueRight3 > 0 && sensorValueRight4 > 0) {
-      output.println((System.nanoTime() - startTime)/1000000000+","+sensorValueLeft0+","+","+sensorValueLeft1+","+","+sensorValueLeft2+","+","+sensorValueLeft3+","+","+sensorValueLeft4+","+","+(System.nanoTime() - startTime)/1000000000+","+sensorValueRight0+","+","+sensorValueRight1+","+","+sensorValueRight2+","+","+sensorValueRight3+","+","+sensorValueRight4);
-    }
-    
-  } else if ((System.nanoTime() - startTime)/1000000000 >= 550 && (System.nanoTime() - startTime)/1000000000 < 1100) {
-    output.flush();
-    output.close();
-    if (sensorValueLeft0 > 0 && sensorValueLeft1 > 0 && sensorValueLeft2 > 0 && sensorValueLeft3 > 0 && sensorValueLeft4 > 0 && sensorValueRight0 > 0 && sensorValueRight1 > 0 && sensorValueRight2 > 0 && sensorValueRight3 > 0 && sensorValueRight4 > 0) {
-      output2.println((System.nanoTime() - startTime)/1000000000+","+sensorValueLeft0+","+","+sensorValueLeft1+","+","+sensorValueLeft2+","+","+sensorValueLeft3+","+","+sensorValueLeft4+","+","+(System.nanoTime() - startTime)/1000000000+","+sensorValueRight0+","+","+sensorValueRight1+","+","+sensorValueRight2+","+","+sensorValueRight3+","+","+sensorValueRight4);
-    }
-  } else if ((System.nanoTime() - startTime)/1000000000 >= 1100 && (System.nanoTime() - startTime)/1000000000 < 1650) {
-    output2.flush();
-    output2.close();
-    if (sensorValueLeft0 > 0 && sensorValueLeft1 > 0 && sensorValueLeft2 > 0 && sensorValueLeft3 > 0 && sensorValueLeft4 > 0 && sensorValueRight0 > 0 && sensorValueRight1 > 0 && sensorValueRight2 > 0 && sensorValueRight3 > 0 && sensorValueRight4 > 0) {
-      output3.println((System.nanoTime() - startTime)/1000000000+","+sensorValueLeft0+","+","+sensorValueLeft1+","+","+sensorValueLeft2+","+","+sensorValueLeft3+","+","+sensorValueLeft4+","+","+(System.nanoTime() - startTime)/1000000000+","+sensorValueRight0+","+","+sensorValueRight1+","+","+sensorValueRight2+","+","+sensorValueRight3+","+","+sensorValueRight4);
-    }
-  } else {
-    output3.flush();
-    output3.close();
-    if (sensorValueLeft0 > 0 && sensorValueLeft1 > 0 && sensorValueLeft2 > 0 && sensorValueLeft3 > 0 && sensorValueLeft4 > 0 && sensorValueRight0 > 0 && sensorValueRight1 > 0 && sensorValueRight2 > 0 && sensorValueRight3 > 0 && sensorValueRight4 > 0) {
-      output4.println((System.nanoTime() - startTime)/1000000000+","+sensorValueLeft0+","+","+sensorValueLeft1+","+","+sensorValueLeft2+","+","+sensorValueLeft3+","+","+sensorValueLeft4+","+","+(System.nanoTime() - startTime)/1000000000+","+sensorValueRight0+","+","+sensorValueRight1+","+","+sensorValueRight2+","+","+sensorValueRight3+","+","+sensorValueRight4);
-    }
-  }
-  
-  println("time1="+nf((float)(System.nanoTime() - startTime)/1000000000,3,3)+"inByte1_0="+sensorValueLeft0+", inByte1_1="+sensorValueLeft1+", inByte1_2="+sensorValueLeft2+", inByte1_3="+sensorValueLeft3+", inByte1_4="+sensorValueLeft4);
-  println("time2="+nf((float)(System.nanoTime() - startTime)/1000000000,3,3)+"inByte2_0="+sensorValueRight0+", inByte2_1="+sensorValueRight1+", inByte2_2="+sensorValueRight2+", inByte2_3="+sensorValueRight3+", inByte2_4="+sensorValueRight4);
+  //if ((System.nanoTime() - startTime)/1000000000 >= 0 && (System.nanoTime() - startTime)/1000000000 < 550) {
+  //  if (sensorValueLeft0 > 0 && sensorValueLeft1 > 0 && sensorValueLeft2 > 0 && sensorValueLeft3 > 0 && sensorValueLeft4 > 0 && sensorValueRight0 > 0 && sensorValueRight1 > 0 && sensorValueRight2 > 0 && sensorValueRight3 > 0 && sensorValueRight4 > 0) {
+  //    output.println((System.nanoTime() - startTime)/1000000000+","+sensorValueLeft0+","+","+sensorValueLeft1+","+","+sensorValueLeft2+","+","+sensorValueLeft3+","+","+sensorValueLeft4+","+","+(System.nanoTime() - startTime)/1000000000+","+sensorValueRight0+","+","+sensorValueRight1+","+","+sensorValueRight2+","+","+sensorValueRight3+","+","+sensorValueRight4);
+  //  }
+  //} else if ((System.nanoTime() - startTime)/1000000000 >= 550 && (System.nanoTime() - startTime)/1000000000 < 1100) {
+  //  output.flush();
+  //  output.close();
+  //  if (sensorValueLeft0 > 0 && sensorValueLeft1 > 0 && sensorValueLeft2 > 0 && sensorValueLeft3 > 0 && sensorValueLeft4 > 0 && sensorValueRight0 > 0 && sensorValueRight1 > 0 && sensorValueRight2 > 0 && sensorValueRight3 > 0 && sensorValueRight4 > 0) {
+  //    output2.println((System.nanoTime() - startTime)/1000000000+","+sensorValueLeft0+","+","+sensorValueLeft1+","+","+sensorValueLeft2+","+","+sensorValueLeft3+","+","+sensorValueLeft4+","+","+(System.nanoTime() - startTime)/1000000000+","+sensorValueRight0+","+","+sensorValueRight1+","+","+sensorValueRight2+","+","+sensorValueRight3+","+","+sensorValueRight4);
+  //  }
+  //} else if ((System.nanoTime() - startTime)/1000000000 >= 1100 && (System.nanoTime() - startTime)/1000000000 < 1650) {
+  //  output2.flush();
+  //  output2.close();
+  //  if (sensorValueLeft0 > 0 && sensorValueLeft1 > 0 && sensorValueLeft2 > 0 && sensorValueLeft3 > 0 && sensorValueLeft4 > 0 && sensorValueRight0 > 0 && sensorValueRight1 > 0 && sensorValueRight2 > 0 && sensorValueRight3 > 0 && sensorValueRight4 > 0) {
+  //    output3.println((System.nanoTime() - startTime)/1000000000+","+sensorValueLeft0+","+","+sensorValueLeft1+","+","+sensorValueLeft2+","+","+sensorValueLeft3+","+","+sensorValueLeft4+","+","+(System.nanoTime() - startTime)/1000000000+","+sensorValueRight0+","+","+sensorValueRight1+","+","+sensorValueRight2+","+","+sensorValueRight3+","+","+sensorValueRight4);
+  //  }
+  //} else {
+  //  output3.flush();
+  //  output3.close();
+  //  if (sensorValueLeft0 > 0 && sensorValueLeft1 > 0 && sensorValueLeft2 > 0 && sensorValueLeft3 > 0 && sensorValueLeft4 > 0 && sensorValueRight0 > 0 && sensorValueRight1 > 0 && sensorValueRight2 > 0 && sensorValueRight3 > 0 && sensorValueRight4 > 0) {
+  //    output4.println((System.nanoTime() - startTime)/1000000000+","+sensorValueLeft0+","+","+sensorValueLeft1+","+","+sensorValueLeft2+","+","+sensorValueLeft3+","+","+sensorValueLeft4+","+","+(System.nanoTime() - startTime)/1000000000+","+sensorValueRight0+","+","+sensorValueRight1+","+","+sensorValueRight2+","+","+sensorValueRight3+","+","+sensorValueRight4);
+  //  }
+  //}
+
+  println("time1="+nf((float)(System.nanoTime() - startTime)/1000000000, 3, 3)+"inByte1_0="+sensorValueLeft0+", inByte1_1="+sensorValueLeft1+", inByte1_2="+sensorValueLeft2+", inByte1_3="+sensorValueLeft3+", inByte1_4="+sensorValueLeft4);
+  println("time2="+nf((float)(System.nanoTime() - startTime)/1000000000, 3, 3)+"inByte2_0="+sensorValueRight0+", inByte2_1="+sensorValueRight1+", inByte2_2="+sensorValueRight2+", inByte2_3="+sensorValueRight3+", inByte2_4="+sensorValueRight4);
 }
