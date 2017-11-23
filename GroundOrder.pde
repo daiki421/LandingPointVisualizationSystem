@@ -24,11 +24,7 @@ int pressOrderLeft[] = {0, 0, 0, 0, 0}, pressOrderRight[] = {0, 0, 0, 0, 0}; // 
 int orderLeft = 1, orderRight = 1; // 着地点の順番
 double startTime = 0;
 double diffGroundTimeLeft = 0, diffLandingTimeLeft = 0, diffGroundTimeRight = 0, diffLandingTimeRight = 0;
-// 正誤判定用変数
-int crrectPressOrderRight = 0, crrectPressOrderLeft = 0;
-int crrectPeak1_0 = 0, crrectPeak1_1 = 0, crrectPeak1_2 = 0, crrectPeak1_3 = 0, crrectPeak1_4 = 0, crrectPeak2_0 = 0, crrectPeak2_1 = 0, crrectPeak2_2 = 0, crrectPeak2_3 = 0, crrectPeak2_4 = 0;
-int correctStride = 0;
-int correctContactTimeLeft = 0, correctContactTimeRight = 0;
+
 
 void setup() {
   startTime = System.nanoTime();
