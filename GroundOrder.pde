@@ -26,7 +26,9 @@ double startTime = 0;
 double diffGroundTimeLeft = 0, diffLandingTimeLeft = 0, diffGroundTimeRight = 0, diffLandingTimeRight = 0;
 float x1, y1;
 float x2, y2;
+
 int count = 4;
+boolean isLeft = true;
 
 void setup() {
   startTime = System.nanoTime();
@@ -113,41 +115,6 @@ void setup() {
   text("4", 725, 297);
   text("5", 550, 225);
   fill(255);
-  // 左足矢印
-  //putArrow(true, 4, 2); // かかと-親指下
-  //drawArrow(145, 670, 70, 385); // かかと-小指下
-  //drawArrow(145, 670, 60, 285); // かかと-小指
-  //drawArrow(145, 670, 230, 220); // かかと-親指
-  //drawArrow(70, 385, 230, 335); // 小指下-親指下
-  //drawArrow(70, 385, 60, 285); // 小指下-小指
-  //drawArrow(70, 385, 230, 220); // 小指下-親指
-  //drawArrow(230, 335, 70, 385); // 親指下-小指下
-  //drawArrow(230, 335, 60, 285); // 親指下-小指
-  //drawArrow(230, 335, 230, 220); // 親指下-親指
-  //drawArrow(60, 285, 70, 385); // 小指-小指下
-  //drawArrow(60, 285, 230, 335); // 小指-親指下
-  //drawArrow(60, 285, 230, 220); // 小指-親指
-  //drawArrow(230, 220, 70, 385); // 親指-小指下
-  //drawArrow(230, 220, 230, 335); // 親指-親指下
-  //drawArrow(230, 220, 60, 285); // 親指-小指
-  // 右足矢印
-  //drawArrow(650, 675, 565, 335); // かかと-親指下
-  //drawArrow(650, 675, 720, 385); // かかと-小指下
-  //drawArrow(650, 675, 565, 220); // かかと-親指
-  //drawArrow(650, 675, 730, 285); // かかと-小指
-  //drawArrow(720, 385, 650, 675); // 小指下-かかと
-  //drawArrow(720, 385, 565, 335); // 小指下-親指下
-  //drawArrow(720, 385, 565, 220); // 小指下-親指
-  //drawArrow(720, 385, 730, 285); // 小指下-小指
-  //drawArrow(565, 335, 720, 385); // 親指下-小指下
-  //drawArrow(565, 335, 730, 285); // 親指下-小指
-  //drawArrow(565, 335, 565, 220); // 親指下-親指
-  //drawArrow(730, 285, 720, 385); // 小指-小指下
-  //drawArrow(730, 285, 565, 335); // 小指-親指下
-  //drawArrow(730, 285, 565, 220); // 小指-親指
-  //drawArrow(565, 220, 720, 385); // 親指-小指下
-  //drawArrow(565, 220, 565, 335); // 親指-親指下
-  //drawArrow(565, 220, 730, 285); // 親指-小指
 }
 
 void draw() {
@@ -173,7 +140,7 @@ void draw() {
     }
   }
   delay(300);
-  putArrow(true, count, count - 1);
+  putArrow(isLeft, count, count - 1);
   if (count == 0) {
     count = 5;
     image(left_foot, 25, 150, 250, 600);
@@ -193,6 +160,25 @@ void draw() {
     text("5", 215, 225);
   }
   count--;
+  
+  fill(255);
+  strokeWeight(1);
+  rect(325, 0, 150, 800);
+  
+  float rand = random(0, 800);
+  if (rand >= 102.3610404*4 && rand <= 123.0209434*4) {
+    fill(255, 0, 0);
+  } else if (rand >= 86.30914736*4 && rand <= 97.18452892*4) {
+    fill(0, 255, 0);
+  } else {
+    fill(100,100,255);
+  }
+  strokeWeight(1);
+  rect(325, 800 - rand, 150, rand);
+  line(315, 800 - 200, 485, 800 - 200);
+  line(315, 800 - 400, 485, 800 - 400);
+  line(315, 800 - 600, 485, 800 - 600);
+  
   
   // Left
   // 親指
@@ -1078,6 +1064,5 @@ void putArrow(boolean isLeft, int end, int tip) {
       y2 = 670;
     }
   }
-  //println(x1+","+y1+","+x2+","+y2);
   drawArrow(x1, y1, x2, y2);
 }
