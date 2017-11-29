@@ -551,314 +551,364 @@ void draw() {
 
   // Right
   // 親指
-  //if (myPort2.available()>0) {
-  //  if (sensorValueRight0 <= 1010) {
-  //    isLandingPoint2_0 = true;
-  //    if (pressOrderRight[0] == 0) {
-  //      sensorReactedTimeRight[0] = System.nanoTime() - startTime;
-  //      pressOrderRight[0] = orderRight;
-  //      orderRight++;
-  //    }
-  //    if (sensorValueRight0 <= peak2_0) {
-  //      peak2_0 = sensorValueRight0;
-  //      peakTime2_0 = (System.nanoTime() - startTime) - sensorReactedTimeRight[0];
-  //    } else if (sensorValueRight0 > peak2_0) {
-  //    }
-  //    if (isLandingPoint2_1 || isLandingPoint2_2 || isLandingPoint2_3 || isLandingPoint2_4) {
-  //      for (int i = 0; i < 5; i++) {
-  //        if (pressOrderRight[i] == orderRight - 1) {
-  //          image(right_foot, 520, 150, 250, 600);
-  //          noFill();
-  //          strokeWeight(1);
-  //          ellipse(565, 210, 60, 60);
-  //          ellipse(740, 280, 40, 40);
-  //          ellipse(565, 330, 60, 60);
-  //          ellipse(725, 370, 60, 60);
-  //          ellipse(650, 675, 70, 70);
-  //          textSize(50);
-  //          fill(0);
-  //          text("1", 633, 695);
-  //          text("2", 710, 390);
-  //          text("3", 550, 350);
-  //          text("4", 725, 297);
-  //          text("5", 550, 225);
-  //          putArrow(false, 0, i);
-  //        }
-  //      }
-  //    } else {
-  //      if (groundTimeRight != 0) {
-  //      } else {
-  //        groundTimeRight = sensorReactedTimeRight[0];
-  //        diffGroundTimeRight = sensorReactedTimeRight[0];
-  //        diffTime = diffGroundTimeRight - diffGroundTimeLeft;
-  //        fill(255, 255, 255);
-  //        rect(325, 0, 150, 800);
-  //        double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
-  //        fill(100, 100, 255);
-  //        rect(325, 800 - (float)stride*4, 150, (float)stride*4);
-  //        fill(255);
-  //        //println("Stride="+nf((float)stride, 3, 3)+"cm");
-  //      }
-  //    }
-  //  } else {
-  //    isLandingPoint2_0 = false;
-  //  }
-  //  // 小指
-  //  if (sensorValueRight1 <= 1010) {
-  //    isLandingPoint2_1 = true;
-  //    if (pressOrderRight[1] == 0) {
-  //      sensorReactedTimeRight[1] = System.nanoTime() - startTime;
-  //      pressOrderRight[1] = orderRight;
-  //      orderRight++;
-  //    }
-  //    if (sensorValueRight1 <= peak2_1) {
-  //      peak2_1 = sensorValueRight1;
-  //      peakTime2_1 = (System.nanoTime() - startTime) - sensorReactedTimeRight[1];
-  //    } else if (sensorValueRight1 > peak2_1) {
-  //    }
-  //    if (isLandingPoint2_0 || isLandingPoint2_2 || isLandingPoint2_3 || isLandingPoint2_4) {
-  //      for (int i = 0; i < 5; i++) {
-  //        if (pressOrderRight[i] == orderRight - 1) {
-  //          image(right_foot, 520, 150, 250, 600);
-  //          noFill();
-  //          strokeWeight(1);
-  //          ellipse(565, 210, 60, 60);
-  //          ellipse(740, 280, 40, 40);
-  //          ellipse(565, 330, 60, 60);
-  //          ellipse(725, 370, 60, 60);
-  //          ellipse(650, 675, 70, 70);
-  //          textSize(50);
-  //          fill(0);
-  //          text("1", 633, 695);
-  //          text("2", 710, 390);
-  //          text("3", 550, 350);
-  //          text("4", 725, 297);
-  //          text("5", 550, 225);
-  //          putArrow(false, 1, i);
-  //        }
-  //      }
-  //    } else {
-  //      if (groundTimeRight != 0) {
-  //      } else {
-  //        groundTimeRight = sensorReactedTimeRight[1];
-  //        diffGroundTimeRight = sensorReactedTimeRight[1];
-  //        diffTime = diffGroundTimeRight - diffGroundTimeLeft;
-  //        fill(255, 255, 255);
-  //        rect(325, 0, 150, 800);
-  //        double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
-  //        fill(100, 100, 255);
-  //        rect(325, 800 - (float)stride*4, 150, (float)stride*4);
-  //        fill(255);
-  //        //println("Stride="+nf((float)stride, 3, 3)+"cm");
-  //      }
-  //    }
-  //  } else {
-  //    isLandingPoint2_1 = false;
-  //  }
-  //  // 親指下
-  //  if (sensorValueRight2 <= 1010) {
-  //    isLandingPoint2_2 = true;
-  //    if (pressOrderRight[2] == 0) {
-  //      sensorReactedTimeRight[2] = System.nanoTime() - startTime;
-  //      pressOrderRight[2] = orderRight;
-  //      orderRight++;
-  //    }
-  //    if (sensorValueRight2 <= peak2_2) {
-  //      peak2_2 = sensorValueRight2;
-  //      peakTime2_2 = (System.nanoTime() - startTime) - sensorReactedTimeRight[2];
-  //    } else if (sensorValueRight2 > peak2_2) {
-  //    }
-  //    if (isLandingPoint2_0 || isLandingPoint2_1 || isLandingPoint2_3 || isLandingPoint2_4) {
-  //      for (int i = 0; i < 5; i++) {
-  //        if (pressOrderRight[i] == orderRight - 1) {
-  //          image(right_foot, 520, 150, 250, 600);
-  //          noFill();
-  //          strokeWeight(1);
-  //          ellipse(565, 210, 60, 60);
-  //          ellipse(740, 280, 40, 40);
-  //          ellipse(565, 330, 60, 60);
-  //          ellipse(725, 370, 60, 60);
-  //          ellipse(650, 675, 70, 70);
-  //          textSize(50);
-  //          fill(0);
-  //          text("1", 633, 695);
-  //          text("2", 710, 390);
-  //          text("3", 550, 350);
-  //          text("4", 725, 297);
-  //          text("5", 550, 225);
-  //          putArrow(false, 2, i);
-  //        }
-  //      }
-  //    } else {
-  //      if (groundTimeRight != 0) {
-  //      } else {
-  //        groundTimeRight = sensorReactedTimeRight[2];
-  //        diffGroundTimeRight = sensorReactedTimeRight[2];
-  //        diffTime = diffGroundTimeRight - diffGroundTimeLeft;
-  //        fill(255, 255, 255);
-  //        rect(325, 0, 150, 800);
-  //        double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
-  //        fill(100, 100, 255);
-  //        rect(325, 800 - (float)stride*4, 150, (float)stride*4);
-  //        fill(255);
-  //        //println("Stride="+nf((float)stride, 3, 3)+"cm");
-  //      }
-  //    }
-  //  } else {
-  //    isLandingPoint2_2 = false;
-  //  }
-  //  // 小指下
-  //  if (sensorValueRight3 <= 1010) { // システム1：900, システム2：1000
-  //    isLandingPoint2_3 = true;
-  //    if (pressOrderRight[3] == 0) {
-  //      sensorReactedTimeRight[3] = System.nanoTime() - startTime;
-  //      pressOrderRight[3] = orderRight;
-  //      orderRight++;
-  //    }
-  //    if (sensorValueRight3 <= peak2_3) {
-  //      peak2_3 = sensorValueRight3;
-  //      peakTime2_3 = (System.nanoTime() - startTime) - sensorReactedTimeRight[3];
-  //    } else if (sensorValueRight3 > peak2_3) {
-  //    }
-  //    if (isLandingPoint2_0 || isLandingPoint2_1 || isLandingPoint2_2 || isLandingPoint2_4) {
-  //      for (int i = 0; i < 5; i++) {
-  //        if (pressOrderRight[i] == orderRight - 1) {
-  //          image(right_foot, 520, 150, 250, 600);
-  //          noFill();
-  //          strokeWeight(1);
-  //          ellipse(565, 210, 60, 60);
-  //          ellipse(740, 280, 40, 40);
-  //          ellipse(565, 330, 60, 60);
-  //          ellipse(725, 370, 60, 60);
-  //          ellipse(650, 675, 70, 70);
-  //          textSize(50);
-  //          fill(0);
-  //          text("1", 633, 695);
-  //          text("2", 710, 390);
-  //          text("3", 550, 350);
-  //          text("4", 725, 297);
-  //          text("5", 550, 225);
-  //          putArrow(false, 3, i);
-  //        }
-  //      }
-  //    } else {
-  //      if (groundTimeRight != 0) {
-  //      } else {
-  //        groundTimeRight = sensorReactedTimeRight[3];
-  //        diffGroundTimeRight = sensorReactedTimeRight[3];
-  //        diffTime = diffGroundTimeRight - diffGroundTimeLeft;
-  //        fill(255, 255, 255);
-  //        rect(325, 0, 150, 800);
-  //        double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
-  //        fill(100, 100, 255);
-  //        rect(325, 800 - (float)stride*4, 150, (float)stride*4);
-  //        fill(255);
-  //        //println("Stride="+nf((float)stride, 3, 3)+"cm");
-  //      }
-  //    }
-  //  } else {
-  //    isLandingPoint2_3 = false;
-  //  }
-  //  // かかと
-  //  if (sensorValueRight4 <= 1015) { // システム1：900, システム2：1000
-  //    isLandingPoint2_4 = true;
-  //    if (pressOrderRight[4] == 0) {
-  //      sensorReactedTimeRight[4] = System.nanoTime() - startTime;
-  //      pressOrderRight[4] = orderRight;
-  //      orderRight++;
-  //    }
-  //    if (sensorValueRight4 <= peak2_4) {
-  //      peak2_4 = sensorValueRight4;
-  //      peakTime2_4 = (System.nanoTime() - startTime) - sensorReactedTimeRight[4];
-  //    } else if (sensorValueRight4 > peak2_4) {
-  //    }
-  //    if (isLandingPoint2_0 || isLandingPoint2_1 || isLandingPoint2_2 || isLandingPoint2_3) {
-  //      for (int i = 0; i < 5; i++) {
-  //        if (pressOrderRight[i] == orderRight - 1) {
-  //          image(right_foot, 520, 150, 250, 600);
-  //          noFill();
-  //          strokeWeight(1);
-  //          ellipse(565, 210, 60, 60);
-  //          ellipse(740, 280, 40, 40);
-  //          ellipse(565, 330, 60, 60);
-  //          ellipse(725, 370, 60, 60);
-  //          ellipse(650, 675, 70, 70);
-  //          textSize(50);
-  //          fill(0);
-  //          text("1", 633, 695);
-  //          text("2", 710, 390);
-  //          text("3", 550, 350);
-  //          text("4", 725, 297);
-  //          text("5", 550, 225);
-  //          putArrow(false, 4, i);
-  //        }
-  //      }
-  //    } else {
-  //      if (groundTimeRight != 0) {
-  //      } else {
-  //        groundTimeRight = sensorReactedTimeRight[4];
-  //        diffGroundTimeRight = sensorReactedTimeRight[4];
-  //        diffTime = diffGroundTimeRight - diffGroundTimeLeft;
-  //        fill(255, 255, 255);
-  //        rect(325, 0, 150, 800);
-  //        double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
-  //        fill(100, 100, 255);
-  //        rect(325, 800 - (float)stride*4, 150, (float)stride*4);
-  //        fill(255);
-  //        //println("Stride="+nf((float)stride, 3, 3)+"cm");
-  //      }
-  //    }
-  //  } else {
-  //    isLandingPoint2_4 = false;
-  //  }
+  if (myPort2.available()>0) {
+    if (sensorValueRight0 <= 1010) {
+      isLandingPoint2_0 = true;
+      // このセンサ以外のセンサがまだ接地していない場合
+      if (pressOrderRight[1] == 0 && pressOrderRight[2] == 0 && pressOrderRight[3] == 0 && pressOrderRight[4] == 0) {
+        image(right_foot, 520, 150, 250, 600);
+        noFill();
+        strokeWeight(1);
+        ellipse(650, 675, 75, 75);
+        ellipse(565, 210, 65, 65);
+        ellipse(740, 280, 65, 65);
+        ellipse(565, 330, 65, 65);
+        ellipse(725, 370, 65, 65);
+        textSize(50);
+        fill(0);
+        text("1", 633, 695);
+        text("2", 710, 390);
+        text("3", 550, 350);
+        text("4", 725, 297);
+        text("5", 550, 225);
+      } else if (pressOrderRight[0] != 0) {
+        // このセンサの１つ前のセンサを探す
+        if (isDrawRight0) {
+        } else {
+          for (int i = 0; i < 5; i++) {
+            if (pressOrderRight[i] == orderRight - 2) {
+              putArrow(false, i, 0);
+              isDrawRight0 = true;
+              //println("3:"+i+"-"+3);
+            }
+          }
+        }
+      }
+      if (pressOrderRight[0] == 0) {
+        sensorReactedTimeRight[0] = System.nanoTime() - startTime;
+        pressOrderRight[0] = orderRight;
+        orderRight++;
+      }
+      if (sensorValueRight0 <= peak2_0) {
+        peak2_0 = sensorValueRight0;
+        peakTime2_0 = (System.nanoTime() - startTime) - sensorReactedTimeRight[0];
+      } else if (sensorValueRight0 > peak2_0) {
+      }
+      if (isLandingPoint2_1 || isLandingPoint2_2 || isLandingPoint2_3 || isLandingPoint2_4) {
+      } else {
+        if (groundTimeRight != 0) {
+        } else {
+          groundTimeRight = sensorReactedTimeRight[0];
+          diffGroundTimeRight = sensorReactedTimeRight[0];
+          diffTime = diffGroundTimeRight - diffGroundTimeLeft;
+          fill(255, 255, 255);
+          rect(325, 0, 150, 800);
+          double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
+          fill(100, 100, 255);
+          rect(325, 800 - (float)stride*4, 150, (float)stride*4);
+          fill(255);
+          //println("Stride="+nf((float)stride, 3, 3)+"cm");
+        }
+      }
+    } else {
+      isLandingPoint2_0 = false;
+    }
+    // 小指
+    if (sensorValueRight1 <= 1010) {
+      isLandingPoint2_1 = true;
+      // このセンサ以外のセンサがまだ接地していない場合
+      if (pressOrderRight[0] == 0 && pressOrderRight[2] == 0 && pressOrderRight[3] == 0 && pressOrderRight[4] == 0) {
+        image(right_foot, 520, 150, 250, 600);
+        noFill();
+        strokeWeight(1);
+        ellipse(650, 675, 75, 75);
+        ellipse(565, 210, 65, 65);
+        ellipse(740, 280, 65, 65);
+        ellipse(565, 330, 65, 65);
+        ellipse(725, 370, 65, 65);
+        textSize(50);
+        fill(0);
+        text("1", 633, 695);
+        text("2", 710, 390);
+        text("3", 550, 350);
+        text("4", 725, 297);
+        text("5", 550, 225);
+      } else if (pressOrderRight[1] != 0) {
+        // このセンサの１つ前のセンサを探す
+        if (isDrawRight1) {
+        } else {
+          for (int i = 0; i < 5; i++) {
+            if (pressOrderRight[i] == orderRight - 2) {
+              putArrow(false, i, 1);
+              isDrawRight1 = true;
+              //println("3:"+i+"-"+3);
+            }
+          }
+        }
+      }
+      if (pressOrderRight[1] == 0) {
+        sensorReactedTimeRight[1] = System.nanoTime() - startTime;
+        pressOrderRight[1] = orderRight;
+        orderRight++;
+      }
+      if (sensorValueRight1 <= peak2_1) {
+        peak2_1 = sensorValueRight1;
+        peakTime2_1 = (System.nanoTime() - startTime) - sensorReactedTimeRight[1];
+      } else if (sensorValueRight1 > peak2_1) {
+      }
+      if (isLandingPoint2_0 || isLandingPoint2_2 || isLandingPoint2_3 || isLandingPoint2_4) {
+      } else {
+        if (groundTimeRight != 0) {
+        } else {
+          groundTimeRight = sensorReactedTimeRight[1];
+          diffGroundTimeRight = sensorReactedTimeRight[1];
+          diffTime = diffGroundTimeRight - diffGroundTimeLeft;
+          fill(255, 255, 255);
+          rect(325, 0, 150, 800);
+          double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
+          fill(100, 100, 255);
+          rect(325, 800 - (float)stride*4, 150, (float)stride*4);
+          fill(255);
+          //println("Stride="+nf((float)stride, 3, 3)+"cm");
+        }
+      }
+    } else {
+      isLandingPoint2_1 = false;
+    }
+    // 親指下
+    if (sensorValueRight2 <= 1010) {
+      isLandingPoint2_2 = true;
+      // このセンサ以外のセンサがまだ接地していない場合
+      if (pressOrderRight[0] == 0 && pressOrderRight[1] == 0 && pressOrderRight[3] == 0 && pressOrderRight[4] == 0) {
+        image(right_foot, 520, 150, 250, 600);
+        noFill();
+        strokeWeight(1);
+        ellipse(650, 675, 75, 75);
+        ellipse(565, 210, 65, 65);
+        ellipse(740, 280, 65, 65);
+        ellipse(565, 330, 65, 65);
+        ellipse(725, 370, 65, 65);
+        textSize(50);
+        fill(0);
+        text("1", 633, 695);
+        text("2", 710, 390);
+        text("3", 550, 350);
+        text("4", 725, 297);
+        text("5", 550, 225);
+      } else if (pressOrderRight[2] != 0) {
+        // このセンサの１つ前のセンサを探す
+        if (isDrawRight2) {
+        } else {
+          for (int i = 0; i < 5; i++) {
+            if (pressOrderRight[i] == orderRight - 2) {
+              putArrow(false, i, 2);
+              isDrawRight2 = true;
+              //println("3:"+i+"-"+3);
+            }
+          }
+        }
+      }
+      if (pressOrderRight[2] == 0) {
+        sensorReactedTimeRight[2] = System.nanoTime() - startTime;
+        pressOrderRight[2] = orderRight;
+        orderRight++;
+      }
+      if (sensorValueRight2 <= peak2_2) {
+        peak2_2 = sensorValueRight2;
+        peakTime2_2 = (System.nanoTime() - startTime) - sensorReactedTimeRight[2];
+      } else if (sensorValueRight2 > peak2_2) {
+      }
+      if (isLandingPoint2_0 || isLandingPoint2_1 || isLandingPoint2_3 || isLandingPoint2_4) {
+      } else {
+        if (groundTimeRight != 0) {
+        } else {
+          groundTimeRight = sensorReactedTimeRight[2];
+          diffGroundTimeRight = sensorReactedTimeRight[2];
+          diffTime = diffGroundTimeRight - diffGroundTimeLeft;
+          fill(255, 255, 255);
+          rect(325, 0, 150, 800);
+          double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
+          fill(100, 100, 255);
+          rect(325, 800 - (float)stride*4, 150, (float)stride*4);
+          fill(255);
+          //println("Stride="+nf((float)stride, 3, 3)+"cm");
+        }
+      }
+    } else {
+      isLandingPoint2_2 = false;
+    }
+    // 小指下
+    if (sensorValueRight3 <= 1010) { // システム1：900, システム2：1000
+      isLandingPoint2_3 = true;
+      // このセンサ以外のセンサがまだ接地していない場合
+      if (pressOrderRight[0] == 0 && pressOrderRight[1] == 0 && pressOrderRight[2] == 0 && pressOrderRight[4] == 0) {
+        image(right_foot, 520, 150, 250, 600);
+        noFill();
+        strokeWeight(1);
+        ellipse(650, 675, 75, 75);
+        ellipse(565, 210, 65, 65);
+        ellipse(740, 280, 65, 65);
+        ellipse(565, 330, 65, 65);
+        ellipse(725, 370, 65, 65);
+        textSize(50);
+        fill(0);
+        text("1", 633, 695);
+        text("2", 710, 390);
+        text("3", 550, 350);
+        text("4", 725, 297);
+        text("5", 550, 225);
+      } else if (pressOrderRight[3] != 0) {
+        // このセンサの１つ前のセンサを探す
+        if (isDrawRight3) {
+        } else {
+          for (int i = 0; i < 5; i++) {
+            if (pressOrderRight[i] == orderRight - 2) {
+              putArrow(false, i, 3);
+              isDrawRight3 = true;
+              //println("3:"+i+"-"+3);
+            }
+          }
+        }
+      }
+      if (pressOrderRight[3] == 0) {
+        sensorReactedTimeRight[3] = System.nanoTime() - startTime;
+        pressOrderRight[3] = orderRight;
+        orderRight++;
+      }
+      if (sensorValueRight3 <= peak2_3) {
+        peak2_3 = sensorValueRight3;
+        peakTime2_3 = (System.nanoTime() - startTime) - sensorReactedTimeRight[3];
+      } else if (sensorValueRight3 > peak2_3) {
+      }
+      if (isLandingPoint2_0 || isLandingPoint2_1 || isLandingPoint2_2 || isLandingPoint2_4) {
+      } else {
+        if (groundTimeRight != 0) {
+        } else {
+          groundTimeRight = sensorReactedTimeRight[3];
+          diffGroundTimeRight = sensorReactedTimeRight[3];
+          diffTime = diffGroundTimeRight - diffGroundTimeLeft;
+          fill(255, 255, 255);
+          rect(325, 0, 150, 800);
+          double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
+          fill(100, 100, 255);
+          rect(325, 800 - (float)stride*4, 150, (float)stride*4);
+          fill(255);
+          //println("Stride="+nf((float)stride, 3, 3)+"cm");
+        }
+      }
+    } else {
+      isLandingPoint2_3 = false;
+    }
+    // かかと
+    if (sensorValueRight4 <= 1015) { // システム1：900, システム2：1000
+      isLandingPoint2_4 = true;
+      // このセンサ以外のセンサがまだ接地していない場合
+      if (pressOrderRight[0] == 0 && pressOrderRight[1] == 0 && pressOrderRight[2] == 0 && pressOrderRight[3] == 0) {
+        image(right_foot, 520, 150, 250, 600);
+        noFill();
+        strokeWeight(1);
+        ellipse(650, 675, 75, 75);
+        ellipse(565, 210, 65, 65);
+        ellipse(740, 280, 65, 65);
+        ellipse(565, 330, 65, 65);
+        ellipse(725, 370, 65, 65);
+        textSize(50);
+        fill(0);
+        text("1", 633, 695);
+        text("2", 710, 390);
+        text("3", 550, 350);
+        text("4", 725, 297);
+        text("5", 550, 225);
+      } else if (pressOrderRight[4] != 0) {
+        // このセンサの１つ前のセンサを探す
+        if (isDrawRight4) {
+        } else {
+          for (int i = 0; i < 5; i++) {
+            if (pressOrderRight[i] == orderRight - 2) {
+              putArrow(false, i, 4);
+              isDrawRight4 = true;
+              //println("3:"+i+"-"+3);
+            }
+          }
+        }
+      }
+      if (pressOrderRight[4] == 0) {
+        sensorReactedTimeRight[4] = System.nanoTime() - startTime;
+        pressOrderRight[4] = orderRight;
+        orderRight++;
+      }
+      if (sensorValueRight4 <= peak2_4) {
+        peak2_4 = sensorValueRight4;
+        peakTime2_4 = (System.nanoTime() - startTime) - sensorReactedTimeRight[4];
+      } else if (sensorValueRight4 > peak2_4) {
+      }
+      if (isLandingPoint2_0 || isLandingPoint2_1 || isLandingPoint2_2 || isLandingPoint2_3) {
+      } else {
+        if (groundTimeRight != 0) {
+        } else {
+          groundTimeRight = sensorReactedTimeRight[4];
+          diffGroundTimeRight = sensorReactedTimeRight[4];
+          diffTime = diffGroundTimeRight - diffGroundTimeLeft;
+          fill(255, 255, 255);
+          rect(325, 0, 150, 800);
+          double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
+          fill(100, 100, 255);
+          rect(325, 800 - (float)stride*4, 150, (float)stride*4);
+          fill(255);
+          //println("Stride="+nf((float)stride, 3, 3)+"cm");
+        }
+      }
+    } else {
+      isLandingPoint2_4 = false;
+    }
 
-  //  if (!isLandingPoint2_0 && !isLandingPoint2_1 && !isLandingPoint2_2 && !isLandingPoint2_3 && !isLandingPoint2_4) {
-  //    if (pressOrderRight[0] == 0 && pressOrderRight[1] == 0 && pressOrderRight[2] == 0 && pressOrderRight[3] == 0 && pressOrderRight[4] == 0) {
-  //    } else {
-  //      fill(255);
-  //      isDrawRight0 = false;
-  //      isDrawRight1 = false;
-  //      isDrawRight2 = false;
-  //      isDrawRight3 = false;
-  //      isDrawRight4 = false;
-  //      if (landingTimeRight != 0) {
-  //      } else {
-  //        diffLandingTimeRight = System.nanoTime() - startTime; // 離地した時間
-  //      }
-  //      for (int i = 0; i < 5; i++) {
-  //        if (pressOrderRight[i] == 2) {
-  //          timeIntervalRight0_1 = sensorReactedTimeRight[i] - diffGroundTimeRight;
-  //          evacuateRight2 = sensorReactedTimeRight[i];
-  //        }
-  //        if (pressOrderRight[i] == 3) {
-  //          timeIntervalRight1_2 = sensorReactedTimeRight[i] - evacuateRight2;
-  //          evacuateRight3 = sensorReactedTimeRight[i];
-  //        }
-  //        if (pressOrderRight[i] == 4) {
-  //          timeIntervalRight2_3 = sensorReactedTimeRight[i] - evacuateRight3;
-  //          evacuateRight4 = sensorReactedTimeRight[i];
-  //        }
-  //        if (pressOrderRight[i] == 5) {
-  //          timeIntervalRight3_4 = sensorReactedTimeRight[i] - evacuateRight4;
-  //        }
-  //      }
-  //      if (pressOrderRight[0] != 0 && pressOrderRight[1] != 0 && pressOrderRight[2] != 0 && pressOrderRight[3] != 0 && pressOrderRight[4] != 0) {
-  //        outputPressOrder.println(","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+(System.nanoTime() - startTime)/1000000000+","+diffTime/1000000000*runningSpeed*1000*100/3600+","+(diffLandingTimeRight - diffGroundTimeRight)/1000000000+","+pressOrderRight[0]+","+pressOrderRight[1]+","+pressOrderRight[2]+","+pressOrderRight[3]+","+pressOrderRight[4]+","+peak2_0+","+peakTime2_0/1000000000+","+peak2_1+","+peakTime2_1/1000000000+","+peak2_2+","+peakTime2_2/1000000000+","+peak2_3+","+peakTime2_3/1000000000+","+peak2_4+","+peakTime2_4/1000000000+","+timeIntervalRight0_1/1000000000+","+timeIntervalRight1_2/1000000000+","+timeIntervalRight2_3/1000000000+","+timeIntervalRight3_4/1000000000);
-  //      }
-  //      peak2_0 = 2000;
-  //      peak2_1 = 2000;
-  //      peak2_2 = 2000;
-  //      peak2_3 = 2000;
-  //      peak2_4 = 2000;
-  //      for (int i = 0; i < pressOrderRight.length; i++) {
-  //        pressOrderRight[i] = 0;
-  //      }
-  //      orderRight = 1;
-  //      groundTimeRight = 0;
-  //      landingTimeRight = 0;
-  //    }
-  //  }
-  //}
+    if (!isLandingPoint2_0 && !isLandingPoint2_1 && !isLandingPoint2_2 && !isLandingPoint2_3 && !isLandingPoint2_4) {
+      if (pressOrderRight[0] == 0 && pressOrderRight[1] == 0 && pressOrderRight[2] == 0 && pressOrderRight[3] == 0 && pressOrderRight[4] == 0) {
+      } else {
+        fill(255);
+        isDrawRight0 = false;
+        isDrawRight1 = false;
+        isDrawRight2 = false;
+        isDrawRight3 = false;
+        isDrawRight4 = false;
+        if (landingTimeRight != 0) {
+        } else {
+          diffLandingTimeRight = System.nanoTime() - startTime; // 離地した時間
+        }
+        for (int i = 0; i < 5; i++) {
+          if (pressOrderRight[i] == 2) {
+            timeIntervalRight0_1 = sensorReactedTimeRight[i] - diffGroundTimeRight;
+            evacuateRight2 = sensorReactedTimeRight[i];
+          }
+          if (pressOrderRight[i] == 3) {
+            timeIntervalRight1_2 = sensorReactedTimeRight[i] - evacuateRight2;
+            evacuateRight3 = sensorReactedTimeRight[i];
+          }
+          if (pressOrderRight[i] == 4) {
+            timeIntervalRight2_3 = sensorReactedTimeRight[i] - evacuateRight3;
+            evacuateRight4 = sensorReactedTimeRight[i];
+          }
+          if (pressOrderRight[i] == 5) {
+            timeIntervalRight3_4 = sensorReactedTimeRight[i] - evacuateRight4;
+          }
+        }
+        if (pressOrderRight[0] != 0 && pressOrderRight[1] != 0 && pressOrderRight[2] != 0 && pressOrderRight[3] != 0 && pressOrderRight[4] != 0) {
+          outputPressOrder.println(","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+(System.nanoTime() - startTime)/1000000000+","+diffTime/1000000000*runningSpeed*1000*100/3600+","+(diffLandingTimeRight - diffGroundTimeRight)/1000000000+","+pressOrderRight[0]+","+pressOrderRight[1]+","+pressOrderRight[2]+","+pressOrderRight[3]+","+pressOrderRight[4]+","+peak2_0+","+peakTime2_0/1000000000+","+peak2_1+","+peakTime2_1/1000000000+","+peak2_2+","+peakTime2_2/1000000000+","+peak2_3+","+peakTime2_3/1000000000+","+peak2_4+","+peakTime2_4/1000000000+","+timeIntervalRight0_1/1000000000+","+timeIntervalRight1_2/1000000000+","+timeIntervalRight2_3/1000000000+","+timeIntervalRight3_4/1000000000);
+        }
+        peak2_0 = 2000;
+        peak2_1 = 2000;
+        peak2_2 = 2000;
+        peak2_3 = 2000;
+        peak2_4 = 2000;
+        for (int i = 0; i < pressOrderRight.length; i++) {
+          pressOrderRight[i] = 0;
+        }
+        orderRight = 1;
+        groundTimeRight = 0;
+        landingTimeRight = 0;
+      }
+    }
+  }
 }
 
 
@@ -930,8 +980,8 @@ void serialEvent(Serial port) {
   //    output4.println((System.nanoTime() - startTime)/1000000000+","+sensorValueLeft0+","+","+sensorValueLeft1+","+","+sensorValueLeft2+","+","+sensorValueLeft3+","+","+sensorValueLeft4+","+","+(System.nanoTime() - startTime)/1000000000+","+sensorValueRight0+","+","+sensorValueRight1+","+","+sensorValueRight2+","+","+sensorValueRight3+","+","+sensorValueRight4);
   //  }
   //}
-  //println("time1="+nf((float)(System.nanoTime() - startTime)/1000000000, 3, 3)+",inByte1_0="+sensorValueLeft0+", inByte1_1="+sensorValueLeft1+", inByte1_2="+sensorValueLeft2+", inByte1_3="+sensorValueLeft3+", inByte1_4="+sensorValueLeft4);
-  //println("time2="+nf((float)(System.nanoTime() - startTime)/1000000000, 3, 3)+",inByte2_0="+sensorValueRight0+", inByte2_1="+sensorValueRight1+", inByte2_2="+sensorValueRight2+", inByte2_3="+sensorValueRight3+", inByte2_4="+sensorValueRight4);
+  println("time1="+nf((float)(System.nanoTime() - startTime)/1000000000, 3, 0)+",inByte1_0="+sensorValueLeft0+", inByte1_1="+sensorValueLeft1+", inByte1_2="+sensorValueLeft2+", inByte1_3="+sensorValueLeft3+", inByte1_4="+sensorValueLeft4);
+  println("time2="+nf((float)(System.nanoTime() - startTime)/1000000000, 3, 0)+",inByte2_0="+sensorValueRight0+", inByte2_1="+sensorValueRight1+", inByte2_2="+sensorValueRight2+", inByte2_3="+sensorValueRight3+", inByte2_4="+sensorValueRight4);
 }
 
 void drawArrow(float x1, float y1, float x2, float y2) {
