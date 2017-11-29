@@ -1,6 +1,6 @@
 import processing.serial.*;
 
-PImage foot_img, landingPoint100, landingPoint80, landingPoint60, landingPoint40, landingPoint20, backButton, landingPointWhite, right_foot, left_foot;
+PImage landingPoint100, landingPoint80, landingPoint60, landingPoint40, landingPoint20, backButton, landingPointWhite, right_foot, left_foot;
 PImage whiteBoardGood_imgLeft, whiteBoardBad_imgLeft, whiteBoardGood_imgRight, whiteBoardBad_imgRight;
 Serial myPort1, myPort2;
 int analog1_0_high, analog1_0_low, analog1_1_high, analog1_1_low, analog1_2_high, analog1_2_low, analog1_3_high, analog1_3_low, analog1_4_high, analog1_4_low; // Arduinoから送られてきた分割された値
@@ -49,16 +49,10 @@ void setup() {
   //myPort2 = new Serial(this, "/dev/tty.HC-06-DevB", 9600);
   //myPort1 = new Serial(this, "/dev/tty.HC-06-DevB-1", 9600);
   // システム2号機
-  myPort1 = new Serial(this, "/dev/tty.HC-06-DevB-2", 9600);
-  myPort2 = new Serial(this, "/dev/tty.HC-06-DevB-3", 9600);
-  foot_img = loadImage("foot_sole900.jpeg");
+  //myPort1 = new Serial(this, "/dev/tty.HC-06-DevB-2", 9600);
+  //myPort2 = new Serial(this, "/dev/tty.HC-06-DevB-3", 9600);
   left_foot = loadImage("left_foot.jpg");
   right_foot = loadImage("right_foot.jpg");
-  landingPoint100 = loadImage("LandingPoint_a100.png");
-  landingPoint80 = loadImage("LandingPoint_a80.png");
-  landingPoint60 = loadImage("LandingPoint_a60.png");
-  landingPoint40 = loadImage("LandingPoint_a40.png");
-  landingPoint20 = loadImage("LandingPoint_a20.png");
   landingPointWhite = loadImage("white.png");
 
   background(255);
@@ -199,6 +193,21 @@ void draw() {
       if (isLandingPoint1_1 || isLandingPoint1_2 || isLandingPoint1_3 || isLandingPoint1_4) {
         for (int i = 0; i < 5; i++) {
           if (pressOrderLeft[i] == orderLeft - 1) {
+            image(left_foot, 25, 150, 250, 600);
+            noFill();
+            strokeWeight(1);
+            ellipse(144, 674, 75, 75);
+            ellipse(230, 210, 65, 65);
+            ellipse(55, 280, 65, 65);
+            ellipse(230, 330, 65, 65);
+            ellipse(70, 380, 65, 65);
+            textSize(50);
+            fill(0);
+            text("1", 128, 690);
+            text("4", 40, 300);
+            text("3", 215, 350);
+            text("2", 55, 400);
+            text("5", 215, 225);
             putArrow(true, 0, i);
           }
         }
@@ -218,27 +227,6 @@ void draw() {
           // println("Stride="+nf((float)stride, 3, 3)+"cm");
         }
       }
-      //if (isDrawLeft0) {
-      //} else {
-      //  if (pressOrderLeft[0] == 1) {
-      //    isDrawLeft0 = true;
-      //    image(landingPoint100, 200, 180, 60, 60);
-      //  } else if (pressOrderLeft[0] == 2) {
-      //    isDrawLeft0 = true;
-      //    image(landingPoint100, 200, 180, 60, 60);
-      //  } else if (pressOrderLeft[0] == 3) {
-      //    isDrawLeft0 = true;
-      //    image(landingPoint100, 200, 180, 60, 60);
-      //  } else if (pressOrderLeft[0] == 4) {
-      //    isDrawLeft0 = true;
-      //    image(landingPoint100, 200, 180, 60, 60);
-      //  } else if (pressOrderLeft[0] == 5) {
-      //    isDrawLeft0 = true;
-      //    noStroke();
-      //    fill(255);
-      //    ellipse(230, 210, 60, 60);
-      //  }
-      //}
     } else {
       isLandingPoint1_0 = false;
     }
@@ -258,6 +246,21 @@ void draw() {
       if (isLandingPoint1_0 || isLandingPoint1_2 || isLandingPoint1_3 || isLandingPoint1_4) {
         for (int i = 0; i < 5; i++) {
           if (pressOrderLeft[i] == orderLeft - 1) {
+            image(left_foot, 25, 150, 250, 600);
+            noFill();
+            strokeWeight(1);
+            ellipse(144, 674, 75, 75);
+            ellipse(230, 210, 65, 65);
+            ellipse(55, 280, 65, 65);
+            ellipse(230, 330, 65, 65);
+            ellipse(70, 380, 65, 65);
+            textSize(50);
+            fill(0);
+            text("1", 128, 690);
+            text("4", 40, 300);
+            text("3", 215, 350);
+            text("2", 55, 400);
+            text("5", 215, 225);
             putArrow(true, 1, i);
           }
         }
@@ -277,27 +280,6 @@ void draw() {
           //println("Stride="+nf((float)stride, 3, 3)+"cm");
         }
       }
-      //if (isDrawLeft1) {
-      //} else {
-      //  if (pressOrderLeft[1] == 1) {
-      //    isDrawLeft1 = true;
-      //    image(landingPoint100, 35, 263, 40, 40);
-      //  } else if (pressOrderLeft[1] == 2) {
-      //    isDrawLeft1 = true;
-      //    image(landingPoint100, 35, 263, 40, 40);
-      //  } else if (pressOrderLeft[1] == 3) {
-      //    isDrawLeft1 = true;
-      //    image(landingPoint100, 35, 263, 40, 40);
-      //  } else if (pressOrderLeft[1] == 4) {
-      //    isDrawLeft1 = true;
-      //    noStroke();
-      //    fill(255);
-      //    ellipse(55, 283, 40, 40);
-      //  } else if (pressOrderLeft[1] == 5) {
-      //    isDrawLeft1 = true;
-      //    image(landingPoint100, 35, 263, 40, 40);
-      //  }
-      //}
     } else {
       isLandingPoint1_1 = false;
     }
@@ -317,6 +299,21 @@ void draw() {
       if (isLandingPoint1_0 || isLandingPoint1_1 || isLandingPoint1_3 || isLandingPoint1_4) {
         for (int i = 0; i < 5; i++) {
           if (pressOrderLeft[i] == orderLeft - 1) {
+            image(left_foot, 25, 150, 250, 600);
+            noFill();
+            strokeWeight(1);
+            ellipse(144, 674, 75, 75);
+            ellipse(230, 210, 65, 65);
+            ellipse(55, 280, 65, 65);
+            ellipse(230, 330, 65, 65);
+            ellipse(70, 380, 65, 65);
+            textSize(50);
+            fill(0);
+            text("1", 128, 690);
+            text("4", 40, 300);
+            text("3", 215, 350);
+            text("2", 55, 400);
+            text("5", 215, 225);
             putArrow(true, 2, i);
           }
         }
@@ -336,27 +333,6 @@ void draw() {
           //println("Stride="+nf((float)stride, 3, 3)+"cm");
         }
       }
-      //if (isDrawLeft2) {
-      //} else {
-      //  if (pressOrderLeft[2] == 1) {
-      //    isDrawLeft2 = true;
-      //    image(landingPoint100, 200, 300, 60, 60);
-      //  } else if (pressOrderLeft[2] == 2) {
-      //    isDrawLeft2 = true;
-      //    image(landingPoint100, 200, 300, 60, 60);
-      //  } else if (pressOrderLeft[2] == 3) {
-      //    isDrawLeft2 = true;
-      //    noStroke();
-      //    fill(255);
-      //    ellipse(230, 330, 60, 60);
-      //  } else if (pressOrderLeft[2] == 4) {
-      //    isDrawLeft2 = true;
-      //    image(landingPoint100, 200, 300, 60, 60);
-      //  } else if (pressOrderLeft[2] == 5) {
-      //    isDrawLeft2 = true;
-      //    image(landingPoint100, 200, 300, 60, 60);
-      //  }
-      //}
     } else {
       isLandingPoint1_2 = false;
     }
@@ -376,6 +352,21 @@ void draw() {
       if (isLandingPoint1_0 || isLandingPoint1_1 || isLandingPoint1_2 || isLandingPoint1_4) {
         for (int i = 0; i < 5; i++) {
           if (pressOrderLeft[i] == orderLeft - 1) {
+            image(left_foot, 25, 150, 250, 600);
+            noFill();
+            strokeWeight(1);
+            ellipse(144, 674, 75, 75);
+            ellipse(230, 210, 65, 65);
+            ellipse(55, 280, 65, 65);
+            ellipse(230, 330, 65, 65);
+            ellipse(70, 380, 65, 65);
+            textSize(50);
+            fill(0);
+            text("1", 128, 690);
+            text("4", 40, 300);
+            text("3", 215, 350);
+            text("2", 55, 400);
+            text("5", 215, 225);
             putArrow(true, 3, i);
           }
         }
@@ -395,27 +386,6 @@ void draw() {
           //println("Stride="+nf((float)stride, 3, 3)+"cm");
         }
       }
-      //if (isDrawLeft3) {
-      //} else {
-      //  if (pressOrderLeft[3] == 1) {
-      //    isDrawLeft3 = true;
-      //    image(landingPoint100, 40, 350, 60, 60);
-      //  } else if (pressOrderLeft[3] == 2) {
-      //    isDrawLeft3 = true;
-      //    noStroke();
-      //    fill(255);
-      //    ellipse(70, 380, 60, 60);
-      //  } else if (pressOrderLeft[3] == 3) {
-      //    isDrawLeft3 = true;
-      //    image(landingPoint100, 40, 350, 60, 60);
-      //  } else if (pressOrderLeft[3] == 4) {
-      //    isDrawLeft3 = true;
-      //    image(landingPoint100, 40, 350, 60, 60);
-      //  } else if (pressOrderLeft[3] == 5) {
-      //    isDrawLeft3 = true;
-      //    image(landingPoint100, 40, 350, 60, 60);
-      //  }
-      //}
     } else {
       isLandingPoint1_3 = false;
     }
@@ -430,12 +400,27 @@ void draw() {
       if (sensorValueLeft4 <= peak1_4) {
         peak1_4 = sensorValueLeft4;
         peakTime1_4 = (System.nanoTime() - startTime) - sensorReactedTimeLeft[4];
-        println((System.nanoTime() - startTime)+" - "+sensorReactedTimeLeft[4]+" = "+peakTime1_4/1000000000);
+        //println((System.nanoTime() - startTime)+" - "+sensorReactedTimeLeft[4]+" = "+peakTime1_4/1000000000);
       } else if (sensorValueLeft4 > peak1_4) {
       }
       if (isLandingPoint1_0 || isLandingPoint1_1 || isLandingPoint1_2 || isLandingPoint1_3) {
         for (int i = 0; i < 5; i++) {
           if (pressOrderLeft[i] == orderLeft - 1) {
+            image(left_foot, 25, 150, 250, 600);
+            noFill();
+            strokeWeight(1);
+            ellipse(144, 674, 75, 75);
+            ellipse(230, 210, 65, 65);
+            ellipse(55, 280, 65, 65);
+            ellipse(230, 330, 65, 65);
+            ellipse(70, 380, 65, 65);
+            textSize(50);
+            fill(0);
+            text("1", 128, 690);
+            text("4", 40, 300);
+            text("3", 215, 350);
+            text("2", 55, 400);
+            text("5", 215, 225);
             putArrow(true, 4, i);
           }
         }
@@ -455,27 +440,6 @@ void draw() {
           //println("Stride="+nf((float)stride, 3, 3)+"cm");
         }
       }
-      //if (isDrawLeft4) {
-      //} else {
-      //  if (pressOrderLeft[4] == 1) {
-      //    isDrawLeft4 = true;
-      //    noStroke();
-      //    fill(255);
-      //    ellipse(145, 675, 70, 70);
-      //  } else if (pressOrderLeft[4] == 2) {
-      //    isDrawLeft4 = true;
-      //    image(landingPoint100, 110, 640, 70, 70);
-      //  } else if (pressOrderLeft[4] == 3) {
-      //    isDrawLeft4 = true;
-      //    image(landingPoint100, 110, 640, 70, 70);
-      //  } else if (pressOrderLeft[4] == 4) {
-      //    isDrawLeft4 = true;
-      //    image(landingPoint100, 110, 640, 70, 70);
-      //  } else if (pressOrderLeft[4] == 5) {
-      //    isDrawLeft4 = true;
-      //    image(landingPoint100, 110, 640, 70, 70);
-      //  }
-      //}
     } else {
       isLandingPoint1_4 = false;
     }
@@ -484,36 +448,7 @@ void draw() {
     if (!isLandingPoint1_0 && !isLandingPoint1_1 && !isLandingPoint1_2 && !isLandingPoint1_3 && !isLandingPoint1_4) {
       // そもそも踏まれてない時
       if (pressOrderLeft[0] == 0 && pressOrderLeft[1] == 0 && pressOrderLeft[2] == 0 && pressOrderLeft[3] == 0 && pressOrderLeft[4] == 0) {
-      } else { 
-        //noStroke();
-        //fill(255);
-        //ellipse(230, 210, 60, 60);
-        //ellipse(55, 283, 40, 40);
-        //ellipse(230, 330, 60, 60);
-        //ellipse(70, 380, 60, 60);
-        //ellipse(145, 675, 70, 70);
-        //textSize(50);
-        //fill(0);
-        //text("1", 128, 690);
-        //text("2", 55, 400);
-        //text("3", 215, 350);
-        //text("4", 40, 300);
-        //text("5", 215, 225);
-        image(left_foot, 25, 150, 250, 600);
-        noFill();
-        strokeWeight(1);
-        ellipse(144, 674, 75, 75);
-        ellipse(230, 210, 65, 65);
-        ellipse(55, 280, 65, 65);
-        ellipse(230, 330, 65, 65);
-        ellipse(70, 380, 65, 65);
-        textSize(50);
-        fill(0);
-        text("1", 128, 690);
-        text("4", 40, 300);
-        text("3", 215, 350);
-        text("2", 55, 400);
-        text("5", 215, 225);
+      } else {
         fill(255);
         isDrawLeft0 = false;
         isDrawLeft1 = false;
@@ -582,6 +517,21 @@ void draw() {
       if (isLandingPoint2_1 || isLandingPoint2_2 || isLandingPoint2_3 || isLandingPoint2_4) {
         for (int i = 0; i < 5; i++) {
           if (pressOrderRight[i] == orderRight - 1) {
+            image(right_foot, 520, 150, 250, 600);
+            noFill();
+            strokeWeight(1);
+            ellipse(565, 210, 60, 60);
+            ellipse(740, 280, 40, 40);
+            ellipse(565, 330, 60, 60);
+            ellipse(725, 370, 60, 60);
+            ellipse(650, 675, 70, 70);
+            textSize(50);
+            fill(0);
+            text("1", 633, 695);
+            text("2", 710, 390);
+            text("3", 550, 350);
+            text("4", 725, 297);
+            text("5", 550, 225);
             putArrow(false, 0, i);
           }
         }
@@ -601,27 +551,6 @@ void draw() {
           //println("Stride="+nf((float)stride, 3, 3)+"cm");
         }
       }
-      //if (isDrawRight0) {
-      //} else {
-      //  if (pressOrderRight[0] == 1) {
-      //    isDrawRight0 = true;
-      //    image(landingPoint100, 535, 180, 60, 60);
-      //  } else if (pressOrderRight[0] == 2) {
-      //    isDrawRight0 = true;
-      //    image(landingPoint100, 535, 180, 60, 60);
-      //  } else if (pressOrderRight[0] == 3) {
-      //    isDrawRight0 = true;
-      //    image(landingPoint100, 535, 180, 60, 60);
-      //  } else if (pressOrderRight[0] == 4) {
-      //    isDrawRight0 = true;
-      //    image(landingPoint100, 535, 180, 60, 60);
-      //  } else if (pressOrderRight[0] == 5) {
-      //    isDrawRight0 = true;
-      //    noStroke();
-      //    fill(255);
-      //    ellipse(565, 210, 60, 60);
-      //  }
-      //}
     } else {
       isLandingPoint2_0 = false;
     }
@@ -641,6 +570,21 @@ void draw() {
       if (isLandingPoint2_0 || isLandingPoint2_2 || isLandingPoint2_3 || isLandingPoint2_4) {
         for (int i = 0; i < 5; i++) {
           if (pressOrderRight[i] == orderRight - 1) {
+            image(right_foot, 520, 150, 250, 600);
+            noFill();
+            strokeWeight(1);
+            ellipse(565, 210, 60, 60);
+            ellipse(740, 280, 40, 40);
+            ellipse(565, 330, 60, 60);
+            ellipse(725, 370, 60, 60);
+            ellipse(650, 675, 70, 70);
+            textSize(50);
+            fill(0);
+            text("1", 633, 695);
+            text("2", 710, 390);
+            text("3", 550, 350);
+            text("4", 725, 297);
+            text("5", 550, 225);
             putArrow(false, 1, i);
           }
         }
@@ -660,27 +604,6 @@ void draw() {
           //println("Stride="+nf((float)stride, 3, 3)+"cm");
         }
       }
-      //if (isDrawRight1) {
-      //} else {
-      //  if (pressOrderRight[1] == 1) {
-      //    isDrawRight1 = true;
-      //    image(landingPoint100, 720, 260, 40, 40);
-      //  } else if (pressOrderRight[1] == 2) {
-      //    isDrawRight1 = true;
-      //    image(landingPoint100, 720, 260, 40, 40);
-      //  } else if (pressOrderRight[1] == 3) {
-      //    isDrawRight1 = true;
-      //    image(landingPoint100, 720, 260, 40, 40);
-      //  } else if (pressOrderRight[1] == 4) {
-      //    isDrawRight1 = true;
-      //    noStroke();
-      //    fill(255);
-      //    ellipse(740, 280, 40, 40);
-      //  } else if (pressOrderRight[1] == 5) {
-      //    isDrawRight1 = true;
-      //    image(landingPoint100, 720, 260, 40, 40);
-      //  }
-      //}
     } else {
       isLandingPoint2_1 = false;
     }
@@ -700,6 +623,21 @@ void draw() {
       if (isLandingPoint2_0 || isLandingPoint2_1 || isLandingPoint2_3 || isLandingPoint2_4) {
         for (int i = 0; i < 5; i++) {
           if (pressOrderRight[i] == orderRight - 1) {
+            image(right_foot, 520, 150, 250, 600);
+            noFill();
+            strokeWeight(1);
+            ellipse(565, 210, 60, 60);
+            ellipse(740, 280, 40, 40);
+            ellipse(565, 330, 60, 60);
+            ellipse(725, 370, 60, 60);
+            ellipse(650, 675, 70, 70);
+            textSize(50);
+            fill(0);
+            text("1", 633, 695);
+            text("2", 710, 390);
+            text("3", 550, 350);
+            text("4", 725, 297);
+            text("5", 550, 225);
             putArrow(false, 2, i);
           }
         }
@@ -719,27 +657,6 @@ void draw() {
           //println("Stride="+nf((float)stride, 3, 3)+"cm");
         }
       }
-      //if (isDrawRight2) {
-      //} else {
-      //  if (pressOrderRight[2] == 1) {
-      //    isDrawRight2 = true;
-      //    image(landingPoint100, 535, 300, 60, 60);
-      //  } else if (pressOrderRight[2] == 2) {
-      //    isDrawRight2 = true;
-      //    image(landingPoint100, 535, 300, 60, 60);
-      //  } else if (pressOrderRight[2] == 3) {
-      //    isDrawRight2 = true;
-      //    noStroke();
-      //    fill(255);
-      //    ellipse(565, 330, 60, 60);
-      //  } else if (pressOrderRight[2] == 4) {
-      //    isDrawRight2 = true;
-      //    image(landingPoint100, 535, 300, 60, 60);
-      //  } else if (pressOrderRight[2] == 5) {
-      //    isDrawRight2 = true;
-      //    image(landingPoint100, 535, 300, 60, 60);
-      //  }
-      //}
     } else {
       isLandingPoint2_2 = false;
     }
@@ -759,6 +676,21 @@ void draw() {
       if (isLandingPoint2_0 || isLandingPoint2_1 || isLandingPoint2_2 || isLandingPoint2_4) {
         for (int i = 0; i < 5; i++) {
           if (pressOrderRight[i] == orderRight - 1) {
+            image(right_foot, 520, 150, 250, 600);
+            noFill();
+            strokeWeight(1);
+            ellipse(565, 210, 60, 60);
+            ellipse(740, 280, 40, 40);
+            ellipse(565, 330, 60, 60);
+            ellipse(725, 370, 60, 60);
+            ellipse(650, 675, 70, 70);
+            textSize(50);
+            fill(0);
+            text("1", 633, 695);
+            text("2", 710, 390);
+            text("3", 550, 350);
+            text("4", 725, 297);
+            text("5", 550, 225);
             putArrow(false, 3, i);
           }
         }
@@ -777,27 +709,6 @@ void draw() {
           //println("Stride="+nf((float)stride, 3, 3)+"cm");
         }
       }
-      //if (isDrawRight3) {
-      //} else {
-      //  if (pressOrderRight[3] == 1) {
-      //    isDrawRight3 = true;
-      //    image(landingPoint100, 695, 340, 60, 60);
-      //  } else if (pressOrderRight[3] == 2) {
-      //    isDrawRight3 = true;
-      //    noStroke();
-      //    fill(255);
-      //    ellipse(725, 370, 60, 60);
-      //  } else if (pressOrderRight[3] == 3) {
-      //    isDrawRight3 = true;
-      //    image(landingPoint100, 695, 340, 60, 60);
-      //  } else if (pressOrderRight[3] == 4) {
-      //    isDrawRight3 = true;
-      //    image(landingPoint100, 695, 340, 60, 60);
-      //  } else if (pressOrderRight[3] == 5) {
-      //    isDrawRight3 = true;
-      //    image(landingPoint100, 695, 340, 60, 60);
-      //  }
-      //}
     } else {
       isLandingPoint2_3 = false;
     }
@@ -817,6 +728,21 @@ void draw() {
       if (isLandingPoint2_0 || isLandingPoint2_1 || isLandingPoint2_2 || isLandingPoint2_3) {
         for (int i = 0; i < 5; i++) {
           if (pressOrderRight[i] == orderRight - 1) {
+            image(right_foot, 520, 150, 250, 600);
+            noFill();
+            strokeWeight(1);
+            ellipse(565, 210, 60, 60);
+            ellipse(740, 280, 40, 40);
+            ellipse(565, 330, 60, 60);
+            ellipse(725, 370, 60, 60);
+            ellipse(650, 675, 70, 70);
+            textSize(50);
+            fill(0);
+            text("1", 633, 695);
+            text("2", 710, 390);
+            text("3", 550, 350);
+            text("4", 725, 297);
+            text("5", 550, 225);
             putArrow(false, 4, i);
           }
         }
@@ -835,27 +761,6 @@ void draw() {
           //println("Stride="+nf((float)stride, 3, 3)+"cm");
         }
       }
-      //if (isDrawRight4) {
-      //} else {
-      //  if (pressOrderRight[4] == 1) {
-      //    isDrawRight4 = true;
-      //    noStroke();
-      //    fill(255);
-      //    ellipse(650, 675, 70, 70);
-      //  } else if (pressOrderRight[4] == 2) {
-      //    isDrawRight4 = true;
-      //    image(landingPoint100, 615, 640, 70, 70);
-      //  } else if (pressOrderRight[4] == 3) {
-      //    isDrawRight4 = true;
-      //    image(landingPoint100, 615, 640, 70, 70);
-      //  } else if (pressOrderRight[4] == 4) {
-      //    isDrawRight4 = true;
-      //    image(landingPoint100, 615, 640, 70, 70);
-      //  } else if (pressOrderRight[4] == 5) {
-      //    isDrawRight4 = true;
-      //    image(landingPoint100, 615, 640, 70, 70);
-      //  }
-      //}
     } else {
       isLandingPoint2_4 = false;
     }
@@ -863,34 +768,6 @@ void draw() {
     if (!isLandingPoint2_0 && !isLandingPoint2_1 && !isLandingPoint2_2 && !isLandingPoint2_3 && !isLandingPoint2_4) {
       if (pressOrderRight[0] == 0 && pressOrderRight[1] == 0 && pressOrderRight[2] == 0 && pressOrderRight[3] == 0 && pressOrderRight[4] == 0) {
       } else {
-        //noStroke();
-        //ellipse(565, 210, 60, 60);
-        //ellipse(740, 280, 40, 40);
-        //ellipse(565, 330, 60, 60);
-        //ellipse(725, 370, 60, 60);
-        //ellipse(650, 675, 70, 70);
-        //textSize(50);
-        //fill(0);
-        //text("1", 633, 695);
-        //text("2", 710, 390);
-        //text("3", 550, 350);
-        //text("4", 725, 297);
-        //text("5", 550, 225);
-        image(right_foot, 520, 150, 250, 600);
-        noFill();
-        strokeWeight(1);
-        ellipse(565, 210, 60, 60);
-        ellipse(740, 280, 40, 40);
-        ellipse(565, 330, 60, 60);
-        ellipse(725, 370, 60, 60);
-        ellipse(650, 675, 70, 70);
-        textSize(50);
-        fill(0);
-        text("1", 633, 695);
-        text("2", 710, 390);
-        text("3", 550, 350);
-        text("4", 725, 297);
-        text("5", 550, 225);
         fill(255);
         isDrawRight0 = false;
         isDrawRight1 = false;
@@ -958,10 +835,8 @@ void serialEvent(Serial port) {
         sensorValueLeft2 = analog1_2_high*256 + analog1_2_low;
         sensorValueLeft3 = analog1_3_high*256 + analog1_3_low;
         sensorValueLeft4 = analog1_4_high*256 + analog1_4_low;
-        
       }
     }
-  } else {
   }
   if (port == myPort2) {
     if (port.available() >= 12) {
@@ -984,7 +859,6 @@ void serialEvent(Serial port) {
         sensorValueRight4 = analog2_4_high*256 + analog2_4_low;
       }
     }
-  } else {
   }
   //if ((System.nanoTime() - startTime)/1000000000 >= 0 && (System.nanoTime() - startTime)/1000000000 < 550) {
   //  if (sensorValueLeft0 > 0 && sensorValueLeft1 > 0 && sensorValueLeft2 > 0 && sensorValueLeft3 > 0 && sensorValueLeft4 > 0 && sensorValueRight0 > 0 && sensorValueRight1 > 0 && sensorValueRight2 > 0 && sensorValueRight3 > 0 && sensorValueRight4 > 0) {
