@@ -17,7 +17,7 @@ double diffTime = 0; // 片足が接地してからもう片足が接地する�
 double timeIntervalLeft0_1 = 0, timeIntervalLeft1_2 = 0, timeIntervalLeft2_3 = 0, timeIntervalLeft3_4 = 0, timeIntervalRight0_1 = 0, timeIntervalRight1_2 = 0, timeIntervalRight2_3 = 0, timeIntervalRight3_4 = 0; // 各センサ間の設置時間間隔
 double sensorReactedTimeLeft[] = {0, 0, 0, 0, 0}, sensorReactedTimeRight[] = {0, 0, 0, 0, 0}; // 各センサが地面に設置した時間
 double evacuateLeft2 = 0, evacuateLeft3 = 0, evacuateLeft4 = 0, evacuateRight2 = 0, evacuateRight3 = 0, evacuateRight4 = 0; //センサが反応した時間を一時保存
-int runningSpeed = 12;// トレッドミルの時速を指定
+int runningSpeed = 4;// トレッドミルの時速を指定
 int peak1_0 = 2000, peak1_1 = 2000, peak1_2 = 2000, peak1_3 = 2000, peak1_4 = 2000, peak2_0 = 2000, peak2_1 = 2000, peak2_2 = 2000, peak2_3 = 2000, peak2_4 = 2000; // 各圧力センサ値のピーク
 double peakTime1_0 = 0, peakTime1_1 = 0, peakTime1_2 = 0, peakTime1_3 = 0, peakTime1_4 = 0, peakTime2_0 = 0, peakTime2_1 = 0, peakTime2_2 = 0, peakTime2_3 = 0, peakTime2_4 = 0;
 int pressOrderLeft[] = {0, 0, 0, 0, 0}, pressOrderRight[] = {0, 0, 0, 0, 0}; // 着地点の順番を格納する
@@ -113,7 +113,10 @@ void setup() {
   text("4", 725, 297);
   text("5", 550, 225);
   //putArrow(true, 4, 0);
-  hm.put(1, 100);
+  for (Integer i = 0; i < 5; i++) {
+    orderTimeL.put(i+1, dummy);
+    orderTimeR.put(1, dummy);
+  }
   fill(255);
 }
 
@@ -146,13 +149,13 @@ void draw() {
     if (sensorValueLeft0 <= 1010) {
       isLandingPoint1_0 = true;
       //image(landingPoint100, 200, 180, 60, 60);
-      // 最初に触れたセンサかどうかを判定
+      // 触れたセンサかどうかを判定
       if (pressOrderLeft[0] == 0) {
         sensorReactedTimeLeft[0] = System.nanoTime() - startTime;
         pressOrderLeft[0] = orderLeft;
-        println(" 0:"+orderLeft);
+        //println(" 0:"+orderLeft);
         orderTimeL.put(pressOrderLeft[0], sensorReactedTimeLeft[0]);
-        // 最初に接地しているか判定
+        // 最初に触れたセンサか判定
         if (orderLeft == 1) {
           image(left_foot, 25, 150, 250, 600);
           noFill();
@@ -182,25 +185,12 @@ void draw() {
             }
           }
         }
-        if (groundTimeLeft == 0) {
-          groundTimeLeft = sensorReactedTimeLeft[0]; // 着地時間記録
-          //diffGroundTimeLeft = sensorReactedTimeLeft[4]; // スタートから接地までの時間
-          diffTime = groundTimeLeft - groundTimeRight; // 右足を接地してから左足が着くまでの時間
-          fill(255, 255, 255);
-          rect(325, 0, 150, 800);
-          double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
-          fill(100, 100, 255);
-          rect(325, 800 - (float)stride*4, 150, (float)stride*4);
-          fill(255);
-          //println("Stride="+nf((float)stride, 3, 3)+"cm");
-        }
         orderLeft++;
       }
       // 取得したセンサ値が前の値より小さければピークを更新
       if (sensorValueLeft0 <= peak1_0) {
         peak1_0 = sensorValueLeft0;
         peakTime1_0 = (System.nanoTime() - startTime) - sensorReactedTimeLeft[0];
-      } else if (sensorValueLeft0 > peak1_0) {
       }
       // 着地時に他のセンサが着地判定していたら
       if (isLandingPoint1_1 || isLandingPoint1_2 || isLandingPoint1_3 || isLandingPoint1_4) {
@@ -214,7 +204,7 @@ void draw() {
           rect(325, 0, 150, 800);
           double stride = diffTime/1000000000*runningSpeed*1000*100/3600; // 秒 * cm/s
           fill(100, 100, 255);
-          rect(325, 800 - (float)stride*4, 150, (float)stride*4);
+          rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
           fill(255);
           // println("Stride="+nf((float)stride, 3, 3)+"cm");
         }
@@ -261,18 +251,6 @@ void draw() {
             }
           }
         }
-        if (groundTimeLeft == 0) {
-          groundTimeLeft = sensorReactedTimeLeft[1]; // 着地時間記録
-          //diffGroundTimeLeft = sensorReactedTimeLeft[4]; // スタートから接地までの時間
-          diffTime = groundTimeLeft - groundTimeRight; // 右足を接地してから左足が着くまでの時間
-          fill(255, 255, 255);
-          rect(325, 0, 150, 800);
-          double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
-          fill(100, 100, 255);
-          rect(325, 800 - (float)stride*4, 150, (float)stride*4);
-          fill(255);
-          //println("Stride="+nf((float)stride, 3, 3)+"cm");
-        }
         orderLeft++;
       }
       if (sensorValueLeft1 <= peak1_1) {
@@ -291,7 +269,7 @@ void draw() {
           rect(325, 0, 150, 800);
           double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
           fill(100, 100, 255);
-          rect(325, 800 - (float)stride*4, 150, (float)stride*4);
+          rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
           fill(255);
           //println("Stride="+nf((float)stride, 3, 3)+"cm");
         }
@@ -338,18 +316,6 @@ void draw() {
             }
           }
         }
-        if (groundTimeLeft == 0) {
-          groundTimeLeft = sensorReactedTimeLeft[2]; // 着地時間記録
-          //diffGroundTimeLeft = sensorReactedTimeLeft[4]; // スタートから接地までの時間
-          diffTime = groundTimeLeft - groundTimeRight; // 右足を接地してから左足が着くまでの時間
-          fill(255, 255, 255);
-          rect(325, 0, 150, 800);
-          double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
-          fill(100, 100, 255);
-          rect(325, 800 - (float)stride*4, 150, (float)stride*4);
-          fill(255);
-          //println("Stride="+nf((float)stride, 3, 3)+"cm");
-        }
         orderLeft++;
       }
       if (sensorValueLeft2 <= peak1_2) {
@@ -368,7 +334,7 @@ void draw() {
           rect(325, 0, 150, 800);
           double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
           fill(100, 100, 255);
-          rect(325, 800 - (float)stride*4, 150, (float)stride*4);
+          rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
           fill(255);
           //println("Stride="+nf((float)stride, 3, 3)+"cm");
         }
@@ -415,18 +381,6 @@ void draw() {
             }
           }
         }
-        if (groundTimeLeft == 0) {
-          groundTimeLeft = sensorReactedTimeLeft[3]; // 着地時間記録
-          //diffGroundTimeLeft = sensorReactedTimeLeft[4]; // スタートから接地までの時間
-          diffTime = groundTimeLeft - groundTimeRight; // 右足を接地してから左足が着くまでの時間
-          fill(255, 255, 255);
-          rect(325, 0, 150, 800);
-          double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
-          fill(100, 100, 255);
-          rect(325, 800 - (float)stride*4, 150, (float)stride*4);
-          fill(255);
-          //println("Stride="+nf((float)stride, 3, 3)+"cm");
-        }
         orderLeft++;
       }
       if (sensorValueLeft3 <= peak1_3) {
@@ -445,7 +399,7 @@ void draw() {
           rect(325, 0, 150, 800);
           double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
           fill(100, 100, 255);
-          rect(325, 800 - (float)stride*4, 150, (float)stride*4);
+          rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
           fill(255);
           //println("Stride="+nf((float)stride, 3, 3)+"cm");
         }
@@ -493,18 +447,6 @@ void draw() {
             }
           }
         }
-        if (groundTimeLeft == 0) {
-          groundTimeLeft = sensorReactedTimeLeft[4]; // 着地時間記録
-          //diffGroundTimeLeft = sensorReactedTimeLeft[4]; // スタートから接地までの時間
-          diffTime = groundTimeLeft - groundTimeRight; // 右足を接地してから左足が着くまでの時間
-          fill(255, 255, 255);
-          rect(325, 0, 150, 800);
-          double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
-          fill(100, 100, 255);
-          rect(325, 800 - (float)stride*4, 150, (float)stride*4);
-          fill(255);
-          //println("Stride="+nf((float)stride, 3, 3)+"cm");
-        }
         orderLeft++;
       }
       if (sensorValueLeft4 <= peak1_4) {
@@ -514,6 +456,19 @@ void draw() {
       }
       if (isLandingPoint1_0 || isLandingPoint1_1 || isLandingPoint1_2 || isLandingPoint1_3) {
       } else {
+        if (groundTimeLeft != 0) {
+        } else {
+          groundTimeLeft = sensorReactedTimeLeft[3]; // 着地時間記録
+          //diffGroundTimeLeft = sensorReactedTimeLeft[3]; // スタートから接地までの時間
+          diffTime = groundTimeLeft - groundTimeRight; // 左足を離してから右足が着くまでの時間
+          fill(255, 255, 255);
+          rect(325, 0, 150, 800);
+          double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
+          fill(100, 100, 255);
+          rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
+          fill(255);
+          //println("Stride="+nf((float)stride, 3, 3)+"cm");
+        }
       }
     } else {
       //image(landingPointWhite, 110, 640, 70, 70);
@@ -537,11 +492,6 @@ void draw() {
           landingTimeLeft = System.nanoTime() - startTime; // スタートしてから離地までの時間
         }
         // 計算したものをファイルに保存
-        for (Integer i = 1; i <= 5; i++) {
-          if (orderTimeL.get(i) == null) {
-            orderTimeL.put(i, dummy);
-          }
-        }
         outputPressOrder.println((System.nanoTime() - startTime)/1000000000+","+diffTime/1000000000*runningSpeed*1000*100/3600+","+(landingTimeLeft - groundTimeLeft)/1000000000+","+pressOrderLeft[0]+","+pressOrderLeft[1]+","+pressOrderLeft[2]+","+pressOrderLeft[3]+","+pressOrderLeft[4]+","+peak1_0+","+peakTime1_0/1000000000+","+peak1_1+","+peakTime1_1/1000000000+","+peak1_2+","+peakTime1_2/1000000000+","+peak1_3+","+peakTime1_3/1000000000+","+peak1_4+","+peakTime1_4/1000000000+","+(orderTimeL.get(2) - orderTimeL.get(1))/1000000000+","+(orderTimeL.get(3) - orderTimeL.get(2))/1000000000+","+(orderTimeL.get(4) - orderTimeL.get(3))/1000000000+","+(orderTimeL.get(5) - orderTimeL.get(4))/1000000000+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+",");
       }
 
@@ -600,18 +550,6 @@ void draw() {
             }
           }
         }
-        if (groundTimeRight == 0) {
-          groundTimeRight = sensorReactedTimeRight[0]; // 着地時間記録
-          //diffGroundTimeLeft = sensorReactedTimeLeft[4]; // スタートから接地までの時間
-          diffTime = groundTimeRight - groundTimeLeft; // 右足を接地してから左足が着くまでの時間
-          fill(255, 255, 255);
-          rect(325, 0, 150, 800);
-          double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
-          fill(100, 100, 255);
-          rect(325, 800 - (float)stride*4, 150, (float)stride*4);
-          fill(255);
-          //println("Stride="+nf((float)stride, 3, 3)+"cm");
-        }
         orderRight++;
       }
       if (sensorValueRight0 <= peak2_0) {
@@ -630,7 +568,7 @@ void draw() {
           rect(325, 0, 150, 800);
           double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
           fill(100, 100, 255);
-          rect(325, 800 - (float)stride*4, 150, (float)stride*4);
+          rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
           fill(255);
           //println("Stride="+nf((float)stride, 3, 3)+"cm");
         }
@@ -675,18 +613,6 @@ void draw() {
             }
           }
         }
-        if (groundTimeRight == 0) {
-          groundTimeRight = sensorReactedTimeRight[1]; // 着地時間記録
-          //diffGroundTimeLeft = sensorReactedTimeLeft[4]; // スタートから接地までの時間
-          diffTime = groundTimeRight - groundTimeLeft; // 右足を接地してから左足が着くまでの時間
-          fill(255, 255, 255);
-          rect(325, 0, 150, 800);
-          double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
-          fill(100, 100, 255);
-          rect(325, 800 - (float)stride*4, 150, (float)stride*4);
-          fill(255);
-          //println("Stride="+nf((float)stride, 3, 3)+"cm");
-        }
         orderRight++;
       }
       if (sensorValueRight1 <= peak2_1) {
@@ -705,7 +631,7 @@ void draw() {
           rect(325, 0, 150, 800);
           double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
           fill(100, 100, 255);
-          rect(325, 800 - (float)stride*4, 150, (float)stride*4);
+          rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
           fill(255);
           //println("Stride="+nf((float)stride, 3, 3)+"cm");
         }
@@ -750,18 +676,6 @@ void draw() {
             }
           }
         }
-        if (groundTimeRight == 0) {
-          groundTimeRight = sensorReactedTimeRight[2]; // 着地時間記録
-          //diffGroundTimeLeft = sensorReactedTimeLeft[4]; // スタートから接地までの時間
-          diffTime = groundTimeRight - groundTimeLeft; // 右足を接地してから左足が着くまでの時間
-          fill(255, 255, 255);
-          rect(325, 0, 150, 800);
-          double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
-          fill(100, 100, 255);
-          rect(325, 800 - (float)stride*4, 150, (float)stride*4);
-          fill(255);
-          //println("Stride="+nf((float)stride, 3, 3)+"cm");
-        }
         orderRight++;
       }
       if (sensorValueRight2 <= peak2_2) {
@@ -780,7 +694,7 @@ void draw() {
           rect(325, 0, 150, 800);
           double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
           fill(100, 100, 255);
-          rect(325, 800 - (float)stride*4, 150, (float)stride*4);
+          rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
           fill(255);
           //println("Stride="+nf((float)stride, 3, 3)+"cm");
         }
@@ -825,18 +739,6 @@ void draw() {
             }
           }
         }
-        if (groundTimeRight == 0) {
-          groundTimeRight = sensorReactedTimeRight[3]; // 着地時間記録
-          //diffGroundTimeLeft = sensorReactedTimeLeft[4]; // スタートから接地までの時間
-          diffTime = groundTimeRight - groundTimeLeft; // 右足を接地してから左足が着くまでの時間
-          fill(255, 255, 255);
-          rect(325, 0, 150, 800);
-          double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
-          fill(100, 100, 255);
-          rect(325, 800 - (float)stride*4, 150, (float)stride*4);
-          fill(255);
-          //println("Stride="+nf((float)stride, 3, 3)+"cm");
-        }
         orderRight++;
       }
       if (sensorValueRight3 <= peak2_3) {
@@ -855,7 +757,7 @@ void draw() {
           rect(325, 0, 150, 800);
           double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
           fill(100, 100, 255);
-          rect(325, 800 - (float)stride*4, 150, (float)stride*4);
+          rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
           fill(255);
           //println("Stride="+nf((float)stride, 3, 3)+"cm");
         }
@@ -900,18 +802,6 @@ void draw() {
             }
           }
         }
-        if (groundTimeRight == 0) {
-          groundTimeRight = sensorReactedTimeRight[0]; // 着地時間記録
-          //diffGroundTimeLeft = sensorReactedTimeLeft[4]; // スタートから接地までの時間
-          diffTime = groundTimeRight - groundTimeLeft; // 右足を接地してから左足が着くまでの時間
-          fill(255, 255, 255);
-          rect(325, 0, 150, 800);
-          double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
-          fill(100, 100, 255);
-          rect(325, 800 - (float)stride*4, 150, (float)stride*4);
-          fill(255);
-          //println("Stride="+nf((float)stride, 3, 3)+"cm");
-        }
         orderRight++;
       }
       if (sensorValueRight4 <= peak2_4) {
@@ -930,7 +820,7 @@ void draw() {
           rect(325, 0, 150, 800);
           double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
           fill(100, 100, 255);
-          rect(325, 800 - (float)stride*4, 150, (float)stride*4);
+          rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
           fill(255);
           //println("Stride="+nf((float)stride, 3, 3)+"cm");
         }
@@ -967,11 +857,6 @@ void draw() {
           }
           if (pressOrderRight[i] == 5) {
             timeIntervalRight3_4 = sensorReactedTimeRight[i] - evacuateRight4;
-          }
-        }
-        for (Integer i = 1; i <= 5; i++) {
-          if (orderTimeR.get(i) == null) {
-            orderTimeR.put(i, dummy);
           }
         }
         outputPressOrder.println(","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+(System.nanoTime() - startTime)/1000000000+","+diffTime/1000000000*runningSpeed*1000*100/3600+","+(landingTimeRight - groundTimeRight)/1000000000+","+pressOrderRight[0]+","+pressOrderRight[1]+","+pressOrderRight[2]+","+pressOrderRight[3]+","+pressOrderRight[4]+","+peak2_0+","+peakTime2_0/1000000000+","+peak2_1+","+peakTime2_1/1000000000+","+peak2_2+","+peakTime2_2/1000000000+","+peak2_3+","+peakTime2_3/1000000000+","+peak2_4+","+peakTime2_4/1000000000+","+(orderTimeL.get(2) - orderTimeL.get(1))/1000000000+","+(orderTimeL.get(3) - orderTimeL.get(2))/1000000000+","+(orderTimeL.get(4) - orderTimeL.get(3))/1000000000+","+(orderTimeL.get(5) - orderTimeL.get(4))/1000000000);
