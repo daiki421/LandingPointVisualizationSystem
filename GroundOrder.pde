@@ -14,7 +14,6 @@ double time1 = 0, time2 = 0; // Arduinoで取得した時間
 double groundTimeLeft = 0, groundTimeRight = 0; // 地面に初めて接地した時間
 double landingTimeRight = 0, landingTimeLeft = 0; // 地面から離れた時間
 double diffTime = 0; // 片足が接地してからもう片足が接地するまでの時間
-double timeIntervalLeft0_1 = 0, timeIntervalLeft1_2 = 0, timeIntervalLeft2_3 = 0, timeIntervalLeft3_4 = 0, timeIntervalRight0_1 = 0, timeIntervalRight1_2 = 0, timeIntervalRight2_3 = 0, timeIntervalRight3_4 = 0; // 各センサ間の設置時間間隔
 double sensorReactedTimeLeft[] = {0, 0, 0, 0, 0}, sensorReactedTimeRight[] = {0, 0, 0, 0, 0}; // 各センサが地面に設置した時間
 double evacuateLeft2 = 0, evacuateLeft3 = 0, evacuateLeft4 = 0, evacuateRight2 = 0, evacuateRight3 = 0, evacuateRight4 = 0; //センサが反応した時間を一時保存
 int runningSpeed = 4;// トレッドミルの時速を指定
@@ -54,8 +53,8 @@ void setup() {
   //myPort1 = new Serial(this, "/dev/tty.HC-06-DevB", 9600);
   //myPort1 = new Serial(this, "/dev/tty.HC-06-DevB-1", 9600);
   // システム2号機
-  myPort1 = new Serial(this, "/dev/tty.HC-06-DevB-2", 9600);
-  myPort2 = new Serial(this, "/dev/tty.HC-06-DevB-3", 9600);
+  //myPort1 = new Serial(this, "/dev/tty.HC-06-DevB-2", 9600);
+  //myPort2 = new Serial(this, "/dev/tty.HC-06-DevB-3", 9600);
   left_foot = loadImage("left_foot.jpg");
   right_foot = loadImage("right_foot.jpg");
   landingPointWhite = loadImage("white.png");
@@ -115,7 +114,7 @@ void setup() {
   //putArrow(true, 4, 0);
   for (Integer i = 0; i < 5; i++) {
     orderTimeL.put(i+1, dummy);
-    orderTimeR.put(1, dummy);
+    orderTimeR.put(i+1, dummy);
   }
   fill(255);
 }
@@ -142,18 +141,17 @@ void draw() {
       println("File Close");
     }
   }
-  
+
   // Left
   // 親指
   if (myPort1.available()>0) {
     if (sensorValueLeft0 <= 1010) {
       isLandingPoint1_0 = true;
       //image(landingPoint100, 200, 180, 60, 60);
-      // 触れたセンサかどうかを判定
+      // センサの接地順序格納
       if (pressOrderLeft[0] == 0) {
         sensorReactedTimeLeft[0] = System.nanoTime() - startTime;
         pressOrderLeft[0] = orderLeft;
-        //println(" 0:"+orderLeft);
         orderTimeL.put(pressOrderLeft[0], sensorReactedTimeLeft[0]);
         // 最初に触れたセンサか判定
         if (orderLeft == 1) {
@@ -172,6 +170,16 @@ void draw() {
           text("3", 215, 350);
           text("2", 55, 400);
           text("5", 215, 225);
+          groundTimeLeft = sensorReactedTimeLeft[0]; // 着地時間記録
+          diffTime = groundTimeLeft - groundTimeRight; // 右足が接地してから左足が接地するまでの時間
+          //println("diffTime = "+diffTime);
+          fill(255, 255, 255);
+          rect(325, 0, 150, 800);
+          double stride = diffTime/1000000000*runningSpeed*1000*100/3600; // 秒 * cm/s
+          fill(100, 100, 255);
+          rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
+          fill(255);
+          // println("Stride="+nf((float)stride, 3, 3)+"cm");
         } else {
           // このセンサの１つ前のセンサを探して矢印描画
           if (isDrawLeft0) {
@@ -192,23 +200,6 @@ void draw() {
         peak1_0 = sensorValueLeft0;
         peakTime1_0 = (System.nanoTime() - startTime) - sensorReactedTimeLeft[0];
       }
-      // 着地時に他のセンサが着地判定していたら
-      if (isLandingPoint1_1 || isLandingPoint1_2 || isLandingPoint1_3 || isLandingPoint1_4) {
-      } else { 
-        if (groundTimeLeft != 0) {
-        } else {
-          groundTimeLeft = sensorReactedTimeLeft[0]; // 着地時間記録
-          //diffGroundTimeLeft = sensorReactedTimeLeft[0]; // スタートから接地までの時間
-          diffTime = groundTimeLeft - groundTimeRight; // 右足が接地してから左足が接地するまでの時間
-          fill(255, 255, 255);
-          rect(325, 0, 150, 800);
-          double stride = diffTime/1000000000*runningSpeed*1000*100/3600; // 秒 * cm/s
-          fill(100, 100, 255);
-          rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
-          fill(255);
-          // println("Stride="+nf((float)stride, 3, 3)+"cm");
-        }
-      }
     } else {
       isLandingPoint1_0 = false;
     }
@@ -219,7 +210,7 @@ void draw() {
       if (pressOrderLeft[1] == 0) {
         sensorReactedTimeLeft[1] = System.nanoTime() - startTime;
         pressOrderLeft[1] = orderLeft;
-        println(" 1:"+orderLeft);
+        //println(" 1:"+orderLeft);
         orderTimeL.put(pressOrderLeft[1], sensorReactedTimeLeft[1]);
         // 最初に接地しているか判定
         if (orderLeft == 1) {
@@ -238,6 +229,17 @@ void draw() {
           text("3", 215, 350);
           text("2", 55, 400);
           text("5", 215, 225);
+          groundTimeLeft = sensorReactedTimeLeft[1]; // 着地時間記録
+          //diffGroundTimeLeft = sensorReactedTimeLeft[1]; // スタートから接地までの時間
+          diffTime = groundTimeLeft - groundTimeRight; // 右足を離してから左足が着くまでの時間
+          //println("diffTime = "+diffTime);
+          fill(255, 255, 255);
+          rect(325, 0, 150, 800);
+          double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
+          fill(100, 100, 255);
+          rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
+          fill(255);
+          //println("Stride="+nf((float)stride, 3, 3)+"cm");
         } else {
           // このセンサの１つ前のセンサを探して矢印描画
           if (isDrawLeft1) {
@@ -258,22 +260,6 @@ void draw() {
         peakTime1_1 = (System.nanoTime() - startTime) - sensorReactedTimeLeft[1];
       } else if (sensorValueLeft1 > peak1_1) {
       }
-      if (isLandingPoint1_0 || isLandingPoint1_2 || isLandingPoint1_3 || isLandingPoint1_4) {
-      } else {
-        if (groundTimeLeft != 0) {
-        } else {
-          groundTimeLeft = sensorReactedTimeLeft[1]; // 着地時間記録
-          //diffGroundTimeLeft = sensorReactedTimeLeft[1]; // スタートから接地までの時間
-          diffTime = groundTimeLeft - groundTimeRight; // 右足を離してから左足が着くまでの時間
-          fill(255, 255, 255);
-          rect(325, 0, 150, 800);
-          double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
-          fill(100, 100, 255);
-          rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
-          fill(255);
-          //println("Stride="+nf((float)stride, 3, 3)+"cm");
-        }
-      }
     } else {
       isLandingPoint1_1 = false;
     }
@@ -284,7 +270,7 @@ void draw() {
       if (pressOrderLeft[2] == 0) {
         sensorReactedTimeLeft[2] = System.nanoTime() - startTime;
         pressOrderLeft[2] = orderLeft;
-        println(" 2:"+orderLeft);
+        //println(" 2:"+orderLeft);
         orderTimeL.put(pressOrderLeft[2], sensorReactedTimeLeft[2]);
         // 最初に接地しているか判定
         if (orderLeft == 1) {
@@ -303,6 +289,17 @@ void draw() {
           text("3", 215, 350);
           text("2", 55, 400);
           text("5", 215, 225);
+          groundTimeLeft = sensorReactedTimeLeft[2]; // 着地時間記録
+          //diffGroundTimeLeft = sensorReactedTimeLeft[2]; // スタートから接地までの時間
+          diffTime = groundTimeLeft - groundTimeRight; // 左足を離してから右足が着くまでの時間
+          //println("diffTime = "+diffTime);
+          fill(255, 255, 255);
+          rect(325, 0, 150, 800);
+          double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
+          fill(100, 100, 255);
+          rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
+          fill(255);
+          //println("Stride="+nf((float)stride, 3, 3)+"cm");
         } else {
           // このセンサの１つ前のセンサを探して矢印描画
           if (isDrawLeft2) {
@@ -323,22 +320,6 @@ void draw() {
         peakTime1_2 = (System.nanoTime() - startTime) - sensorReactedTimeLeft[2];
       } else if (sensorValueLeft2 > peak1_2) {
       }
-      if (isLandingPoint1_0 || isLandingPoint1_1 || isLandingPoint1_3 || isLandingPoint1_4) {
-      } else {
-        if (groundTimeLeft != 0) {
-        } else {
-          groundTimeLeft = sensorReactedTimeLeft[2]; // 着地時間記録
-          //diffGroundTimeLeft = sensorReactedTimeLeft[2]; // スタートから接地までの時間
-          diffTime = groundTimeLeft - groundTimeRight; // 左足を離してから右足が着くまでの時間
-          fill(255, 255, 255);
-          rect(325, 0, 150, 800);
-          double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
-          fill(100, 100, 255);
-          rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
-          fill(255);
-          //println("Stride="+nf((float)stride, 3, 3)+"cm");
-        }
-      }
     } else {
       isLandingPoint1_2 = false;
     }
@@ -349,7 +330,7 @@ void draw() {
       if (pressOrderLeft[3] == 0) {
         sensorReactedTimeLeft[3] = System.nanoTime() - startTime;
         pressOrderLeft[3] = orderLeft;
-        println(" 3:"+orderLeft);
+        //println(" 3:"+orderLeft);
         orderTimeL.put(pressOrderLeft[3], sensorReactedTimeLeft[3]);
         // 最初に接地しているか判定
         if (orderLeft == 1) {
@@ -368,6 +349,17 @@ void draw() {
           text("3", 215, 350);
           text("2", 55, 400);
           text("5", 215, 225);
+          groundTimeLeft = sensorReactedTimeLeft[3]; // 着地時間記録
+          //diffGroundTimeLeft = sensorReactedTimeLeft[3]; // スタートから接地までの時間
+          diffTime = groundTimeLeft - groundTimeRight; // 左足を離してから右足が着くまでの時間
+          //println("diffTime = "+diffTime);
+          fill(255, 255, 255);
+          rect(325, 0, 150, 800);
+          double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
+          fill(100, 100, 255);
+          rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
+          fill(255);
+          //println("Stride="+nf((float)stride, 3, 3)+"cm");
         } else {
           // このセンサの１つ前のセンサを探して矢印描画
           if (isDrawLeft3) {
@@ -388,22 +380,6 @@ void draw() {
         peakTime1_3 = (System.nanoTime() - startTime) - sensorReactedTimeLeft[3];
       } else if (sensorValueLeft3 > peak1_3) {
       }
-      if (isLandingPoint1_0 || isLandingPoint1_1 || isLandingPoint1_2 || isLandingPoint1_4) {
-      } else {
-        if (groundTimeLeft != 0) {
-        } else {
-          groundTimeLeft = sensorReactedTimeLeft[3]; // 着地時間記録
-          //diffGroundTimeLeft = sensorReactedTimeLeft[3]; // スタートから接地までの時間
-          diffTime = groundTimeLeft - groundTimeRight; // 左足を離してから右足が着くまでの時間
-          fill(255, 255, 255);
-          rect(325, 0, 150, 800);
-          double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
-          fill(100, 100, 255);
-          rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
-          fill(255);
-          //println("Stride="+nf((float)stride, 3, 3)+"cm");
-        }
-      }
     } else {
       isLandingPoint1_3 = false;
     }
@@ -415,7 +391,7 @@ void draw() {
       if (pressOrderLeft[4] == 0) {
         sensorReactedTimeLeft[4] = System.nanoTime() - startTime;
         pressOrderLeft[4] = orderLeft;
-        println(" 4:"+orderLeft);
+        //println(" 4:"+orderLeft);
         orderTimeL.put(pressOrderLeft[4], sensorReactedTimeLeft[4]);
         // 最初に接地しているか判定
         if (orderLeft == 1) {
@@ -434,6 +410,17 @@ void draw() {
           text("3", 215, 350);
           text("2", 55, 400);
           text("5", 215, 225);
+          groundTimeLeft = sensorReactedTimeLeft[4]; // 着地時間記録
+          //diffGroundTimeLeft = sensorReactedTimeLeft[3]; // スタートから接地までの時間
+          diffTime = groundTimeLeft - groundTimeRight; // 左足を離してから右足が着くまでの時間
+          //println("diffTime = "+diffTime);
+          fill(255, 255, 255);
+          rect(325, 0, 150, 800);
+          double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
+          fill(100, 100, 255);
+          rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
+          fill(255);
+          //println("Stride="+nf((float)stride, 3, 3)+"cm");
         } else {
           // このセンサの１つ前のセンサを探して矢印描画
           if (isDrawLeft4) {
@@ -453,22 +440,6 @@ void draw() {
         peak1_4 = sensorValueLeft4;
         peakTime1_4 = (System.nanoTime() - startTime) - sensorReactedTimeLeft[4];
         //println((System.nanoTime() - startTime)+" - "+sensorReactedTimeLeft[4]+" = "+peakTime1_4/1000000000);
-      }
-      if (isLandingPoint1_0 || isLandingPoint1_1 || isLandingPoint1_2 || isLandingPoint1_3) {
-      } else {
-        if (groundTimeLeft != 0) {
-        } else {
-          groundTimeLeft = sensorReactedTimeLeft[3]; // 着地時間記録
-          //diffGroundTimeLeft = sensorReactedTimeLeft[3]; // スタートから接地までの時間
-          diffTime = groundTimeLeft - groundTimeRight; // 左足を離してから右足が着くまでの時間
-          fill(255, 255, 255);
-          rect(325, 0, 150, 800);
-          double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
-          fill(100, 100, 255);
-          rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
-          fill(255);
-          //println("Stride="+nf((float)stride, 3, 3)+"cm");
-        }
       }
     } else {
       //image(landingPointWhite, 110, 640, 70, 70);
@@ -494,7 +465,6 @@ void draw() {
         // 計算したものをファイルに保存
         outputPressOrder.println((System.nanoTime() - startTime)/1000000000+","+diffTime/1000000000*runningSpeed*1000*100/3600+","+(landingTimeLeft - groundTimeLeft)/1000000000+","+pressOrderLeft[0]+","+pressOrderLeft[1]+","+pressOrderLeft[2]+","+pressOrderLeft[3]+","+pressOrderLeft[4]+","+peak1_0+","+peakTime1_0/1000000000+","+peak1_1+","+peakTime1_1/1000000000+","+peak1_2+","+peakTime1_2/1000000000+","+peak1_3+","+peakTime1_3/1000000000+","+peak1_4+","+peakTime1_4/1000000000+","+(orderTimeL.get(2) - orderTimeL.get(1))/1000000000+","+(orderTimeL.get(3) - orderTimeL.get(2))/1000000000+","+(orderTimeL.get(4) - orderTimeL.get(3))/1000000000+","+(orderTimeL.get(5) - orderTimeL.get(4))/1000000000+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+",");
       }
-
       peak1_0 = 2000;
       peak1_1 = 2000;
       peak1_2 = 2000;
@@ -520,6 +490,7 @@ void draw() {
       if (pressOrderRight[0] == 0) {
         sensorReactedTimeRight[0] = System.nanoTime() - startTime;
         pressOrderRight[0] = orderRight;
+        orderTimeR.put(pressOrderRight[0], sensorReactedTimeRight[0]);
         // 最初に接地しているか判定
         if (orderRight == 1) {
           image(right_foot, 520, 150, 250, 600);
@@ -537,6 +508,20 @@ void draw() {
           text("3", 550, 350);
           text("4", 725, 297);
           text("5", 550, 225);
+          if (groundTimeRight != 0) {
+          } else {
+            groundTimeRight = sensorReactedTimeRight[0];
+            //diffGroundTimeRight = sensorReactedTimeRight[0];
+            diffTime = groundTimeRight - groundTimeLeft;
+            //println("diffTime = "+diffTime);
+            fill(255, 255, 255);
+            rect(325, 0, 150, 800);
+            double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
+            fill(100, 100, 255);
+            rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
+            fill(255);
+            //println("Stride="+nf((float)stride, 3, 3)+"cm");
+          }
         } else {
           // このセンサの１つ前のセンサを探して矢印描画
           if (isDrawRight0) {
@@ -557,22 +542,6 @@ void draw() {
         peakTime2_0 = (System.nanoTime() - startTime) - sensorReactedTimeRight[0];
       } else if (sensorValueRight0 > peak2_0) {
       }
-      if (isLandingPoint2_1 || isLandingPoint2_2 || isLandingPoint2_3 || isLandingPoint2_4) {
-      } else {
-        if (groundTimeRight != 0) {
-        } else {
-          groundTimeRight = sensorReactedTimeRight[0];
-          //diffGroundTimeRight = sensorReactedTimeRight[0];
-          diffTime = groundTimeRight - groundTimeLeft;
-          fill(255, 255, 255);
-          rect(325, 0, 150, 800);
-          double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
-          fill(100, 100, 255);
-          rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
-          fill(255);
-          //println("Stride="+nf((float)stride, 3, 3)+"cm");
-        }
-      }
     } else {
       isLandingPoint2_0 = false;
     }
@@ -583,6 +552,7 @@ void draw() {
       if (pressOrderRight[1] == 0) {
         sensorReactedTimeRight[1] = System.nanoTime() - startTime;
         pressOrderRight[1] = orderRight;
+        orderTimeR.put(pressOrderRight[1], sensorReactedTimeRight[1]);
         // 最初に接地しているか判定
         if (orderRight == 1) {
           image(right_foot, 520, 150, 250, 600);
@@ -600,6 +570,17 @@ void draw() {
           text("3", 550, 350);
           text("4", 725, 297);
           text("5", 550, 225);
+          groundTimeRight = sensorReactedTimeRight[1];
+          //diffGroundTimeRight = sensorReactedTimeRight[1];
+          diffTime = groundTimeRight - groundTimeLeft;
+          //println("diffTime = "+diffTime);
+          fill(255, 255, 255);
+          rect(325, 0, 150, 800);
+          double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
+          fill(100, 100, 255);
+          rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
+          fill(255);
+          //println("Stride="+nf((float)stride, 3, 3)+"cm");
         } else {
           // このセンサの１つ前のセンサを探して矢印描画
           if (isDrawRight1) {
@@ -620,22 +601,6 @@ void draw() {
         peakTime2_1 = (System.nanoTime() - startTime) - sensorReactedTimeRight[1];
       } else if (sensorValueRight1 > peak2_1) {
       }
-      if (isLandingPoint2_0 || isLandingPoint2_2 || isLandingPoint2_3 || isLandingPoint2_4) {
-      } else {
-        if (groundTimeRight != 0) {
-        } else {
-          groundTimeRight = sensorReactedTimeRight[1];
-          //diffGroundTimeRight = sensorReactedTimeRight[1];
-          diffTime = groundTimeRight - groundTimeLeft;
-          fill(255, 255, 255);
-          rect(325, 0, 150, 800);
-          double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
-          fill(100, 100, 255);
-          rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
-          fill(255);
-          //println("Stride="+nf((float)stride, 3, 3)+"cm");
-        }
-      }
     } else {
       isLandingPoint2_1 = false;
     }
@@ -646,6 +611,7 @@ void draw() {
       if (pressOrderRight[2] == 0) {
         sensorReactedTimeRight[2] = System.nanoTime() - startTime;
         pressOrderRight[2] = orderRight;
+        orderTimeR.put(pressOrderRight[2], sensorReactedTimeRight[2]);
         // 最初に接地しているか判定
         if (orderRight == 1) {
           image(right_foot, 520, 150, 250, 600);
@@ -663,6 +629,17 @@ void draw() {
           text("3", 550, 350);
           text("4", 725, 297);
           text("5", 550, 225);
+          groundTimeRight = sensorReactedTimeRight[2];
+          //diffGroundTimeRight = sensorReactedTimeRight[2];
+          diffTime = groundTimeRight - groundTimeLeft;
+          //println("diffTime = "+diffTime);
+          fill(255, 255, 255);
+          rect(325, 0, 150, 800);
+          double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
+          fill(100, 100, 255);
+          rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
+          fill(255);
+          //println("Stride="+nf((float)stride, 3, 3)+"cm");
         } else {
           // このセンサの１つ前のセンサを探して矢印描画
           if (isDrawRight2) {
@@ -683,22 +660,6 @@ void draw() {
         peakTime2_2 = (System.nanoTime() - startTime) - sensorReactedTimeRight[2];
       } else if (sensorValueRight2 > peak2_2) {
       }
-      if (isLandingPoint2_0 || isLandingPoint2_1 || isLandingPoint2_3 || isLandingPoint2_4) {
-      } else {
-        if (groundTimeRight != 0) {
-        } else {
-          groundTimeRight = sensorReactedTimeRight[2];
-          //diffGroundTimeRight = sensorReactedTimeRight[2];
-          diffTime = groundTimeRight - groundTimeLeft;
-          fill(255, 255, 255);
-          rect(325, 0, 150, 800);
-          double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
-          fill(100, 100, 255);
-          rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
-          fill(255);
-          //println("Stride="+nf((float)stride, 3, 3)+"cm");
-        }
-      }
     } else {
       isLandingPoint2_2 = false;
     }
@@ -709,6 +670,7 @@ void draw() {
       if (pressOrderRight[3] == 0) {
         sensorReactedTimeRight[3] = System.nanoTime() - startTime;
         pressOrderRight[3] = orderRight;
+        orderTimeR.put(pressOrderRight[3], sensorReactedTimeRight[3]);
         // 最初に接地しているか判定
         if (orderRight == 1) {
           image(right_foot, 520, 150, 250, 600);
@@ -726,6 +688,17 @@ void draw() {
           text("3", 550, 350);
           text("4", 725, 297);
           text("5", 550, 225);
+          groundTimeRight = sensorReactedTimeRight[3];
+          //diffGroundTimeRight = sensorReactedTimeRight[3];
+          diffTime = groundTimeRight - groundTimeLeft;
+          //println("diffTime = "+diffTime);
+          fill(255, 255, 255);
+          rect(325, 0, 150, 800);
+          double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
+          fill(100, 100, 255);
+          rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
+          fill(255);
+          //println("Stride="+nf((float)stride, 3, 3)+"cm");
         } else {
           // このセンサの１つ前のセンサを探して矢印描画
           if (isDrawRight3) {
@@ -746,22 +719,6 @@ void draw() {
         peakTime2_3 = (System.nanoTime() - startTime) - sensorReactedTimeRight[3];
       } else if (sensorValueRight3 > peak2_3) {
       }
-      if (isLandingPoint2_0 || isLandingPoint2_1 || isLandingPoint2_2 || isLandingPoint2_4) {
-      } else {
-        if (groundTimeRight != 0) {
-        } else {
-          groundTimeRight = sensorReactedTimeRight[3];
-          //diffGroundTimeRight = sensorReactedTimeRight[3];
-          diffTime = groundTimeRight - groundTimeLeft;
-          fill(255, 255, 255);
-          rect(325, 0, 150, 800);
-          double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
-          fill(100, 100, 255);
-          rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
-          fill(255);
-          //println("Stride="+nf((float)stride, 3, 3)+"cm");
-        }
-      }
     } else {
       isLandingPoint2_3 = false;
     }
@@ -772,6 +729,7 @@ void draw() {
       if (pressOrderRight[4] == 0) {
         sensorReactedTimeRight[4] = System.nanoTime() - startTime;
         pressOrderRight[4] = orderRight;
+        orderTimeR.put(pressOrderRight[4], sensorReactedTimeRight[4]);
         // 最初に接地しているか判定
         if (orderRight == 1) {
           image(right_foot, 520, 150, 250, 600);
@@ -789,6 +747,17 @@ void draw() {
           text("3", 550, 350);
           text("4", 725, 297);
           text("5", 550, 225);
+          groundTimeRight = sensorReactedTimeRight[4];
+          //diffGroundTimeRight = sensorReactedTimeRight[4];
+          diffTime = groundTimeRight - groundTimeLeft;
+          //println("diffTime = "+diffTime);
+          fill(255, 255, 255);
+          rect(325, 0, 150, 800);
+          double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
+          fill(100, 100, 255);
+          rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
+          fill(255);
+          //println("Stride="+nf((float)stride, 3, 3)+"cm");
         } else {
           // このセンサの１つ前のセンサを探して矢印描画
           if (isDrawRight4) {
@@ -809,22 +778,6 @@ void draw() {
         peakTime2_4 = (System.nanoTime() - startTime) - sensorReactedTimeRight[4];
       } else if (sensorValueRight4 > peak2_4) {
       }
-      if (isLandingPoint2_0 || isLandingPoint2_1 || isLandingPoint2_2 || isLandingPoint2_3) {
-      } else {
-        if (groundTimeRight != 0) {
-        } else {
-          groundTimeRight = sensorReactedTimeRight[4];
-          //diffGroundTimeRight = sensorReactedTimeRight[4];
-          diffTime = groundTimeRight - groundTimeLeft;
-          fill(255, 255, 255);
-          rect(325, 0, 150, 800);
-          double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
-          fill(100, 100, 255);
-          rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
-          fill(255);
-          //println("Stride="+nf((float)stride, 3, 3)+"cm");
-        }
-      }
     } else {
       isLandingPoint2_4 = false;
     }
@@ -842,24 +795,7 @@ void draw() {
         } else {
           landingTimeRight = System.nanoTime() - startTime; // 離地した時間
         }
-        for (int i = 0; i < 5; i++) {
-          if (pressOrderRight[i] == 2) {
-            timeIntervalRight0_1 = sensorReactedTimeRight[i] - groundTimeRight;
-            evacuateRight2 = sensorReactedTimeRight[i];
-          }
-          if (pressOrderRight[i] == 3) {
-            timeIntervalRight1_2 = sensorReactedTimeRight[i] - evacuateRight2;
-            evacuateRight3 = sensorReactedTimeRight[i];
-          }
-          if (pressOrderRight[i] == 4) {
-            timeIntervalRight2_3 = sensorReactedTimeRight[i] - evacuateRight3;
-            evacuateRight4 = sensorReactedTimeRight[i];
-          }
-          if (pressOrderRight[i] == 5) {
-            timeIntervalRight3_4 = sensorReactedTimeRight[i] - evacuateRight4;
-          }
-        }
-        outputPressOrder.println(","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+(System.nanoTime() - startTime)/1000000000+","+diffTime/1000000000*runningSpeed*1000*100/3600+","+(landingTimeRight - groundTimeRight)/1000000000+","+pressOrderRight[0]+","+pressOrderRight[1]+","+pressOrderRight[2]+","+pressOrderRight[3]+","+pressOrderRight[4]+","+peak2_0+","+peakTime2_0/1000000000+","+peak2_1+","+peakTime2_1/1000000000+","+peak2_2+","+peakTime2_2/1000000000+","+peak2_3+","+peakTime2_3/1000000000+","+peak2_4+","+peakTime2_4/1000000000+","+(orderTimeL.get(2) - orderTimeL.get(1))/1000000000+","+(orderTimeL.get(3) - orderTimeL.get(2))/1000000000+","+(orderTimeL.get(4) - orderTimeL.get(3))/1000000000+","+(orderTimeL.get(5) - orderTimeL.get(4))/1000000000);
+        outputPressOrder.println(","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+(System.nanoTime() - startTime)/1000000000+","+diffTime/1000000000*runningSpeed*1000*100/3600+","+(landingTimeRight - groundTimeRight)/1000000000+","+pressOrderRight[0]+","+pressOrderRight[1]+","+pressOrderRight[2]+","+pressOrderRight[3]+","+pressOrderRight[4]+","+peak2_0+","+peakTime2_0/1000000000+","+peak2_1+","+peakTime2_1/1000000000+","+peak2_2+","+peakTime2_2/1000000000+","+peak2_3+","+peakTime2_3/1000000000+","+peak2_4+","+peakTime2_4/1000000000+","+(orderTimeR.get(2) - orderTimeR.get(1))/1000000000+","+(orderTimeR.get(3) - orderTimeR.get(2))/1000000000+","+(orderTimeR.get(4) - orderTimeR.get(3))/1000000000+","+(orderTimeR.get(5) - orderTimeR.get(4))/1000000000);
         peak2_0 = 2000;
         peak2_1 = 2000;
         peak2_2 = 2000;
@@ -945,8 +881,8 @@ void serialEvent(Serial port) {
   //  }
   //}
   output.println((System.nanoTime() - startTime)/1000000000+","+sensorValueLeft0+","+","+sensorValueLeft1+","+","+sensorValueLeft2+","+","+sensorValueLeft3+","+","+sensorValueLeft4+","+","+(System.nanoTime() - startTime)/1000000000+","+sensorValueRight0+","+","+sensorValueRight1+","+","+sensorValueRight2+","+","+sensorValueRight3+","+","+sensorValueRight4);
-  //println("time1="+nf((float)(System.nanoTime() - startTime)/1000000000, 3, 0)+",inByte1_0="+sensorValueLeft0+", inByte1_1="+sensorValueLeft1+", inByte1_2="+sensorValueLeft2+", inByte1_3="+sensorValueLeft3+", inByte1_4="+sensorValueLeft4);
-  //println("time2="+nf((float)(System.nanoTime() - startTime)/1000000000, 3, 0)+",inByte2_0="+sensorValueRight0+", inByte2_1="+sensorValueRight1+", inByte2_2="+sensorValueRight2+", inByte2_3="+sensorValueRight3+", inByte2_4="+sensorValueRight4);
+  println("time1="+nf((float)(System.nanoTime() - startTime)/1000000000, 3, 0)+",inByte1_0="+sensorValueLeft0+", inByte1_1="+sensorValueLeft1+", inByte1_2="+sensorValueLeft2+", inByte1_3="+sensorValueLeft3+", inByte1_4="+sensorValueLeft4);
+  println("time2="+nf((float)(System.nanoTime() - startTime)/1000000000, 3, 0)+",inByte2_0="+sensorValueRight0+", inByte2_1="+sensorValueRight1+", inByte2_2="+sensorValueRight2+", inByte2_3="+sensorValueRight3+", inByte2_4="+sensorValueRight4);
 }
 
 void drawArrow(float x1, float y1, float x2, float y2) {
