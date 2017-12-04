@@ -16,7 +16,7 @@ double landingTimeRight = 0, landingTimeLeft = 0; // 地面から離れた時間
 double diffTime = 0; // 片足が接地してからもう片足が接地するまでの時間
 double sensorReactedTimeLeft[] = {0, 0, 0, 0, 0}, sensorReactedTimeRight[] = {0, 0, 0, 0, 0}; // 各センサが地面に設置した時間
 double evacuateLeft2 = 0, evacuateLeft3 = 0, evacuateLeft4 = 0, evacuateRight2 = 0, evacuateRight3 = 0, evacuateRight4 = 0; //センサが反応した時間を一時保存
-int runningSpeed = 4;// トレッドミルの時速を指定
+int runningSpeed = 9;// トレッドミルの時速を指定
 int peak1_0 = 2000, peak1_1 = 2000, peak1_2 = 2000, peak1_3 = 2000, peak1_4 = 2000, peak2_0 = 2000, peak2_1 = 2000, peak2_2 = 2000, peak2_3 = 2000, peak2_4 = 2000; // 各圧力センサ値のピーク
 double peakTime1_0 = 0, peakTime1_1 = 0, peakTime1_2 = 0, peakTime1_3 = 0, peakTime1_4 = 0, peakTime2_0 = 0, peakTime2_1 = 0, peakTime2_2 = 0, peakTime2_3 = 0, peakTime2_4 = 0;
 int pressOrderLeft[] = {0, 0, 0, 0, 0}, pressOrderRight[] = {0, 0, 0, 0, 0}; // 着地点の順番を格納する
@@ -64,24 +64,78 @@ void setup() {
   image(right_foot, 520, 150, 250, 600);
   fill(100, 100, 255);
   rect(325, 0, 150, 800);
-  line(315, 800 - 200, 485, 800 - 200);
-  line(315, 800 - 400, 485, 800 - 400);
-  line(315, 800 - 600, 485, 800 - 600);
-  textSize(25);
-  fill(0);
-  text("50", 285, 600);
-  text("100", 275, 400);
-  text("150", 275, 200);
-  text("50", 475, 600);
-  text("100", 475, 400);
-  text("150", 475, 200);
-  textSize(15);
-  text("cm", 295, 210);
-  text("cm", 295, 410);
-  text("cm", 295, 610);
-  text("cm", 495, 210);
-  text("cm", 495, 410);
-  text("cm", 485, 610);
+  if (runningSpeed >= 3 && runningSpeed <= 4) {
+    line(315, 800 - 400, 485, 800 - 400);
+    textSize(25);
+    fill(0);
+    text("30", 285, 780);
+    text("50", 285, 400);
+    text("70", 280, 30);
+    text("30", 475, 780);
+    text("50", 475, 400);
+    text("70", 475, 30);
+    textSize(15);
+    text("cm", 295, 790);
+    text("cm", 295, 410);
+    text("cm", 295, 40);
+    text("cm", 485, 790);
+    text("cm", 485, 410);
+    text("cm", 480, 40);
+  } else if (runningSpeed >= 6 && runningSpeed <= 7) {
+    line(315, 800 - 400, 485, 800 - 400);
+    textSize(25);
+    fill(0);
+    text("60", 285, 780);
+    text("80", 285, 400);
+    text("100", 280, 30);
+    text("60", 475, 780);
+    text("80", 475, 400);
+    text("100", 475, 30);
+    textSize(15);
+    text("cm", 295, 790);
+    text("cm", 295, 410);
+    text("cm", 295, 40);
+    text("cm", 485, 790);
+    text("cm", 485, 410);
+    text("cm", 480, 40);
+  } else if (runningSpeed >= 9) {
+    line(315, 800 - 400, 485, 800 - 400);
+    textSize(25);
+    fill(0);
+    text("70", 285, 780);
+    text("90", 285, 400);
+    text("110", 275, 30);
+    text("70", 475, 780);
+    text("90", 475, 400);
+    text("110", 475, 30);
+    textSize(15);
+    text("cm", 295, 790);
+    text("cm", 295, 410);
+    text("cm", 295, 40);
+    text("cm", 485, 790);
+    text("cm", 485, 410);
+    text("cm", 480, 40);
+  } else {
+    line(315, 800 - 200, 485, 800 - 200);
+    line(315, 800 - 400, 485, 800 - 400);
+    line(315, 800 - 600, 485, 800 - 600);
+    textSize(25);
+    fill(0);
+    text("50", 285, 600);
+    text("100", 275, 400);
+    text("150", 275, 200);
+    text("50", 475, 600);
+    text("100", 475, 400);
+    text("150", 475, 200);
+    textSize(15);
+    text("cm", 295, 210);
+    text("cm", 295, 410);
+    text("cm", 295, 610);
+    text("cm", 495, 210);
+    text("cm", 495, 410);
+    text("cm", 485, 610);
+  }
+
   // 左足サークル
   noFill();
   ellipse(144, 674, 75, 75);
@@ -177,7 +231,27 @@ void draw() {
           rect(325, 0, 150, 800);
           double stride = diffTime/1000000000*runningSpeed*1000*100/3600; // 秒 * cm/s
           fill(100, 100, 255);
-          rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
+          if (runningSpeed >= 3 && runningSpeed <= 4) {
+            if (stride < 30) {
+              rect(325, 800, 150, 0);
+            } else {
+              rect(325, 800 - ((float)stride - 30)*20, 150, ((float)stride - 30)*20);
+            }
+          } else if (runningSpeed >= 6 && runningSpeed <= 7) {
+            if (stride < 60) {
+              rect(325, 800, 150, 0);
+            } else {
+              rect(325, 800 - ((float)stride - 60)*20, 150, ((float)stride - 60)*20);
+            }
+          } else if (runningSpeed >= 9) {
+            if (stride < 70) {
+              rect(325, 800, 150, 0);
+            } else {
+              rect(325, 800 - ((float)stride - 70)*20, 150, ((float)stride - 70)*20);
+            }
+          } else {
+          }
+          //rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
           fill(255);
           // println("Stride="+nf((float)stride, 3, 3)+"cm");
         } else {
@@ -237,7 +311,27 @@ void draw() {
           rect(325, 0, 150, 800);
           double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
           fill(100, 100, 255);
-          rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
+          if (runningSpeed >= 3 && runningSpeed <= 4) {
+            if (stride < 30) {
+              rect(325, 800, 150, 0);
+            } else {
+              rect(325, 800 - ((float)stride - 30)*20, 150, ((float)stride - 30)*20);
+            }
+          } else if (runningSpeed >= 6 && runningSpeed <= 7) {
+            if (stride < 60) {
+              rect(325, 800, 150, 0);
+            } else {
+              rect(325, 800 - ((float)stride - 60)*20, 150, ((float)stride - 60)*20);
+            }
+          } else if (runningSpeed >= 9) {
+            if (stride < 70) {
+              rect(325, 800, 150, 0);
+            } else {
+              rect(325, 800 - ((float)stride - 70)*20, 150, ((float)stride - 70)*20);
+            }
+          } else {
+          }
+          //rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
           fill(255);
           //println("Stride="+nf((float)stride, 3, 3)+"cm");
         } else {
@@ -297,7 +391,27 @@ void draw() {
           rect(325, 0, 150, 800);
           double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
           fill(100, 100, 255);
-          rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
+          if (runningSpeed >= 3 && runningSpeed <= 4) {
+            if (stride < 30) {
+              rect(325, 800, 150, 0);
+            } else {
+              rect(325, 800 - ((float)stride - 30)*20, 150, ((float)stride - 30)*20);
+            }
+          } else if (runningSpeed >= 6 && runningSpeed <= 7) {
+            if (stride < 60) {
+              rect(325, 800, 150, 0);
+            } else {
+              rect(325, 800 - ((float)stride - 60)*20, 150, ((float)stride - 60)*20);
+            }
+          } else if (runningSpeed >= 9) {
+            if (stride < 70) {
+              rect(325, 800, 150, 0);
+            } else {
+              rect(325, 800 - ((float)stride - 70)*20, 150, ((float)stride - 70)*20);
+            }
+          } else {
+          }
+          //rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
           fill(255);
           //println("Stride="+nf((float)stride, 3, 3)+"cm");
         } else {
@@ -357,7 +471,27 @@ void draw() {
           rect(325, 0, 150, 800);
           double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
           fill(100, 100, 255);
-          rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
+          if (runningSpeed >= 3 && runningSpeed <= 4) {
+            if (stride < 30) {
+              rect(325, 800, 150, 0);
+            } else {
+              rect(325, 800 - ((float)stride - 30)*20, 150, ((float)stride - 30)*20);
+            }
+          } else if (runningSpeed >= 6 && runningSpeed <= 7) {
+            if (stride < 60) {
+              rect(325, 800, 150, 0);
+            } else {
+              rect(325, 800 - ((float)stride - 60)*20, 150, ((float)stride - 60)*20);
+            }
+          } else if (runningSpeed >= 9) {
+            if (stride < 70) {
+              rect(325, 800, 150, 0);
+            } else {
+              rect(325, 800 - ((float)stride - 70)*20, 150, ((float)stride - 70)*20);
+            }
+          } else {
+          }
+          //rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
           fill(255);
           //println("Stride="+nf((float)stride, 3, 3)+"cm");
         } else {
@@ -418,7 +552,27 @@ void draw() {
           rect(325, 0, 150, 800);
           double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
           fill(100, 100, 255);
-          rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
+          if (runningSpeed >= 3 && runningSpeed <= 4) {
+            if (stride < 30) {
+              rect(325, 800, 150, 0);
+            } else {
+              rect(325, 800 - ((float)stride - 30)*20, 150, ((float)stride - 30)*20);
+            }
+          } else if (runningSpeed >= 6 && runningSpeed <= 7) {
+            if (stride < 60) {
+              rect(325, 800, 150, 0);
+            } else {
+              rect(325, 800 - ((float)stride - 60)*20, 150, ((float)stride - 60)*20);
+            }
+          } else if (runningSpeed >= 9) {
+            if (stride < 70) {
+              rect(325, 800, 150, 0);
+            } else {
+              rect(325, 800 - ((float)stride - 70)*20, 150, ((float)stride - 70)*20);
+            }
+          } else {
+          }
+          //rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
           fill(255);
           //println("Stride="+nf((float)stride, 3, 3)+"cm");
         } else {
@@ -518,7 +672,27 @@ void draw() {
             rect(325, 0, 150, 800);
             double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
             fill(100, 100, 255);
-            rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
+            if (runningSpeed >= 3 && runningSpeed <= 4) {
+              if (stride < 30) {
+                rect(325, 800, 150, 0);
+              } else {
+                rect(325, 800 - ((float)stride - 30)*20, 150, ((float)stride - 30)*20);
+              }
+            } else if (runningSpeed >= 6 && runningSpeed <= 7) {
+              if (stride < 60) {
+                rect(325, 800, 150, 0);
+              } else {
+                rect(325, 800 - ((float)stride - 60)*20, 150, ((float)stride - 60)*20);
+              }
+            } else if (runningSpeed >= 9) {
+              if (stride < 70) {
+                rect(325, 800, 150, 0);
+              } else {
+                rect(325, 800 - ((float)stride - 70)*20, 150, ((float)stride - 70)*20);
+              }
+            } else {
+            }
+            //rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
             fill(255);
             //println("Stride="+nf((float)stride, 3, 3)+"cm");
           }
@@ -578,7 +752,28 @@ void draw() {
           rect(325, 0, 150, 800);
           double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
           fill(100, 100, 255);
-          rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
+          if (runningSpeed >= 3 && runningSpeed <= 4) {
+            if (stride < 30) {
+              rect(325, 800, 150, 0);
+            } else {
+              rect(325, 800 - ((float)stride - 30)*20, 150, ((float)stride - 30)*20);
+            }
+          } else if (runningSpeed >= 6 && runningSpeed <= 7) {
+            if (stride < 60) {
+              rect(325, 800, 150, 0);
+            } else {
+              rect(325, 800 - ((float)stride - 60)*20, 150, ((float)stride - 60)*20);
+            }
+          } else if (runningSpeed >= 9) {
+            if (stride < 70) {
+              rect(325, 800, 150, 0);
+            } else {
+              rect(325, 800 - ((float)stride - 70)*20, 150, ((float)stride - 70)*20);
+            }
+          } else {
+            
+          }
+          //rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
           fill(255);
           //println("Stride="+nf((float)stride, 3, 3)+"cm");
         } else {
@@ -637,7 +832,28 @@ void draw() {
           rect(325, 0, 150, 800);
           double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
           fill(100, 100, 255);
-          rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
+          if (runningSpeed >= 3 && runningSpeed <= 4) {
+            if (stride < 30) {
+              rect(325, 800, 150, 0);
+            } else {
+              rect(325, 800 - ((float)stride - 30)*20, 150, ((float)stride - 30)*20);
+            }
+          } else if (runningSpeed >= 6 && runningSpeed <= 7) {
+            if (stride < 60) {
+              rect(325, 800, 150, 0);
+            } else {
+              rect(325, 800 - ((float)stride - 60)*20, 150, ((float)stride - 60)*20);
+            }
+          } else if (runningSpeed >= 9) {
+            if (stride < 70) {
+              rect(325, 800, 150, 0);
+            } else {
+              rect(325, 800 - ((float)stride - 70)*20, 150, ((float)stride - 70)*20);
+            }
+          } else {
+            
+          }
+          //rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
           fill(255);
           //println("Stride="+nf((float)stride, 3, 3)+"cm");
         } else {
@@ -696,7 +912,28 @@ void draw() {
           rect(325, 0, 150, 800);
           double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
           fill(100, 100, 255);
-          rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
+          if (runningSpeed >= 3 && runningSpeed <= 4) {
+            if (stride < 30) {
+              rect(325, 800, 150, 0);
+            } else {
+              rect(325, 800 - ((float)stride - 30)*20, 150, ((float)stride - 30)*20);
+            }
+          } else if (runningSpeed >= 6 && runningSpeed <= 7) {
+            if (stride < 60) {
+              rect(325, 800, 150, 0);
+            } else {
+              rect(325, 800 - ((float)stride - 60)*20, 150, ((float)stride - 60)*20);
+            }
+          } else if (runningSpeed >= 9) {
+            if (stride < 70) {
+              rect(325, 800, 150, 0);
+            } else {
+              rect(325, 800 - ((float)stride - 70)*20, 150, ((float)stride - 70)*20);
+            }
+          } else {
+            
+          }
+          //rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
           fill(255);
           //println("Stride="+nf((float)stride, 3, 3)+"cm");
         } else {
@@ -755,7 +992,28 @@ void draw() {
           rect(325, 0, 150, 800);
           double stride = diffTime/1000000000*runningSpeed*1000*100/3600;
           fill(100, 100, 255);
-          rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
+          if (runningSpeed >= 3 && runningSpeed <= 4) {
+            if (stride < 30) {
+              rect(325, 800, 150, 0);
+            } else {
+              rect(325, 800 - ((float)stride - 30)*20, 150, ((float)stride - 30)*20);
+            }
+          } else if (runningSpeed >= 6 && runningSpeed <= 7) {
+            if (stride < 60) {
+              rect(325, 800, 150, 0);
+            } else {
+              rect(325, 800 - ((float)stride - 60)*20, 150, ((float)stride - 60)*20);
+            }
+          } else if (runningSpeed >= 9) {
+            if (stride < 70) {
+              rect(325, 800, 150, 0);
+            } else {
+              rect(325, 800 - ((float)stride - 70)*20, 150, ((float)stride - 70)*20);
+            }
+          } else {
+            
+          }
+          //rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
           fill(255);
           //println("Stride="+nf((float)stride, 3, 3)+"cm");
         } else {
