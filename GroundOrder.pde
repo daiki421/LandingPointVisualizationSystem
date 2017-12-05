@@ -16,7 +16,7 @@ double landingTimeRight = 0, landingTimeLeft = 0; // 地面から離れた時間
 double diffTime = 0; // 片足が接地してからもう片足が接地するまでの時間
 double sensorReactedTimeLeft[] = {0, 0, 0, 0, 0}, sensorReactedTimeRight[] = {0, 0, 0, 0, 0}; // 各センサが地面に設置した時間
 double evacuateLeft2 = 0, evacuateLeft3 = 0, evacuateLeft4 = 0, evacuateRight2 = 0, evacuateRight3 = 0, evacuateRight4 = 0; //センサが反応した時間を一時保存
-int runningSpeed = 9;// トレッドミルの時速を指定
+int runningSpeed = 6;// トレッドミルの時速を指定
 int peak1_0 = 2000, peak1_1 = 2000, peak1_2 = 2000, peak1_3 = 2000, peak1_4 = 2000, peak2_0 = 2000, peak2_1 = 2000, peak2_2 = 2000, peak2_3 = 2000, peak2_4 = 2000; // 各圧力センサ値のピーク
 double peakTime1_0 = 0, peakTime1_1 = 0, peakTime1_2 = 0, peakTime1_3 = 0, peakTime1_4 = 0, peakTime2_0 = 0, peakTime2_1 = 0, peakTime2_2 = 0, peakTime2_3 = 0, peakTime2_4 = 0;
 int pressOrderLeft[] = {0, 0, 0, 0, 0}, pressOrderRight[] = {0, 0, 0, 0, 0}; // 着地点の順番を格納する
@@ -37,24 +37,26 @@ boolean isLeft = true;
 void setup() {
   startTime = System.nanoTime();
   size(800, 800);
-  output = createWriter("Test1.csv");
-  outputPressOrder = createWriter("TestOrder1.csv");
-  //output = createWriter("SensorData1"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
-  //output2 = createWriter("SensorData2"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
-  //output3 = createWriter("SensorData3"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
-  //output4 = createWriter("SensorData4"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
-  //outputPressOrder = createWriter("PressOrder"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
+  //output = createWriter("Test1.csv");
+  //outputPressOrder = createWriter("TestOrder1.csv");
+  output = createWriter("SensorData1"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
+  output2 = createWriter("SensorData2"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
+  output3 = createWriter("SensorData3"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
+  output4 = createWriter("SensorData4"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
+  outputPressOrder = createWriter("PressOrder"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
   output.println("time1,Left0,,Left1,,Left2,,Left3,,Left4,,time2,Right0,,Right1,,Right2,,Right3,,Right4,"+String.valueOf(runningSpeed)+"km/h");
-  //output2.println("time1,Left0,,Left1,,Left2,,Left3,,Left4,,time2,Right0,,Right1,,Right2,,Right3,,Right4");
-  //output3.println("time1,Left0,,Left1,,Left2,,Left3,,Left4,,time2,Right0,,Right1,,Right2,,Right3,,Right4");
-  //output4.println("time1,Left0,,Left1,,Left2,,Left3,,Left4,,time2,Right0,,Right1,,Right2,,Right3,,Right4");
+  output2.println("time1,Left0,,Left1,,Left2,,Left3,,Left4,,time2,Right0,,Right1,,Right2,,Right3,,Right4");
+  output3.println("time1,Left0,,Left1,,Left2,,Left3,,Left4,,time2,Right0,,Right1,,Right2,,Right3,,Right4");
+  output4.println("time1,Left0,,Left1,,Left2,,Left3,,Left4,,time2,Right0,,Right1,,Right2,,Right3,,Right4");
   outputPressOrder.println("TimeLeft,StrideLeft(cm),ContactTimeLeft(s),Left0,Left1,Left2,Left3,Left4,LPeak1,LPTime1,LPeak2,LPTime2,LPeak3,LPTime3,LPeak4,LPTime4,LPeak5,LPTime5,TIL0_1,TIL1_2,TIL2_3,TIL3_4,,TimeRight,StrideRight,ContactTimeRight,Right0,Right1,Right2,Right3,Right4,RPeak1,RPTime1,RPeak2,RPTime2,RPeak3,RPTime3,RPeak4,RPTime4,RPeak5,RPTime5,TIR0_1,TIR1_2,TIR2_3,TIR3_4");
   // システム1号機
-  //myPort1 = new Serial(this, "/dev/tty.HC-06-DevB", 9600);
-  //myPort1 = new Serial(this, "/dev/tty.HC-06-DevB-1", 9600);
+  myPort1 = new Serial(this, "/dev/tty.HC-06-DevB-4", 9600); // 2
+  //myPort1 = new Serial(this, "/dev/tty.HC-06-DevB-5", 9600); // 1*
   // システム2号機
-  //myPort1 = new Serial(this, "/dev/tty.HC-06-DevB-2", 9600);
-  //myPort2 = new Serial(this, "/dev/tty.HC-06-DevB-3", 9600);
+  myPort2 = new Serial(this, "/dev/tty.HC-06-DevB-2", 9600); // 0
+  //myPort1 = new Serial(this, "/dev/tty.HC-06-DevB-3", 9600); // 3
+  println("myPort1="+myPort1.available()+", myPort2="+myPort2.available());
+  //printArray(Serial.list());
   left_foot = loadImage("left_foot.jpg");
   right_foot = loadImage("right_foot.jpg");
   landingPointWhite = loadImage("white.png");
@@ -65,84 +67,122 @@ void setup() {
   fill(100, 100, 255);
   rect(325, 0, 150, 800);
   if (runningSpeed >= 3 && runningSpeed <= 4) {
-    line(315, 800 - 400, 485, 800 - 400);
+    line(315, 200, 485, 200);
+    line(315, 400, 485, 400);
+    line(315, 600, 485, 600);
     textSize(25);
     fill(0);
     text("30", 285, 780);
+    text("40", 285, 590);
     text("50", 285, 400);
+    text("60", 285, 200);
     text("70", 280, 30);
     text("30", 475, 780);
+    text("40", 475, 590);
     text("50", 475, 400);
+    text("60", 475, 200);
     text("70", 475, 30);
     textSize(15);
     text("cm", 295, 790);
+    text("cm", 285, 600);
     text("cm", 295, 410);
+    text("cm", 285, 210);
     text("cm", 295, 40);
     text("cm", 485, 790);
+    text("cm", 485, 600);
     text("cm", 485, 410);
+    text("cm", 485, 210);
     text("cm", 480, 40);
   } else if (runningSpeed >= 6 && runningSpeed <= 7) {
-    line(315, 800 - 400, 485, 800 - 400);
+    line(315, 200, 485, 200);
+    line(315, 400, 485, 400);
+    line(315, 600, 485, 600);
     textSize(25);
     fill(0);
     text("60", 285, 780);
+    text("70", 285, 590);
     text("80", 285, 400);
+    text("90", 285, 200);
     text("100", 280, 30);
     text("60", 475, 780);
+    text("70", 475, 590);
     text("80", 475, 400);
+    text("90", 475, 200);
     text("100", 475, 30);
     textSize(15);
     text("cm", 295, 790);
+    text("cm", 285, 600);
     text("cm", 295, 410);
+    text("cm", 285, 210);
     text("cm", 295, 40);
     text("cm", 485, 790);
+    text("cm", 485, 600);
     text("cm", 485, 410);
+    text("cm", 485, 210);
     text("cm", 480, 40);
   } else if (runningSpeed >= 9) {
-    line(315, 800 - 400, 485, 800 - 400);
+    line(315, 200, 485, 200);
+    line(315, 400, 485, 400);
+    line(315, 600, 485, 600);
     textSize(25);
     fill(0);
     text("70", 285, 780);
+    text("80", 285, 590);
     text("90", 285, 400);
-    text("110", 275, 30);
+    text("100", 285, 200);
+    text("110", 280, 30);
     text("70", 475, 780);
+    text("80", 475, 590);
     text("90", 475, 400);
+    text("100", 475, 200);
     text("110", 475, 30);
     textSize(15);
     text("cm", 295, 790);
+    text("cm", 285, 600);
     text("cm", 295, 410);
+    text("cm", 285, 210);
     text("cm", 295, 40);
     text("cm", 485, 790);
+    text("cm", 485, 600);
     text("cm", 485, 410);
+    text("cm", 485, 210);
     text("cm", 480, 40);
   } else {
-    line(315, 800 - 200, 485, 800 - 200);
-    line(315, 800 - 400, 485, 800 - 400);
-    line(315, 800 - 600, 485, 800 - 600);
+    line(315, 200, 485, 200);
+    line(315, 400, 485, 400);
+    line(315, 600, 485, 600);
     textSize(25);
     fill(0);
-    text("50", 285, 600);
-    text("100", 275, 400);
-    text("150", 275, 200);
-    text("50", 475, 600);
-    text("100", 475, 400);
-    text("150", 475, 200);
+    text("30", 285, 780);
+    text("40", 285, 590);
+    text("50", 285, 400);
+    text("60", 285, 200);
+    text("70", 280, 30);
+    text("30", 475, 780);
+    text("40", 475, 590);
+    text("50", 475, 400);
+    text("60", 475, 200);
+    text("70", 475, 30);
     textSize(15);
-    text("cm", 295, 210);
+    text("cm", 295, 790);
+    text("cm", 285, 600);
     text("cm", 295, 410);
-    text("cm", 295, 610);
-    text("cm", 495, 210);
-    text("cm", 495, 410);
-    text("cm", 485, 610);
+    text("cm", 285, 210);
+    text("cm", 295, 40);
+    text("cm", 485, 790);
+    text("cm", 485, 600);
+    text("cm", 485, 410);
+    text("cm", 485, 210);
+    text("cm", 480, 40);
   }
 
   // 左足サークル
   noFill();
-  ellipse(144, 674, 75, 75);
-  ellipse(230, 210, 65, 65);
-  ellipse(55, 280, 65, 65);
-  ellipse(230, 330, 65, 65);
-  ellipse(70, 380, 65, 65);
+  ellipse(144, 674, 75, 75); // 小指下
+  ellipse(230, 210, 65, 65); // 親指
+  ellipse(55, 280, 65, 65); //小指
+  ellipse(230, 330, 65, 65); // 親指下
+  ellipse(70, 380, 65, 65); // かかと
   // 右足サークル
   ellipse(650, 675, 75, 75);
   ellipse(565, 210, 65, 65);
@@ -174,6 +214,7 @@ void setup() {
 }
 
 void draw() {
+
   fill(255);
   strokeWeight(1);
   rect(0, 0, 200, 30);
@@ -184,18 +225,17 @@ void draw() {
     if (mouseX >= 0 && mouseX < 800 && mouseY >= 0 && mouseY <= 800) {
       output.flush(); // データ書き込み
       output.close(); // ファイル閉じる
-      //output2.flush(); // データ書き込み
-      //output2.close(); // ファイル閉じる
-      //output3.flush(); // データ書き込み
-      //output3.close(); // ファイル閉じる
-      //output4.flush(); // データ書き込み
-      //output4.close(); // ファイル閉じる
+      output2.flush(); // データ書き込み
+      output2.close(); // ファイル閉じる
+      output3.flush(); // データ書き込み
+      output3.close(); // ファイル閉じる
+      output4.flush(); // データ書き込み
+      output4.close(); // ファイル閉じる
       outputPressOrder.flush();
       outputPressOrder.close();
       println("File Close");
     }
   }
-
   // Left
   // 親指
   if (myPort1.available()>0) {
@@ -230,6 +270,7 @@ void draw() {
           fill(255, 255, 255);
           rect(325, 0, 150, 800);
           double stride = diffTime/1000000000*runningSpeed*1000*100/3600; // 秒 * cm/s
+          println("groundTimeLeft="+nf((float)groundTimeLeft/1000000000,3,3)+", groundTimeRight="+nf((float)groundTimeRight/1000000000),3,3);
           fill(100, 100, 255);
           if (runningSpeed >= 3 && runningSpeed <= 4) {
             if (stride < 30) {
@@ -304,7 +345,6 @@ void draw() {
           text("2", 55, 400);
           text("5", 215, 225);
           groundTimeLeft = sensorReactedTimeLeft[1]; // 着地時間記録
-          //diffGroundTimeLeft = sensorReactedTimeLeft[1]; // スタートから接地までの時間
           diffTime = groundTimeLeft - groundTimeRight; // 右足を離してから左足が着くまでの時間
           //println("diffTime = "+diffTime);
           fill(255, 255, 255);
@@ -384,7 +424,6 @@ void draw() {
           text("2", 55, 400);
           text("5", 215, 225);
           groundTimeLeft = sensorReactedTimeLeft[2]; // 着地時間記録
-          //diffGroundTimeLeft = sensorReactedTimeLeft[2]; // スタートから接地までの時間
           diffTime = groundTimeLeft - groundTimeRight; // 左足を離してから右足が着くまでの時間
           //println("diffTime = "+diffTime);
           fill(255, 255, 255);
@@ -518,7 +557,7 @@ void draw() {
       isLandingPoint1_3 = false;
     }
     // かかと
-    if (sensorValueLeft4 <= 1010) {
+    if (sensorValueLeft4 <= 1015) {
       isLandingPoint1_4 = true;
       //image(landingPoint100, 110, 640, 70, 70);
       // 接地した順序を格納
@@ -771,7 +810,6 @@ void draw() {
               rect(325, 800 - ((float)stride - 70)*20, 150, ((float)stride - 70)*20);
             }
           } else {
-            
           }
           //rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
           fill(255);
@@ -851,7 +889,6 @@ void draw() {
               rect(325, 800 - ((float)stride - 70)*20, 150, ((float)stride - 70)*20);
             }
           } else {
-            
           }
           //rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
           fill(255);
@@ -931,7 +968,6 @@ void draw() {
               rect(325, 800 - ((float)stride - 70)*20, 150, ((float)stride - 70)*20);
             }
           } else {
-            
           }
           //rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
           fill(255);
@@ -1011,7 +1047,6 @@ void draw() {
               rect(325, 800 - ((float)stride - 70)*20, 150, ((float)stride - 70)*20);
             }
           } else {
-            
           }
           //rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
           fill(255);
@@ -1072,6 +1107,7 @@ void draw() {
 
 void serialEvent(Serial port) {
   if (port == myPort1) {
+    //println("available1:"+port.available());
     if (port.available() >= 12) {
       if (port.read() == 'H') {
         time1 = port.read();
@@ -1092,8 +1128,11 @@ void serialEvent(Serial port) {
         sensorValueLeft4 = analog1_4_high*256 + analog1_4_low;
       }
     }
+  } else {
+    //println("Not found port1");
   }
   if (port == myPort2) {
+    //println(", available2:"+port.available());
     if (port.available() >= 12) {
       if (port.read() == 'H') {
         time2 = port.read();
@@ -1114,35 +1153,37 @@ void serialEvent(Serial port) {
         sensorValueRight4 = analog2_4_high*256 + analog2_4_low;
       }
     }
+  } else {
+    //println("Not found port2");
   }
-  //if ((System.nanoTime() - startTime)/1000000000 >= 0 && (System.nanoTime() - startTime)/1000000000 < 550) {
-  //  if (sensorValueLeft0 > 0 && sensorValueLeft1 > 0 && sensorValueLeft2 > 0 && sensorValueLeft3 > 0 && sensorValueLeft4 > 0 && sensorValueRight0 > 0 && sensorValueRight1 > 0 && sensorValueRight2 > 0 && sensorValueRight3 > 0 && sensorValueRight4 > 0) {
-  //    output.println((System.nanoTime() - startTime)/1000000000+","+sensorValueLeft0+","+","+sensorValueLeft1+","+","+sensorValueLeft2+","+","+sensorValueLeft3+","+","+sensorValueLeft4+","+","+(System.nanoTime() - startTime)/1000000000+","+sensorValueRight0+","+","+sensorValueRight1+","+","+sensorValueRight2+","+","+sensorValueRight3+","+","+sensorValueRight4);
-  //  }
-  //} else if ((System.nanoTime() - startTime)/1000000000 >= 550 && (System.nanoTime() - startTime)/1000000000 < 1100) {
-  //  output.flush();
-  //  output.close();
-  //  if (sensorValueLeft0 > 0 && sensorValueLeft1 > 0 && sensorValueLeft2 > 0 && sensorValueLeft3 > 0 && sensorValueLeft4 > 0 && sensorValueRight0 > 0 && sensorValueRight1 > 0 && sensorValueRight2 > 0 && sensorValueRight3 > 0 && sensorValueRight4 > 0) {
-  //    output2.println((System.nanoTime() - startTime)/1000000000+","+sensorValueLeft0+","+","+sensorValueLeft1+","+","+sensorValueLeft2+","+","+sensorValueLeft3+","+","+sensorValueLeft4+","+","+(System.nanoTime() - startTime)/1000000000+","+sensorValueRight0+","+","+sensorValueRight1+","+","+sensorValueRight2+","+","+sensorValueRight3+","+","+sensorValueRight4);
-  //  }
-  //} else if ((System.nanoTime() - startTime)/1000000000 >= 1100 && (System.nanoTime() - startTime)/1000000000 < 1650) {
-  //  output2.flush();
-  //  output2.close();
-  //  if (sensorValueLeft0 > 0 && sensorValueLeft1 > 0 && sensorValueLeft2 > 0 && sensorValueLeft3 > 0 && sensorValueLeft4 > 0 && sensorValueRight0 > 0 && sensorValueRight1 > 0 && sensorValueRight2 > 0 && sensorValueRight3 > 0 && sensorValueRight4 > 0) {
-  //    output3.println((System.nanoTime() - startTime)/1000000000+","+sensorValueLeft0+","+","+sensorValueLeft1+","+","+sensorValueLeft2+","+","+sensorValueLeft3+","+","+sensorValueLeft4+","+","+(System.nanoTime() - startTime)/1000000000+","+sensorValueRight0+","+","+sensorValueRight1+","+","+sensorValueRight2+","+","+sensorValueRight3+","+","+sensorValueRight4);
-  //  }
-  //} else {
-  //  output3.flush();
-  //  output3.close();
-  //  if (sensorValueLeft0 > 0 && sensorValueLeft1 > 0 && sensorValueLeft2 > 0 && sensorValueLeft3 > 0 && sensorValueLeft4 > 0 && sensorValueRight0 > 0 && sensorValueRight1 > 0 && sensorValueRight2 > 0 && sensorValueRight3 > 0 && sensorValueRight4 > 0) {
-  //    output4.println((System.nanoTime() - startTime)/1000000000+","+sensorValueLeft0+","+","+sensorValueLeft1+","+","+sensorValueLeft2+","+","+sensorValueLeft3+","+","+sensorValueLeft4+","+","+(System.nanoTime() - startTime)/1000000000+","+sensorValueRight0+","+","+sensorValueRight1+","+","+sensorValueRight2+","+","+sensorValueRight3+","+","+sensorValueRight4);
-  //  }
-  //}
-  output.println((System.nanoTime() - startTime)/1000000000+","+sensorValueLeft0+","+","+sensorValueLeft1+","+","+sensorValueLeft2+","+","+sensorValueLeft3+","+","+sensorValueLeft4+","+","+(System.nanoTime() - startTime)/1000000000+","+sensorValueRight0+","+","+sensorValueRight1+","+","+sensorValueRight2+","+","+sensorValueRight3+","+","+sensorValueRight4);
+  if ((System.nanoTime() - startTime)/1000000000 >= 0 && (System.nanoTime() - startTime)/1000000000 < 550) {
+    if (sensorValueLeft0 > 0 && sensorValueLeft1 > 0 && sensorValueLeft2 > 0 && sensorValueLeft3 > 0 && sensorValueLeft4 > 0 && sensorValueRight0 > 0 && sensorValueRight1 > 0 && sensorValueRight2 > 0 && sensorValueRight3 > 0 && sensorValueRight4 > 0) {
+      output.println((System.nanoTime() - startTime)/1000000000+","+sensorValueLeft0+","+","+sensorValueLeft1+","+","+sensorValueLeft2+","+","+sensorValueLeft3+","+","+sensorValueLeft4+","+","+(System.nanoTime() - startTime)/1000000000+","+sensorValueRight0+","+","+sensorValueRight1+","+","+sensorValueRight2+","+","+sensorValueRight3+","+","+sensorValueRight4);
+    }
+  } else if ((System.nanoTime() - startTime)/1000000000 >= 550 && (System.nanoTime() - startTime)/1000000000 < 1100) {
+    output.flush();
+    output.close();
+    if (sensorValueLeft0 > 0 && sensorValueLeft1 > 0 && sensorValueLeft2 > 0 && sensorValueLeft3 > 0 && sensorValueLeft4 > 0 && sensorValueRight0 > 0 && sensorValueRight1 > 0 && sensorValueRight2 > 0 && sensorValueRight3 > 0 && sensorValueRight4 > 0) {
+      output2.println((System.nanoTime() - startTime)/1000000000+","+sensorValueLeft0+","+","+sensorValueLeft1+","+","+sensorValueLeft2+","+","+sensorValueLeft3+","+","+sensorValueLeft4+","+","+(System.nanoTime() - startTime)/1000000000+","+sensorValueRight0+","+","+sensorValueRight1+","+","+sensorValueRight2+","+","+sensorValueRight3+","+","+sensorValueRight4);
+    }
+  } else if ((System.nanoTime() - startTime)/1000000000 >= 1100 && (System.nanoTime() - startTime)/1000000000 < 1650) {
+    output2.flush();
+    output2.close();
+    if (sensorValueLeft0 > 0 && sensorValueLeft1 > 0 && sensorValueLeft2 > 0 && sensorValueLeft3 > 0 && sensorValueLeft4 > 0 && sensorValueRight0 > 0 && sensorValueRight1 > 0 && sensorValueRight2 > 0 && sensorValueRight3 > 0 && sensorValueRight4 > 0) {
+      output3.println((System.nanoTime() - startTime)/1000000000+","+sensorValueLeft0+","+","+sensorValueLeft1+","+","+sensorValueLeft2+","+","+sensorValueLeft3+","+","+sensorValueLeft4+","+","+(System.nanoTime() - startTime)/1000000000+","+sensorValueRight0+","+","+sensorValueRight1+","+","+sensorValueRight2+","+","+sensorValueRight3+","+","+sensorValueRight4);
+    }
+  } else {
+    output3.flush();
+    output3.close();
+    if (sensorValueLeft0 > 0 && sensorValueLeft1 > 0 && sensorValueLeft2 > 0 && sensorValueLeft3 > 0 && sensorValueLeft4 > 0 && sensorValueRight0 > 0 && sensorValueRight1 > 0 && sensorValueRight2 > 0 && sensorValueRight3 > 0 && sensorValueRight4 > 0) {
+      output4.println((System.nanoTime() - startTime)/1000000000+","+sensorValueLeft0+","+","+sensorValueLeft1+","+","+sensorValueLeft2+","+","+sensorValueLeft3+","+","+sensorValueLeft4+","+","+(System.nanoTime() - startTime)/1000000000+","+sensorValueRight0+","+","+sensorValueRight1+","+","+sensorValueRight2+","+","+sensorValueRight3+","+","+sensorValueRight4);
+    }
+  }
+  //output.println((System.nanoTime() - startTime)/1000000000+","+sensorValueLeft0+","+","+sensorValueLeft1+","+","+sensorValueLeft2+","+","+sensorValueLeft3+","+","+sensorValueLeft4+","+","+(System.nanoTime() - startTime)/1000000000+","+sensorValueRight0+","+","+sensorValueRight1+","+","+sensorValueRight2+","+","+sensorValueRight3+","+","+sensorValueRight4);
   println("time1="+nf((float)(System.nanoTime() - startTime)/1000000000, 3, 0)+",inByte1_0="+sensorValueLeft0+", inByte1_1="+sensorValueLeft1+", inByte1_2="+sensorValueLeft2+", inByte1_3="+sensorValueLeft3+", inByte1_4="+sensorValueLeft4);
   println("time2="+nf((float)(System.nanoTime() - startTime)/1000000000, 3, 0)+",inByte2_0="+sensorValueRight0+", inByte2_1="+sensorValueRight1+", inByte2_2="+sensorValueRight2+", inByte2_3="+sensorValueRight3+", inByte2_4="+sensorValueRight4);
 }
-
+//
 void drawArrow(float x1, float y1, float x2, float y2) {
   float a = dist(x1, y1, x2, y2) / 50;
   pushMatrix();
