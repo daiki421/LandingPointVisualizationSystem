@@ -16,7 +16,7 @@ double landingTimeRight = 0, landingTimeLeft = 0; // 地面から離れた時間
 double diffTime = 0; // 片足が接地してからもう片足が接地するまでの時間
 double sensorReactedTimeLeft[] = {0, 0, 0, 0, 0}, sensorReactedTimeRight[] = {0, 0, 0, 0, 0}; // 各センサが地面に設置した時間
 double evacuateLeft2 = 0, evacuateLeft3 = 0, evacuateLeft4 = 0, evacuateRight2 = 0, evacuateRight3 = 0, evacuateRight4 = 0; //センサが反応した時間を一時保存
-int runningSpeed = 6;// トレッドミルの時速を指定
+int runningSpeed = 3;// トレッドミルの時速を指定
 int peak1_0 = 2000, peak1_1 = 2000, peak1_2 = 2000, peak1_3 = 2000, peak1_4 = 2000, peak2_0 = 2000, peak2_1 = 2000, peak2_2 = 2000, peak2_3 = 2000, peak2_4 = 2000; // 各圧力センサ値のピーク
 double peakTime1_0 = 0, peakTime1_1 = 0, peakTime1_2 = 0, peakTime1_3 = 0, peakTime1_4 = 0, peakTime2_0 = 0, peakTime2_1 = 0, peakTime2_2 = 0, peakTime2_3 = 0, peakTime2_4 = 0;
 int pressOrderLeft[] = {0, 0, 0, 0, 0}, pressOrderRight[] = {0, 0, 0, 0, 0}; // 着地点の順番を格納する
@@ -25,16 +25,15 @@ double startTime = 0;
 double diffGroundTimeLeft = 0, diffLandingTimeLeft = 0, diffGroundTimeRight = 0, diffLandingTimeRight = 0;
 float x1, y1;
 float x2, y2;
-
 double dummy = 0;
-
 HashMap<Integer, Double> orderTimeL = new HashMap<Integer, Double>();
 HashMap<Integer, Double> orderTimeR = new HashMap<Integer, Double>();
 
-int count = 4;
-boolean isLeft = true;
+double minStride = 0, maxStride = 0;
 
 void setup() {
+  //minStroke = ;
+  //maxStroke = ;
   startTime = System.nanoTime();
   size(800, 800);
   //output = createWriter("Test1.csv");
@@ -55,8 +54,6 @@ void setup() {
   // システム2号機
   myPort2 = new Serial(this, "/dev/tty.HC-06-DevB-2", 9600); // 0
   //myPort1 = new Serial(this, "/dev/tty.HC-06-DevB-3", 9600); // 3
-  println("myPort1="+myPort1.available()+", myPort2="+myPort2.available());
-  //printArray(Serial.list());
   left_foot = loadImage("left_foot.jpg");
   right_foot = loadImage("right_foot.jpg");
   landingPointWhite = loadImage("white.png");
@@ -178,17 +175,17 @@ void setup() {
 
   // 左足サークル
   noFill();
-  ellipse(144, 674, 75, 75); // 小指下
+  ellipse(144, 674, 75, 75); // かかと
   ellipse(230, 210, 65, 65); // 親指
   ellipse(55, 280, 65, 65); //小指
   ellipse(230, 330, 65, 65); // 親指下
-  ellipse(70, 380, 65, 65); // かかと
+  ellipse(70, 380, 65, 65); // 小指下
   // 右足サークル
-  ellipse(650, 675, 75, 75);
-  ellipse(565, 210, 65, 65);
-  ellipse(740, 280, 65, 65);
-  ellipse(565, 330, 65, 65);
-  ellipse(725, 370, 65, 65);
+  ellipse(650, 675, 75, 75); // かかと
+  ellipse(565, 210, 65, 65); // 親指
+  ellipse(740, 280, 65, 65); // 小指
+  ellipse(565, 330, 65, 65); // 親指下
+  ellipse(725, 370, 65, 65); // 小指下
   // 左足テキスト
   textSize(50);
   fill(0);
@@ -214,9 +211,9 @@ void setup() {
 }
 
 void draw() {
-
   fill(255);
   strokeWeight(1);
+  stroke(0);
   rect(0, 0, 200, 30);
   textSize(20);
   fill(0);
@@ -270,31 +267,44 @@ void draw() {
           fill(255, 255, 255);
           rect(325, 0, 150, 800);
           double stride = diffTime/1000000000*runningSpeed*1000*100/3600; // 秒 * cm/s
-          println("groundTimeLeft="+nf((float)groundTimeLeft/1000000000,3,3)+", groundTimeRight="+nf((float)groundTimeRight/1000000000),3,3);
+          //println("groundTimeLeft="+nf((float)groundTimeLeft/1000000000,3,3)+", groundTimeRight="+nf((float)groundTimeRight/1000000000),3,3);
           fill(100, 100, 255);
           if (runningSpeed >= 3 && runningSpeed <= 4) {
             if (stride < 30) {
               rect(325, 800, 150, 0);
             } else {
+              //if (stride >= minStride && stride <= maxStride) {
+              //  fill(255, 0, 0);  
+              //} else {
+              //  fill(0);
+              //}
               rect(325, 800 - ((float)stride - 30)*20, 150, ((float)stride - 30)*20);
             }
           } else if (runningSpeed >= 6 && runningSpeed <= 7) {
             if (stride < 60) {
               rect(325, 800, 150, 0);
             } else {
+              //if (stride >= minStride && stride <= maxStride) {
+              //  fill(255, 0, 0);  
+              //} else {
+              //  fill(0);
+              //}
               rect(325, 800 - ((float)stride - 60)*20, 150, ((float)stride - 60)*20);
             }
           } else if (runningSpeed >= 9) {
             if (stride < 70) {
               rect(325, 800, 150, 0);
             } else {
+              //if (stride >= minStride && stride <= maxStride) {
+              //  fill(255, 0, 0);  
+              //} else {
+              //  fill(0);
+              //}
               rect(325, 800 - ((float)stride - 70)*20, 150, ((float)stride - 70)*20);
             }
           } else {
           }
-          //rect(325, 800 - ((float)stride - 30)*5, 150, ((float)stride - 30)*5);
           fill(255);
-          // println("Stride="+nf((float)stride, 3, 3)+"cm");
         } else {
           // このセンサの１つ前のセンサを探して矢印描画
           if (isDrawLeft0) {
@@ -317,6 +327,16 @@ void draw() {
       }
     } else {
       isLandingPoint1_0 = false;
+    }
+    if (isLandingPoint1_0) {
+      noFill();
+      stroke(255, 0, 0);
+      strokeWeight(0.5);
+      ellipse(230, 210, 65, 65);
+    } else {
+      noFill();
+      stroke(0);
+      ellipse(230, 210, 65, 65);
     }
     // 小指
     if (sensorValueLeft1 <= 1010) {
@@ -355,18 +375,33 @@ void draw() {
             if (stride < 30) {
               rect(325, 800, 150, 0);
             } else {
+              //if (stride >= minStride && stride <= maxStride) {
+              //  fill(255, 0, 0);  
+              //} else {
+              //  fill(0);
+              //}
               rect(325, 800 - ((float)stride - 30)*20, 150, ((float)stride - 30)*20);
             }
           } else if (runningSpeed >= 6 && runningSpeed <= 7) {
             if (stride < 60) {
               rect(325, 800, 150, 0);
             } else {
+              //if (stride >= minStride && stride <= maxStride) {
+              //  fill(255, 0, 0);  
+              //} else {
+              //  fill(0);
+              //}
               rect(325, 800 - ((float)stride - 60)*20, 150, ((float)stride - 60)*20);
             }
           } else if (runningSpeed >= 9) {
             if (stride < 70) {
               rect(325, 800, 150, 0);
             } else {
+              //if (stride >= minStride && stride <= maxStride) {
+              //  fill(255, 0, 0);  
+              //} else {
+              //  fill(0);
+              //}
               rect(325, 800 - ((float)stride - 70)*20, 150, ((float)stride - 70)*20);
             }
           } else {
@@ -397,10 +432,19 @@ void draw() {
     } else {
       isLandingPoint1_1 = false;
     }
+    if (isLandingPoint1_1) {
+      noFill();
+      stroke(255, 0, 0);
+      strokeWeight(0.5);
+      ellipse(55, 280, 65, 65);
+    } else {
+      noFill();
+      stroke(0.5);
+      ellipse(55, 280, 65, 65);
+    }
     // 親指下
     if (sensorValueLeft2 <= 1010) {
       isLandingPoint1_2 = true;
-      //image(landingPoint100, 200, 300, 60, 60);
       if (pressOrderLeft[2] == 0) {
         sensorReactedTimeLeft[2] = System.nanoTime() - startTime;
         pressOrderLeft[2] = orderLeft;
@@ -434,18 +478,33 @@ void draw() {
             if (stride < 30) {
               rect(325, 800, 150, 0);
             } else {
+              //if (stride >= minStride && stride <= maxStride) {
+              //  fill(255, 0, 0);  
+              //} else {
+              //  fill(0);
+              //}
               rect(325, 800 - ((float)stride - 30)*20, 150, ((float)stride - 30)*20);
             }
           } else if (runningSpeed >= 6 && runningSpeed <= 7) {
             if (stride < 60) {
               rect(325, 800, 150, 0);
             } else {
+              //if (stride >= minStride && stride <= maxStride) {
+              //  fill(255, 0, 0);  
+              //} else {
+              //  fill(0);
+              //}
               rect(325, 800 - ((float)stride - 60)*20, 150, ((float)stride - 60)*20);
             }
           } else if (runningSpeed >= 9) {
             if (stride < 70) {
               rect(325, 800, 150, 0);
             } else {
+              //if (stride >= minStride && stride <= maxStride) {
+              //  fill(255, 0, 0);  
+              //} else {
+              //  fill(0);
+              //}
               rect(325, 800 - ((float)stride - 70)*20, 150, ((float)stride - 70)*20);
             }
           } else {
@@ -476,10 +535,19 @@ void draw() {
     } else {
       isLandingPoint1_2 = false;
     }
+    if (isLandingPoint1_2) {
+      noFill();
+      stroke(255, 0, 0);
+      strokeWeight(0.5);
+      ellipse(230, 330, 65, 65);
+    } else {
+      noFill();
+      stroke(0.5);
+      ellipse(230, 330, 65, 65);
+    }
     // 小指下
     if (sensorValueLeft3 <= 1010) {
       isLandingPoint1_3 = true;
-      //image(landingPoint100, 40, 350, 60, 60);
       if (pressOrderLeft[3] == 0) {
         sensorReactedTimeLeft[3] = System.nanoTime() - startTime;
         pressOrderLeft[3] = orderLeft;
@@ -514,18 +582,33 @@ void draw() {
             if (stride < 30) {
               rect(325, 800, 150, 0);
             } else {
+              //if (stride >= minStride && stride <= maxStride) {
+              //  fill(255, 0, 0);  
+              //} else {
+              //  fill(0);
+              //}
               rect(325, 800 - ((float)stride - 30)*20, 150, ((float)stride - 30)*20);
             }
           } else if (runningSpeed >= 6 && runningSpeed <= 7) {
             if (stride < 60) {
               rect(325, 800, 150, 0);
             } else {
+              //if (stride >= minStride && stride <= maxStride) {
+              //  fill(255, 0, 0);  
+              //} else {
+              //  fill(0);
+              //}
               rect(325, 800 - ((float)stride - 60)*20, 150, ((float)stride - 60)*20);
             }
           } else if (runningSpeed >= 9) {
             if (stride < 70) {
               rect(325, 800, 150, 0);
             } else {
+              //if (stride >= minStride && stride <= maxStride) {
+              //  fill(255, 0, 0);  
+              //} else {
+              //  fill(0);
+              //}
               rect(325, 800 - ((float)stride - 70)*20, 150, ((float)stride - 70)*20);
             }
           } else {
@@ -556,10 +639,19 @@ void draw() {
     } else {
       isLandingPoint1_3 = false;
     }
+    if (isLandingPoint1_3) {
+      noFill();
+      stroke(255, 0, 0);
+      strokeWeight(0.5);
+      ellipse(70, 380, 65, 65);
+    } else {
+      noFill();
+      stroke(0.5);
+      ellipse(70, 380, 65, 65);
+    }
     // かかと
     if (sensorValueLeft4 <= 1015) {
       isLandingPoint1_4 = true;
-      //image(landingPoint100, 110, 640, 70, 70);
       // 接地した順序を格納
       if (pressOrderLeft[4] == 0) {
         sensorReactedTimeLeft[4] = System.nanoTime() - startTime;
@@ -595,18 +687,33 @@ void draw() {
             if (stride < 30) {
               rect(325, 800, 150, 0);
             } else {
+              //if (stride >= minStride && stride <= maxStride) {
+              //  fill(255, 0, 0);  
+              //} else {
+              //  fill(0);
+              //}
               rect(325, 800 - ((float)stride - 30)*20, 150, ((float)stride - 30)*20);
             }
           } else if (runningSpeed >= 6 && runningSpeed <= 7) {
             if (stride < 60) {
               rect(325, 800, 150, 0);
             } else {
+              //if (stride >= minStride && stride <= maxStride) {
+              //  fill(255, 0, 0);  
+              //} else {
+              //  fill(0);
+              //}
               rect(325, 800 - ((float)stride - 60)*20, 150, ((float)stride - 60)*20);
             }
           } else if (runningSpeed >= 9) {
             if (stride < 70) {
               rect(325, 800, 150, 0);
             } else {
+              //if (stride >= minStride && stride <= maxStride) {
+              //  fill(255, 0, 0);  
+              //} else {
+              //  fill(0);
+              //}
               rect(325, 800 - ((float)stride - 70)*20, 150, ((float)stride - 70)*20);
             }
           } else {
@@ -635,10 +742,18 @@ void draw() {
         //println((System.nanoTime() - startTime)+" - "+sensorReactedTimeLeft[4]+" = "+peakTime1_4/1000000000);
       }
     } else {
-      //image(landingPointWhite, 110, 640, 70, 70);
       isLandingPoint1_4 = false;
     }
-
+    if (isLandingPoint1_4) {
+      noFill();
+      stroke(255, 0, 0);
+      strokeWeight(0.5);
+      ellipse(144, 674, 75, 75);
+    } else {
+      noFill();
+      stroke(0.5);
+      ellipse(144, 674, 75, 75);
+    }
     // 全てのセンサで離地判定したら
     if (!isLandingPoint1_0 && !isLandingPoint1_1 && !isLandingPoint1_2 && !isLandingPoint1_3 && !isLandingPoint1_4) {
       // そもそも踏まれてない時
@@ -715,18 +830,33 @@ void draw() {
               if (stride < 30) {
                 rect(325, 800, 150, 0);
               } else {
+                //if (stride >= minStride && stride <= maxStride) {
+                //  fill(255, 0, 0);  
+                //} else {
+                //  fill(0);
+                //}
                 rect(325, 800 - ((float)stride - 30)*20, 150, ((float)stride - 30)*20);
               }
             } else if (runningSpeed >= 6 && runningSpeed <= 7) {
               if (stride < 60) {
                 rect(325, 800, 150, 0);
               } else {
+                //if (stride >= minStride && stride <= maxStride) {
+                //  fill(255, 0, 0);  
+                //} else {
+                //  fill(0);
+                //}
                 rect(325, 800 - ((float)stride - 60)*20, 150, ((float)stride - 60)*20);
               }
             } else if (runningSpeed >= 9) {
               if (stride < 70) {
                 rect(325, 800, 150, 0);
               } else {
+                //if (stride >= minStride && stride <= maxStride) {
+                //  fill(255, 0, 0);  
+                //} else {
+                //  fill(0);
+                //}
                 rect(325, 800 - ((float)stride - 70)*20, 150, ((float)stride - 70)*20);
               }
             } else {
@@ -757,6 +887,16 @@ void draw() {
       }
     } else {
       isLandingPoint2_0 = false;
+    }
+    if (isLandingPoint2_0) {
+      noFill();
+      stroke(255, 0, 0);
+      strokeWeight(0.5);
+      ellipse(565, 210, 65, 65); // 親指
+    } else {
+      noFill();
+      stroke(0.5);
+      ellipse(565, 210, 65, 65); // 親指
     }
     // 小指
     if (sensorValueRight1 <= 1010) {
@@ -795,18 +935,33 @@ void draw() {
             if (stride < 30) {
               rect(325, 800, 150, 0);
             } else {
+              //if (stride >= minStride && stride <= maxStride) {
+              //  fill(255, 0, 0);  
+              //} else {
+              //  fill(0);
+              //}
               rect(325, 800 - ((float)stride - 30)*20, 150, ((float)stride - 30)*20);
             }
           } else if (runningSpeed >= 6 && runningSpeed <= 7) {
             if (stride < 60) {
               rect(325, 800, 150, 0);
             } else {
+              //if (stride >= minStride && stride <= maxStride) {
+              //  fill(255, 0, 0);  
+              //} else {
+              //  fill(0);
+              //}
               rect(325, 800 - ((float)stride - 60)*20, 150, ((float)stride - 60)*20);
             }
           } else if (runningSpeed >= 9) {
             if (stride < 70) {
               rect(325, 800, 150, 0);
             } else {
+              //if (stride >= minStride && stride <= maxStride) {
+              //  fill(255, 0, 0);  
+              //} else {
+              //  fill(0);
+              //}
               rect(325, 800 - ((float)stride - 70)*20, 150, ((float)stride - 70)*20);
             }
           } else {
@@ -836,6 +991,16 @@ void draw() {
       }
     } else {
       isLandingPoint2_1 = false;
+    }
+    if (isLandingPoint2_1) {
+      noFill();
+      stroke(255, 0, 0);
+      strokeWeight(0.5);
+      ellipse(740, 280, 65, 65); // 小指
+    } else {
+      noFill();
+      stroke(0.5);
+      ellipse(740, 280, 65, 65); // 小指
     }
     // 親指下
     if (sensorValueRight2 <= 1010) {
@@ -874,18 +1039,33 @@ void draw() {
             if (stride < 30) {
               rect(325, 800, 150, 0);
             } else {
+              //if (stride >= minStride && stride <= maxStride) {
+              //  fill(255, 0, 0);  
+              //} else {
+              //  fill(0);
+              //}
               rect(325, 800 - ((float)stride - 30)*20, 150, ((float)stride - 30)*20);
             }
           } else if (runningSpeed >= 6 && runningSpeed <= 7) {
             if (stride < 60) {
               rect(325, 800, 150, 0);
             } else {
+              //if (stride >= minStride && stride <= maxStride) {
+              //  fill(255, 0, 0);  
+              //} else {
+              //  fill(0);
+              //}
               rect(325, 800 - ((float)stride - 60)*20, 150, ((float)stride - 60)*20);
             }
           } else if (runningSpeed >= 9) {
             if (stride < 70) {
               rect(325, 800, 150, 0);
             } else {
+              //if (stride >= minStride && stride <= maxStride) {
+              //  fill(255, 0, 0);  
+              //} else {
+              //  fill(0);
+              //}
               rect(325, 800 - ((float)stride - 70)*20, 150, ((float)stride - 70)*20);
             }
           } else {
@@ -915,6 +1095,16 @@ void draw() {
       }
     } else {
       isLandingPoint2_2 = false;
+    }
+    if (isLandingPoint2_2) {
+      noFill();
+      stroke(255, 0, 0);
+      strokeWeight(0.5);
+      ellipse(565, 330, 65, 65); // 親指下
+    } else {
+      noFill();
+      stroke(0.5);
+      ellipse(565, 330, 65, 65); // 親指下
     }
     // 小指下
     if (sensorValueRight3 <= 1010) { // システム1：900, システム2：1000
@@ -953,18 +1143,33 @@ void draw() {
             if (stride < 30) {
               rect(325, 800, 150, 0);
             } else {
+              //if (stride >= minStride && stride <= maxStride) {
+              //  fill(255, 0, 0);  
+              //} else {
+              //  fill(0);
+              //}
               rect(325, 800 - ((float)stride - 30)*20, 150, ((float)stride - 30)*20);
             }
           } else if (runningSpeed >= 6 && runningSpeed <= 7) {
             if (stride < 60) {
               rect(325, 800, 150, 0);
             } else {
+              //if (stride >= minStride && stride <= maxStride) {
+              //  fill(255, 0, 0);  
+              //} else {
+              //  fill(0);
+              //}
               rect(325, 800 - ((float)stride - 60)*20, 150, ((float)stride - 60)*20);
             }
           } else if (runningSpeed >= 9) {
             if (stride < 70) {
               rect(325, 800, 150, 0);
             } else {
+              //if (stride >= minStride && stride <= maxStride) {
+              //  fill(255, 0, 0);  
+              //} else {
+              //  fill(0);
+              //}
               rect(325, 800 - ((float)stride - 70)*20, 150, ((float)stride - 70)*20);
             }
           } else {
@@ -994,6 +1199,16 @@ void draw() {
       }
     } else {
       isLandingPoint2_3 = false;
+    }
+    if (isLandingPoint2_3) {
+      noFill();
+      stroke(255, 0, 0);
+      strokeWeight(0.5);
+      ellipse(725, 370, 65, 65); // 小指下
+    } else {
+      noFill();
+      stroke(0.5);
+      ellipse(725, 370, 65, 65); // 小指下
     }
     // かかと
     if (sensorValueRight4 <= 1015) { // システム1：900, システム2：1000
@@ -1032,18 +1247,33 @@ void draw() {
             if (stride < 30) {
               rect(325, 800, 150, 0);
             } else {
+              //if (stride >= minStride && stride <= maxStride) {
+              //  fill(255, 0, 0);  
+              //} else {
+              //  fill(0);
+              //}
               rect(325, 800 - ((float)stride - 30)*20, 150, ((float)stride - 30)*20);
             }
           } else if (runningSpeed >= 6 && runningSpeed <= 7) {
             if (stride < 60) {
               rect(325, 800, 150, 0);
             } else {
+              //if (stride >= minStride && stride <= maxStride) {
+              //  fill(255, 0, 0);  
+              //} else {
+              //  fill(0);
+              //}
               rect(325, 800 - ((float)stride - 60)*20, 150, ((float)stride - 60)*20);
             }
           } else if (runningSpeed >= 9) {
             if (stride < 70) {
               rect(325, 800, 150, 0);
             } else {
+              //if (stride >= minStride && stride <= maxStride) {
+              //  fill(255, 0, 0);  
+              //} else {
+              //  fill(0);
+              //}
               rect(325, 800 - ((float)stride - 70)*20, 150, ((float)stride - 70)*20);
             }
           } else {
@@ -1074,7 +1304,17 @@ void draw() {
     } else {
       isLandingPoint2_4 = false;
     }
-
+    if (isLandingPoint2_4) {
+      noFill();
+      stroke(255, 0, 0);
+      strokeWeight(0.5);
+      ellipse(650, 675, 75, 75); // かかと
+    } else {
+      noFill();
+      stroke(0.5);
+      ellipse(650, 675, 75, 75); // かかと
+    }
+    // 右足が全て地面から離れたら
     if (!isLandingPoint2_0 && !isLandingPoint2_1 && !isLandingPoint2_2 && !isLandingPoint2_3 && !isLandingPoint2_4) {
       if (pressOrderRight[0] == 0 && pressOrderRight[1] == 0 && pressOrderRight[2] == 0 && pressOrderRight[3] == 0 && pressOrderRight[4] == 0) {
       } else {
@@ -1183,9 +1423,10 @@ void serialEvent(Serial port) {
   println("time1="+nf((float)(System.nanoTime() - startTime)/1000000000, 3, 0)+",inByte1_0="+sensorValueLeft0+", inByte1_1="+sensorValueLeft1+", inByte1_2="+sensorValueLeft2+", inByte1_3="+sensorValueLeft3+", inByte1_4="+sensorValueLeft4);
   println("time2="+nf((float)(System.nanoTime() - startTime)/1000000000, 3, 0)+",inByte2_0="+sensorValueRight0+", inByte2_1="+sensorValueRight1+", inByte2_2="+sensorValueRight2+", inByte2_3="+sensorValueRight3+", inByte2_4="+sensorValueRight4);
 }
-//
+
 void drawArrow(float x1, float y1, float x2, float y2) {
   float a = dist(x1, y1, x2, y2) / 50;
+  stroke(0);
   pushMatrix();
   translate(x2, y2);
   rotate(atan2(y2 - y1, x2 - x1));
