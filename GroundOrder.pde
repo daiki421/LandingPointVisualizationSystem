@@ -2,7 +2,12 @@ import processing.serial.*;
 import java.util.Map;
 public static final float STRIDE_OFFSET = 30;
 public static final float DRAWING_RATIO = 5.7;
-
+// 毎回速度に応じて変える
+public static final int SENSOR_ORDER1 = 5;
+public static final int SENSOR_ORDER2 = 3;
+public static final int SENSOR_ORDER3 = 4;
+public static final int SENSOR_ORDER4 = 2;
+public static final int SENSOR_ORDER5 = 1;
 
 PImage landingPoint100, landingPoint80, landingPoint60, landingPoint40, landingPoint20, landingPointWhite, right_foot, left_foot;
 Serial myPort1, myPort2;
@@ -19,7 +24,7 @@ double landingTimeRight = 0, landingTimeLeft = 0; // 地面から離れた時間
 double diffTime = 0; // 片足が接地してからもう片足が接地するまでの時間
 double sensorReactedTimeLeft[] = {0, 0, 0, 0, 0}, sensorReactedTimeRight[] = {0, 0, 0, 0, 0}; // 各センサが地面に設置した時間
 double evacuateLeft2 = 0, evacuateLeft3 = 0, evacuateLeft4 = 0, evacuateRight2 = 0, evacuateRight3 = 0, evacuateRight4 = 0; //センサが反応した時間を一時保存
-int runningSpeed = 12;// トレッドミルの時速を指定
+int runningSpeed = 6;// トレッドミルの時速を指定
 int peak1_0 = 2000, peak1_1 = 2000, peak1_2 = 2000, peak1_3 = 2000, peak1_4 = 2000, peak2_0 = 2000, peak2_1 = 2000, peak2_2 = 2000, peak2_3 = 2000, peak2_4 = 2000; // 各圧力センサ値のピーク
 double peakTime1_0 = 0, peakTime1_1 = 0, peakTime1_2 = 0, peakTime1_3 = 0, peakTime1_4 = 0, peakTime2_0 = 0, peakTime2_1 = 0, peakTime2_2 = 0, peakTime2_3 = 0, peakTime2_4 = 0;
 int pressOrderLeft[] = {0, 0, 0, 0, 0}, pressOrderRight[] = {0, 0, 0, 0, 0}; // 着地点の順番を格納する
@@ -36,15 +41,15 @@ double left1_2, left2_3, left3_4, left4_5, right1_2, right2_3, right3_4, right4_
 double minStride[] = {0, 0, 0}, maxStride[] = {0, 0, 0}, stride = 0;
 boolean firstTouchLeft=false, firstTouchRight=false;
 
-
+boolean isDrawStrideL = false, isDrawStrideR = false;
 
 void setup() {
   minStride[0] = 40;
-  minStride[1] = 70;
-  minStride[2] = 90;
-  maxStride[0] = 70;
-  maxStride[1] = 100;
-  maxStride[2] = 120;
+  minStride[1] = 71;
+  minStride[2] = 93;
+  maxStride[0] = 100;
+  maxStride[1] = 82;
+  maxStride[2] = 110;
   startTime = System.nanoTime();
   size(800, 800);
   //output = createWriter("Test1.csv");
@@ -54,13 +59,13 @@ void setup() {
   outputPressOrder = createWriter("PressOrder"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
   output.println("time1,Left0,,Left1,,Left2,,Left3,,Left4,,time2,Right0,,Right1,,Right2,,Right3,,Right4,"+String.valueOf(runningSpeed)+"km/h");
   output2.println("time1,Left0,,Left1,,Left2,,Left3,,Left4,,time2,Right0,,Right1,,Right2,,Right3,,Right4");
-  outputPressOrder.println("TimeLeft,StrideLeft(cm),ContactTimeLeft(s),Left0,Left1,Left2,Left3,Left4,LPeak1,LPTime1,LPeak2,LPTime2,LPeak3,LPTime3,LPeak4,LPTime4,LPeak5,LPTime5,TIL0_1,TIL1_2,TIL2_3,TIL3_4,,TimeRight,StrideRight,ContactTimeRight,Right0,Right1,Right2,Right3,Right4,RPeak1,RPTime1,RPeak2,RPTime2,RPeak3,RPTime3,RPeak4,RPTime4,RPeak5,RPTime5,TIR0_1,TIR1_2,TIR2_3,TIR3_4");
+  outputPressOrder.println("TimeLeft,StrideLeft(cm),ContactTimeLeft(s),Left0,Left1,Left2,Left3,Left4,LPeak1,LPTime1,LPeak2,LPTime2,LPeak3,LPTime3,LPeak4,LPTime4,LPeak5,LPTime5,TIL0_1,TIL1_2,TIL2_3,TIL3_4,,TimeRight,StrideRight,ContactTimeRight,Right0,Right1,Right2,Right3,Right4,RPeak1,RPTime1,RPeak2,RPTime2,RPeak3,RPTime3,RPeak4,RPTime4,RPeak5,RPTime5,TIR0_1,TIR1_2,TIR2_3,TIR3_4,"+String.valueOf(runningSpeed)+"km/h");
   // システム1号機
   myPort2 = new Serial(this, "/dev/tty.HC-06-DevB-4", 9600); // 2
   //myPort1 = new Serial(this, "/dev/tty.HC-06-DevB-5", 9600); // 1*
   // システム2号機
-  //myPort2 = new Serial(this, "/dev/tty.HC-06-DevB-2", 9600); // 0
-  myPort1 = new Serial(this, "/dev/tty.HC-06-DevB-3", 9600); // 3
+  myPort1 = new Serial(this, "/dev/tty.HC-06-DevB-2", 9600); // 0
+  //myPort1 = new Serial(this, "/dev/tty.HC-06-DevB-3", 9600); // 3
   left_foot = loadImage("left_foot.jpg");
   right_foot = loadImage("right_foot.jpg");
   landingPointWhite = loadImage("white.png");
@@ -68,65 +73,24 @@ void setup() {
   background(255);
   image(left_foot, 25, 150, 250, 600);
   image(right_foot, 520, 150, 250, 600);
-  fill(100, 100, 255);
+  // 歩幅フィードバック
+  fill(125, 125, 125);
   rect(325, 0, 150, 800);
   line(315, 200, 485, 200);
   line(315, 400, 485, 400);
   line(315, 600, 485, 600);
-  textSize(25);
-  fill(0);
-  text("30", 285, 780);
-  text("65", 285, 590);
-  text("100", 285, 400);
-  text("135", 285, 200);
-  text("170", 280, 30);
-  text("30", 475, 780);
-  text("65", 475, 590);
-  text("100", 470, 400);
-  text("135", 470, 200);
-  text("170", 470, 30);
-  textSize(15);
-  text("cm", 295, 790);
-  text("cm", 285, 600);
-  text("cm", 295, 410);
-  text("cm", 285, 210);
-  text("cm", 295, 40);
-  text("cm", 485, 790);
-  text("cm", 485, 600);
-  text("cm", 485, 410);
-  text("cm", 485, 210);
-  text("cm", 480, 40);
-
-  // 左足サークル
-  noFill();
-  ellipse(144, 674, 75, 75); // かかと
-  ellipse(230, 210, 65, 65); // 親指
-  ellipse(55, 280, 65, 65); //小指
-  ellipse(230, 330, 65, 65); // 親指下
-  ellipse(70, 380, 65, 65); // 小指下
-  // 右足サークル
-  ellipse(650, 675, 75, 75); // かかと
-  ellipse(565, 210, 65, 65); // 親指
-  ellipse(740, 280, 65, 65); // 小指
-  ellipse(565, 330, 65, 65); // 親指下
-  ellipse(725, 370, 65, 65); // 小指下
-  // 左足テキスト
-  textSize(50);
-  fill(0);
-  text("1", 128, 690);
-  text("4", 40, 300);
-  text("3", 215, 350);
-  text("2", 55, 400);
-  text("5", 215, 225);
-  // 右足テキスト
-  textSize(50);
-  fill(0);
-  text("1", 633, 695);
-  text("2", 710, 390);
-  text("3", 550, 350);
-  text("4", 725, 297);
-  text("5", 550, 225);
-  //putArrow(true, 4, 0);
+  if (runningSpeed == 3) {
+    drawStride(30, 200);
+  } else if (runningSpeed == 6) {
+    drawStride(60, 100);
+  } else if (runningSpeed == 9) {
+    drawStride(80, 140);
+  } else {
+    drawStride(30, 170);
+  }
+  drawSensorPos(true, SENSOR_ORDER1, SENSOR_ORDER2, SENSOR_ORDER3, SENSOR_ORDER4, SENSOR_ORDER5);
+  drawSensorPos(false, SENSOR_ORDER1, SENSOR_ORDER2, SENSOR_ORDER3, SENSOR_ORDER4, SENSOR_ORDER5);
+  // ハッシュマップ初期化
   for (Integer i = 0; i < 5; i++) {
     orderTimeL.put(i+1, dummy);
     orderTimeR.put(i+1, dummy);
@@ -167,55 +131,48 @@ void draw() {
         // 最初に触れたセンサか判定
         if (orderLeft == 1) {
           image(left_foot, 25, 150, 250, 600);
-          noFill();
           strokeWeight(1);
-          ellipse(144, 674, 75, 75);
-          ellipse(230, 210, 65, 65);
-          ellipse(55, 280, 65, 65);
-          ellipse(230, 330, 65, 65);
-          ellipse(70, 380, 65, 65);
-          textSize(50);
-          fill(0);
-          text("1", 128, 690);
-          text("4", 40, 300);
-          text("3", 215, 350);
-          text("2", 55, 400);
-          text("5", 215, 225);
+          drawSensorPos(true, SENSOR_ORDER1, SENSOR_ORDER2, SENSOR_ORDER3, SENSOR_ORDER4, SENSOR_ORDER5);
           groundTimeLeft = sensorReactedTimeLeft[0];
           println("GroundTimeLeft="+groundTimeLeft);
           diffTime = groundTimeLeft - groundTimeRight; // 左足を離してから右足が着くまでの時間
           println("DiffTimeL = "+nf((float)diffTime/1000000000, 3, 3));
-          fill(255, 255, 255);
-          rect(325, 0, 150, 800);
           stride = diffTime/1000000000*runningSpeed*1000*100/3600;
           println("Stride="+nf((float)stride, 3, 0));
           fill(100, 100, 255);
           if (stride < 30) {
             rect(325, 800, 150, 0);
           } else {
-            if (runningSpeed == 3) {
-              if (stride >= minStride[0] && stride <= maxStride[0]) {
-                fill(255, 0, 0);
-              } else {
-                fill(0);
+            if (!isDrawStrideL) {
+              fill(255, 255, 255);
+              stroke(0);
+              rect(325, 0, 150, 800);
+              if (runningSpeed == 3) {
+                if (stride >= minStride[0] && stride <= maxStride[0]) {
+                  fill(255, 0, 0);
+                } else {
+                  fill(125, 125, 125);
+                }
+              } else if (runningSpeed == 6) {
+                if (stride >= minStride[1] && stride <= maxStride[1]) {
+                  fill(255, 0, 0);
+                } else {
+                  fill(125, 125, 125);
+                }
+              } else if (runningSpeed == 9) {
+                if (stride >= minStride[2] && stride <= maxStride[2]) {
+                  fill(255, 0, 0);
+                } else {
+                  fill(125, 125, 125);
+                }
               }
-            } else if (runningSpeed == 6) {
-              if (stride >= minStride[1] && stride <= maxStride[1]) {
-                fill(255, 0, 0);
-              } else {
-                fill(0);
-              }
-            } else if (runningSpeed == 9) {
-              if (stride >= minStride[2] && stride <= maxStride[2]) {
-                fill(255, 0, 0);
-              } else {
-                fill(0);
-              }
+              rect(325, 800 - ((float)stride - 30)*5.7, 150, ((float)stride - 30)*5.7);
+              textSize(35);
+              fill(0);
+              text(String.valueOf((int)stride)+"cm", 360, 800 - ((float)stride - 30)*DRAWING_RATIO + STRIDE_OFFSET);
+              isDrawStrideL = true;
+              isDrawStrideR = false;
             }
-            rect(325, 800 - ((float)stride - 30)*5.7, 150, ((float)stride - 30)*5.7);
-            textSize(35);
-            fill(0);
-            text(String.valueOf((int)stride)+"cm", 360, 800 - ((float)stride - 30)*DRAWING_RATIO + STRIDE_OFFSET);
           }
           fill(255);
         } else {
@@ -261,55 +218,49 @@ void draw() {
         // 最初に接地しているか判定
         if (orderLeft == 1) {
           image(left_foot, 25, 150, 250, 600);
-          noFill();
+          //noFill();
           strokeWeight(1);
-          ellipse(144, 674, 75, 75);
-          ellipse(230, 210, 65, 65);
-          ellipse(55, 280, 65, 65);
-          ellipse(230, 330, 65, 65);
-          ellipse(70, 380, 65, 65);
-          textSize(50);
-          fill(0);
-          text("1", 128, 690);
-          text("4", 40, 300);
-          text("3", 215, 350);
-          text("2", 55, 400);
-          text("5", 215, 225);
+          drawSensorPos(true, SENSOR_ORDER1, SENSOR_ORDER2, SENSOR_ORDER3, SENSOR_ORDER4, SENSOR_ORDER5);
           groundTimeLeft = sensorReactedTimeLeft[1];
           println("GroundTimeLeft="+groundTimeLeft);
           diffTime = groundTimeLeft - groundTimeRight; // 左足を離してから右足が着くまでの時間
           println("DiffTimeL = "+nf((float)diffTime/1000000000, 3, 3));
-          fill(255, 255, 255);
-          rect(325, 0, 150, 800);
           stride = diffTime/1000000000*runningSpeed*1000*100/3600;
           println("Stride="+nf((float)stride, 3, 3));
           fill(100, 100, 255);
           if (stride < 30) {
             rect(325, 800, 150, 0);
           } else {
-            if (runningSpeed == 3) {
-              if (stride >= minStride[0] && stride <= maxStride[0]) {
-                fill(255, 0, 0);
-              } else {
-                fill(0);
+            if (!isDrawStrideL) {
+              fill(255, 255, 255);
+              stroke(0);
+              rect(325, 0, 150, 800);
+              if (runningSpeed == 3) {
+                if (stride >= minStride[0] && stride <= maxStride[0]) {
+                  fill(255, 0, 0);
+                } else {
+                  fill(125, 125, 125);
+                }
+              } else if (runningSpeed == 6) {
+                if (stride >= minStride[1] && stride <= maxStride[1]) {
+                  fill(255, 0, 0);
+                } else {
+                  fill(125, 125, 125);
+                }
+              } else if (runningSpeed == 9) {
+                if (stride >= minStride[2] && stride <= maxStride[2]) {
+                  fill(255, 0, 0);
+                } else {
+                  fill(125, 125, 125);
+                }
               }
-            } else if (runningSpeed == 6) {
-              if (stride >= minStride[1] && stride <= maxStride[1]) {
-                fill(255, 0, 0);
-              } else {
-                fill(0);
-              }
-            } else if (runningSpeed == 9) {
-              if (stride >= minStride[2] && stride <= maxStride[2]) {
-                fill(255, 0, 0);
-              } else {
-                fill(0);
-              }
+              rect(325, 800 - ((float)stride - 30)*5.7, 150, ((float)stride - 30)*5.7);
+              textSize(35);
+              fill(0);
+              text(String.valueOf((int)stride)+"cm", 360, 800 - ((float)stride - 30)*DRAWING_RATIO + STRIDE_OFFSET);
+              isDrawStrideL = true;
+              isDrawStrideR = false;
             }
-            rect(325, 800 - ((float)stride - 30)*5.7, 150, ((float)stride - 30)*5.7);
-            textSize(35);
-            fill(0);
-            text(String.valueOf((int)stride)+"cm", 360, 800 - ((float)stride - 30)*DRAWING_RATIO + STRIDE_OFFSET);
           }
           fill(255);
         } else {
@@ -346,7 +297,7 @@ void draw() {
       ellipse(55, 280, 65, 65);
     }
     // 親指下
-    if (sensorValueLeft2 <= 1010) {
+    if (sensorValueLeft2 <=1010) {
       isLandingPoint1_2 = true;
       if (pressOrderLeft[2] == 0) {
         sensorReactedTimeLeft[2] = System.nanoTime() - startTime;
@@ -355,55 +306,49 @@ void draw() {
         // 最初に接地しているか判定
         if (orderLeft == 1) {
           image(left_foot, 25, 150, 250, 600);
-          noFill();
+          //noFill();
           strokeWeight(1);
-          ellipse(144, 674, 75, 75);
-          ellipse(230, 210, 65, 65);
-          ellipse(55, 280, 65, 65);
-          ellipse(230, 330, 65, 65);
-          ellipse(70, 380, 65, 65);
-          textSize(50);
-          fill(0);
-          text("1", 128, 690);
-          text("4", 40, 300);
-          text("3", 215, 350);
-          text("2", 55, 400);
-          text("5", 215, 225);
+          drawSensorPos(true, SENSOR_ORDER1, SENSOR_ORDER2, SENSOR_ORDER3, SENSOR_ORDER4, SENSOR_ORDER5);
           groundTimeLeft = sensorReactedTimeLeft[2];
           println("GroundTimeLeft="+groundTimeLeft);
           diffTime = groundTimeLeft - groundTimeRight; // 左足を離してから右足が着くまでの時間
           println("DiffTimeL = "+nf((float)diffTime/1000000000, 3, 3));
-          fill(255, 255, 255);
-          rect(325, 0, 150, 800);
           stride = diffTime/1000000000*runningSpeed*1000*100/3600;
           println("Stride="+nf((float)stride, 3, 3));
           fill(100, 100, 255);
           if (stride < 30) {
             rect(325, 800, 150, 0);
           } else {
-            if (runningSpeed == 3) {
-              if (stride >= minStride[0] && stride <= maxStride[0]) {
-                fill(255, 0, 0);
-              } else {
-                fill(0);
+            if (!isDrawStrideL) {
+              fill(255, 255, 255);
+              stroke(0);
+              rect(325, 0, 150, 800);
+              if (runningSpeed == 3) {
+                if (stride >= minStride[0] && stride <= maxStride[0]) {
+                  fill(255, 0, 0);
+                } else {
+                  fill(125, 125, 125);
+                }
+              } else if (runningSpeed == 6) {
+                if (stride >= minStride[1] && stride <= maxStride[1]) {
+                  fill(255, 0, 0);
+                } else {
+                  fill(125, 125, 125);
+                }
+              } else if (runningSpeed == 9) {
+                if (stride >= minStride[2] && stride <= maxStride[2]) {
+                  fill(255, 0, 0);
+                } else {
+                  fill(125, 125, 125);
+                }
               }
-            } else if (runningSpeed == 6) {
-              if (stride >= minStride[1] && stride <= maxStride[1]) {
-                fill(255, 0, 0);
-              } else {
-                fill(0);
-              }
-            } else if (runningSpeed == 9) {
-              if (stride >= minStride[2] && stride <= maxStride[2]) {
-                fill(255, 0, 0);
-              } else {
-                fill(0);
-              }
+              rect(325, 800 - ((float)stride - 30)*5.7, 150, ((float)stride - 30)*5.7);
+              textSize(35);
+              fill(0);
+              text(String.valueOf((int)stride)+"cm", 360, 800 - ((float)stride - 30)*DRAWING_RATIO + STRIDE_OFFSET);
+              isDrawStrideL = true;
+              isDrawStrideR = false;
             }
-            rect(325, 800 - ((float)stride - 30)*5.7, 150, ((float)stride - 30)*5.7);
-            textSize(35);
-            fill(0);
-            text(String.valueOf((int)stride)+"cm", 360, 800 - ((float)stride - 30)*DRAWING_RATIO + STRIDE_OFFSET);
           }
           fill(255);
         } else {
@@ -448,55 +393,49 @@ void draw() {
         // 最初に接地しているか判定
         if (orderLeft == 1) {
           image(left_foot, 25, 150, 250, 600);
-          noFill();
+          //noFill();
           strokeWeight(1);
-          ellipse(144, 674, 75, 75);
-          ellipse(230, 210, 65, 65);
-          ellipse(55, 280, 65, 65);
-          ellipse(230, 330, 65, 65);
-          ellipse(70, 380, 65, 65);
-          textSize(50);
-          fill(0);
-          text("1", 128, 690);
-          text("4", 40, 300);
-          text("3", 215, 350);
-          text("2", 55, 400);
-          text("5", 215, 225);
+          drawSensorPos(true, SENSOR_ORDER1, SENSOR_ORDER2, SENSOR_ORDER3, SENSOR_ORDER4, SENSOR_ORDER5);
           groundTimeLeft = sensorReactedTimeLeft[3];
           println("GroundTimeLeft="+groundTimeLeft);
           diffTime = groundTimeLeft - groundTimeRight; // 左足を離してから右足が着くまでの時間
           println("DiffTimeL = "+nf((float)diffTime/1000000000, 3, 3));
-          fill(255, 255, 255);
-          rect(325, 0, 150, 800);
           stride = diffTime/1000000000*runningSpeed*1000*100/3600;
           println("Stride="+nf((float)stride, 3, 3));
           fill(100, 100, 255);
           if (stride < 30) {
             rect(325, 800, 150, 0);
           } else {
-            if (runningSpeed == 3) {
-              if (stride >= minStride[0] && stride <= maxStride[0]) {
-                fill(255, 0, 0);
-              } else {
-                fill(0);
+            if (!isDrawStrideL) {
+              fill(255, 255, 255);
+              stroke(0);
+              rect(325, 0, 150, 800);
+              if (runningSpeed == 3) {
+                if (stride >= minStride[0] && stride <= maxStride[0]) {
+                  fill(255, 0, 0);
+                } else {
+                  fill(125, 125, 125);
+                }
+              } else if (runningSpeed == 6) {
+                if (stride >= minStride[1] && stride <= maxStride[1]) {
+                  fill(255, 0, 0);
+                } else {
+                  fill(125, 125, 125);
+                }
+              } else if (runningSpeed == 9) {
+                if (stride >= minStride[2] && stride <= maxStride[2]) {
+                  fill(255, 0, 0);
+                } else {
+                  fill(125, 125, 125);
+                }
               }
-            } else if (runningSpeed == 6) {
-              if (stride >= minStride[1] && stride <= maxStride[1]) {
-                fill(255, 0, 0);
-              } else {
-                fill(0);
-              }
-            } else if (runningSpeed == 9) {
-              if (stride >= minStride[2] && stride <= maxStride[2]) {
-                fill(255, 0, 0);
-              } else {
-                fill(0);
-              }
+              rect(325, 800 - ((float)stride - 30)*5.7, 150, ((float)stride - 30)*5.7);
+              textSize(35);
+              fill(0);
+              text(String.valueOf((int)stride)+"cm", 360, 800 - ((float)stride - 30)*DRAWING_RATIO + STRIDE_OFFSET);
+              isDrawStrideL = true;
+              isDrawStrideR = false;
             }
-            rect(325, 800 - ((float)stride - 30)*5.7, 150, ((float)stride - 30)*5.7);
-            textSize(35);
-            fill(0);
-            text(String.valueOf((int)stride)+"cm", 360, 800 - ((float)stride - 30)*DRAWING_RATIO + STRIDE_OFFSET);
           }
           fill(255);
         } else {
@@ -532,7 +471,7 @@ void draw() {
       ellipse(70, 380, 65, 65);
     }
     // かかと
-    if (sensorValueLeft4 <= 1015) {
+    if (sensorValueLeft4 <= 1010) {
       isLandingPoint1_4 = true;
       // 接地した順序を格納
       if (pressOrderLeft[4] == 0) {
@@ -542,55 +481,49 @@ void draw() {
         // 最初に接地しているか判定
         if (orderLeft == 1) {
           image(left_foot, 25, 150, 250, 600);
-          noFill();
+          //noFill();
           strokeWeight(1);
-          ellipse(144, 674, 75, 75);
-          ellipse(230, 210, 65, 65);
-          ellipse(55, 280, 65, 65);
-          ellipse(230, 330, 65, 65);
-          ellipse(70, 380, 65, 65);
-          textSize(50);
-          fill(0);
-          text("1", 128, 690);
-          text("4", 40, 300);
-          text("3", 215, 350);
-          text("2", 55, 400);
-          text("5", 215, 225);
+          drawSensorPos(true, SENSOR_ORDER1, SENSOR_ORDER2, SENSOR_ORDER3, SENSOR_ORDER4, SENSOR_ORDER5);
           groundTimeLeft = sensorReactedTimeLeft[4];
           println("GroundTimeLeft="+groundTimeLeft);
           diffTime = groundTimeLeft - groundTimeRight; // 左足を離してから右足が着くまでの時間
           println("DiffTimeL = "+nf((float)diffTime/1000000000, 3, 3));
-          fill(255, 255, 255);
-          rect(325, 0, 150, 800);
           stride = diffTime/1000000000*runningSpeed*1000*100/3600;
           println("Stride="+nf((float)stride, 3, 3));
           fill(100, 100, 255);
           if (stride < 30) {
             rect(325, 800, 150, 0);
           } else {
-            if (runningSpeed == 3) {
-              if (stride >= minStride[0] && stride <= maxStride[0]) {
-                fill(255, 0, 0);
-              } else {
-                fill(0);
+            if (!isDrawStrideL) {
+              fill(255, 255, 255);
+              stroke(0);
+              rect(325, 0, 150, 800);
+              if (runningSpeed == 3) {
+                if (stride >= minStride[0] && stride <= maxStride[0]) {
+                  fill(255, 0, 0);
+                } else {
+                  fill(125, 125, 125);
+                }
+              } else if (runningSpeed == 6) {
+                if (stride >= minStride[1] && stride <= maxStride[1]) {
+                  fill(255, 0, 0);
+                } else {
+                  fill(125, 125, 125);
+                }
+              } else if (runningSpeed == 9) {
+                if (stride >= minStride[2] && stride <= maxStride[2]) {
+                  fill(255, 0, 0);
+                } else {
+                  fill(125, 125, 125);
+                }
               }
-            } else if (runningSpeed == 6) {
-              if (stride >= minStride[1] && stride <= maxStride[1]) {
-                fill(255, 0, 0);
-              } else {
-                fill(0);
-              }
-            } else if (runningSpeed == 9) {
-              if (stride >= minStride[2] && stride <= maxStride[2]) {
-                fill(255, 0, 0);
-              } else {
-                fill(0);
-              }
+              rect(325, 800 - ((float)stride - 30)*5.7, 150, ((float)stride - 30)*5.7);
+              textSize(35);
+              fill(0);
+              text(String.valueOf((int)stride)+"cm", 360, 800 - ((float)stride - 30)*DRAWING_RATIO + STRIDE_OFFSET);
+              isDrawStrideL = true;
+              isDrawStrideR = false;
             }
-            rect(325, 800 - ((float)stride - 30)*5.7, 150, ((float)stride - 30)*5.7);
-            textSize(35);
-            fill(0);
-            text(String.valueOf((int)stride)+"cm", 360, 800 - ((float)stride - 30)*DRAWING_RATIO + STRIDE_OFFSET);
           }
           fill(255);
         } else {
@@ -684,7 +617,7 @@ void draw() {
   // Right
   // 親指
   if (myPort2.available()>0) {
-    if (sensorValueRight0 <= 1010) {
+    if (sensorValueRight0 <= 990) {
       isLandingPoint2_0 = true;
       // 接地した順序を格納
       if (pressOrderRight[0] == 0) {
@@ -694,55 +627,49 @@ void draw() {
         // 最初に接地しているか判定
         if (orderRight == 1) {
           image(right_foot, 520, 150, 250, 600);
-          noFill();
+          //noFill();
           strokeWeight(1);
-          ellipse(650, 675, 75, 75);
-          ellipse(565, 210, 65, 65);
-          ellipse(740, 280, 65, 65);
-          ellipse(565, 330, 65, 65);
-          ellipse(725, 370, 65, 65);
-          textSize(50);
-          fill(0);
-          text("1", 633, 695);
-          text("2", 710, 390);
-          text("3", 550, 350);
-          text("4", 725, 297);
-          text("5", 550, 225);
+          drawSensorPos(false, SENSOR_ORDER1, SENSOR_ORDER2, SENSOR_ORDER3, SENSOR_ORDER4, SENSOR_ORDER5);
           groundTimeRight = sensorReactedTimeRight[0];
           println("GroundTimeRight="+groundTimeRight);
           diffTime = groundTimeRight - groundTimeLeft;
           println("DiffTimeR = "+nf((float)diffTime/1000000000, 3, 3));
-          fill(255, 255, 255);
-          rect(325, 0, 150, 800);
           stride = diffTime/1000000000*runningSpeed*1000*100/3600;
           println("Stride="+nf((float)stride, 3, 3));
           fill(100, 100, 255);
           if (stride < 30) {
             rect(325, 800, 150, 0);
           } else {
-            if (runningSpeed == 3) {
-              if (stride >= minStride[0] && stride <= maxStride[0]) {
-                fill(255, 0, 0);
-              } else {
-                fill(0);
+            if (!isDrawStrideR) {
+              fill(255, 255, 255);
+              stroke(0);
+              rect(325, 0, 150, 800);
+              if (runningSpeed == 3) {
+                if (stride >= minStride[0] && stride <= maxStride[0]) {
+                  fill(255, 0, 0);
+                } else {
+                  fill(125, 125, 125);
+                }
+              } else if (runningSpeed == 6) {
+                if (stride >= minStride[1] && stride <= maxStride[1]) {
+                  fill(255, 0, 0);
+                } else {
+                  fill(125, 125, 125);
+                }
+              } else if (runningSpeed == 9) {
+                if (stride >= minStride[2] && stride <= maxStride[2]) {
+                  fill(255, 0, 0);
+                } else {
+                  fill(125, 125, 125);
+                }
               }
-            } else if (runningSpeed == 6) {
-              if (stride >= minStride[1] && stride <= maxStride[1]) {
-                fill(255, 0, 0);
-              } else {
-                fill(0);
-              }
-            } else if (runningSpeed == 9) {
-              if (stride >= minStride[2] && stride <= maxStride[2]) {
-                fill(255, 0, 0);
-              } else {
-                fill(0);
-              }
+              rect(325, 800 - ((float)stride - 30)*5.7, 150, ((float)stride - 30)*5.7);
+              textSize(35);
+              fill(0);
+              text(String.valueOf((int)stride)+"cm", 360, 800 - ((float)stride - 30)*DRAWING_RATIO + STRIDE_OFFSET);
+              isDrawStrideR = true;
+              isDrawStrideL = false;
             }
-            rect(325, 800 - ((float)stride - 30)*5.7, 150, ((float)stride - 30)*5.7);
-            textSize(35);
-            fill(0);
-            text(String.valueOf((int)stride)+"cm", 360, 800 - ((float)stride - 30)*DRAWING_RATIO + STRIDE_OFFSET);
           }
           fill(255);
         } else {
@@ -778,7 +705,7 @@ void draw() {
       ellipse(565, 210, 65, 65); // 親指
     }
     // 小指
-    if (sensorValueRight1 <= 1010) {
+    if (sensorValueRight1 <= 990) {
       isLandingPoint2_1 = true;
       // このセンサ以外のセンサがまだ接地していない場合
       if (pressOrderRight[1] == 0) {
@@ -788,55 +715,49 @@ void draw() {
         // 最初に接地しているか判定
         if (orderRight == 1) {
           image(right_foot, 520, 150, 250, 600);
-          noFill();
+          //noFill();
           strokeWeight(1);
-          ellipse(650, 675, 75, 75);
-          ellipse(565, 210, 65, 65);
-          ellipse(740, 280, 65, 65);
-          ellipse(565, 330, 65, 65);
-          ellipse(725, 370, 65, 65);
-          textSize(50);
-          fill(0);
-          text("1", 633, 695);
-          text("2", 710, 390);
-          text("3", 550, 350);
-          text("4", 725, 297);
-          text("5", 550, 225);
+          drawSensorPos(false, SENSOR_ORDER1, SENSOR_ORDER2, SENSOR_ORDER3, SENSOR_ORDER4, SENSOR_ORDER5);
           groundTimeRight = sensorReactedTimeRight[1];
           println("GroundTimeRight="+groundTimeRight);
           diffTime = groundTimeRight - groundTimeLeft;
           println("DiffTimeR = "+nf((float)diffTime/1000000000, 3, 3));
-          fill(255, 255, 255);
-          rect(325, 0, 150, 800);
           stride = diffTime/1000000000*runningSpeed*1000*100/3600;
           println("Stride="+nf((float)stride, 3, 3));
           fill(100, 100, 255);
           if (stride < 30) {
             rect(325, 800, 150, 0);
           } else {
-            if (runningSpeed == 3) {
-              if (stride >= minStride[0] && stride <= maxStride[0]) {
-                fill(255, 0, 0);
-              } else {
-                fill(0);
+            if (!isDrawStrideR) {
+              fill(255, 255, 255);
+              stroke(0);
+              rect(325, 0, 150, 800);
+              if (runningSpeed == 3) {
+                if (stride >= minStride[0] && stride <= maxStride[0]) {
+                  fill(255, 0, 0);
+                } else {
+                  fill(125, 125, 125);
+                }
+              } else if (runningSpeed == 6) {
+                if (stride >= minStride[1] && stride <= maxStride[1]) {
+                  fill(255, 0, 0);
+                } else {
+                  fill(125, 125, 125);
+                }
+              } else if (runningSpeed == 9) {
+                if (stride >= minStride[2] && stride <= maxStride[2]) {
+                  fill(255, 0, 0);
+                } else {
+                  fill(125, 125, 125);
+                }
               }
-            } else if (runningSpeed == 6) {
-              if (stride >= minStride[1] && stride <= maxStride[1]) {
-                fill(255, 0, 0);
-              } else {
-                fill(0);
-              }
-            } else if (runningSpeed == 9) {
-              if (stride >= minStride[2] && stride <= maxStride[2]) {
-                fill(255, 0, 0);
-              } else {
-                fill(0);
-              }
+              rect(325, 800 - ((float)stride - 30)*5.7, 150, ((float)stride - 30)*5.7);
+              textSize(35);
+              fill(0);
+              text(String.valueOf((int)stride)+"cm", 360, 800 - ((float)stride - 30)*DRAWING_RATIO + STRIDE_OFFSET);
+              isDrawStrideR = true;
+              isDrawStrideL = false;
             }
-            rect(325, 800 - ((float)stride - 30)*5.7, 150, ((float)stride - 30)*5.7);
-            textSize(35);
-            fill(0);
-            text(String.valueOf((int)stride)+"cm", 360, 800 - ((float)stride - 30)*DRAWING_RATIO + STRIDE_OFFSET);
           }
           fill(255);
         } else {
@@ -872,7 +793,7 @@ void draw() {
       ellipse(740, 280, 65, 65); // 小指
     }
     // 親指下
-    if (sensorValueRight2 <= 1010) {
+    if (sensorValueRight2 <= 990) {
       isLandingPoint2_2 = true;
       // このセンサ以外のセンサがまだ接地していない場合
       if (pressOrderRight[2] == 0) {
@@ -882,55 +803,48 @@ void draw() {
         // 最初に接地しているか判定
         if (orderRight == 1) {
           image(right_foot, 520, 150, 250, 600);
-          noFill();
           strokeWeight(1);
-          ellipse(650, 675, 75, 75);
-          ellipse(565, 210, 65, 65);
-          ellipse(740, 280, 65, 65);
-          ellipse(565, 330, 65, 65);
-          ellipse(725, 370, 65, 65);
-          textSize(50);
-          fill(0);
-          text("1", 633, 695);
-          text("2", 710, 390);
-          text("3", 550, 350);
-          text("4", 725, 297);
-          text("5", 550, 225);
+          drawSensorPos(false, SENSOR_ORDER1, SENSOR_ORDER2, SENSOR_ORDER3, SENSOR_ORDER4, SENSOR_ORDER5);
           groundTimeRight = sensorReactedTimeRight[2];
           println("groundTimeRight="+groundTimeRight);
           diffTime = groundTimeRight - groundTimeLeft;
           println("DiffTimeR = "+nf((float)diffTime/1000000000, 3, 3));
-          fill(255, 255, 255);
-          rect(325, 0, 150, 800);
           stride = diffTime/1000000000*runningSpeed*1000*100/3600;
           println("Stride="+nf((float)stride, 3, 3));
           fill(100, 100, 255);
           if (stride < 30) {
             rect(325, 800, 150, 0);
           } else {
-            if (runningSpeed == 3) {
-              if (stride >= minStride[0] && stride <= maxStride[0]) {
-                fill(255, 0, 0);
-              } else {
-                fill(0);
+            if (!isDrawStrideR) {
+              fill(255, 255, 255);
+              stroke(0);
+              rect(325, 0, 150, 800);
+              if (runningSpeed == 3) {
+                if (stride >= minStride[0] && stride <= maxStride[0]) {
+                  fill(255, 0, 0);
+                } else {
+                  fill(125, 125, 125);
+                }
+              } else if (runningSpeed == 6) {
+                if (stride >= minStride[1] && stride <= maxStride[1]) {
+                  fill(255, 0, 0);
+                } else {
+                  fill(125, 125, 125);
+                }
+              } else if (runningSpeed == 9) {
+                if (stride >= minStride[2] && stride <= maxStride[2]) {
+                  fill(255, 0, 0);
+                } else {
+                  fill(125, 125, 125);
+                }
               }
-            } else if (runningSpeed == 6) {
-              if (stride >= minStride[1] && stride <= maxStride[1]) {
-                fill(255, 0, 0);
-              } else {
-                fill(0);
-              }
-            } else if (runningSpeed == 9) {
-              if (stride >= minStride[2] && stride <= maxStride[2]) {
-                fill(255, 0, 0);
-              } else {
-                fill(0);
-              }
+              rect(325, 800 - ((float)stride - 30)*5.7, 150, ((float)stride - 30)*5.7);
+              textSize(35);
+              fill(0);
+              text(String.valueOf((int)stride)+"cm", 360, 800 - ((float)stride - 30)*DRAWING_RATIO + STRIDE_OFFSET);
+              isDrawStrideR = true;
+              isDrawStrideL = false;
             }
-            rect(325, 800 - ((float)stride - 30)*5.7, 150, ((float)stride - 30)*5.7);
-            textSize(35);
-            fill(0);
-            text(String.valueOf((int)stride)+"cm", 360, 800 - ((float)stride - 30)*DRAWING_RATIO + STRIDE_OFFSET);
           }
           fill(255);
         } else {
@@ -967,7 +881,7 @@ void draw() {
       ellipse(565, 330, 65, 65); // 親指下
     }
     // 小指下
-    if (sensorValueRight3 <= 1010) { // システム1：900, システム2：1000
+    if (sensorValueRight3 <= 990) { 
       isLandingPoint2_3 = true;
       // このセンサ以外のセンサがまだ接地していない場合
       if (pressOrderRight[3] == 0) {
@@ -977,56 +891,48 @@ void draw() {
         // 最初に接地しているか判定
         if (orderRight == 1) {
           image(right_foot, 520, 150, 250, 600);
-          noFill();
           strokeWeight(1);
-          ellipse(650, 675, 75, 75);
-          ellipse(565, 210, 65, 65);
-          ellipse(740, 280, 65, 65);
-          ellipse(565, 330, 65, 65);
-          ellipse(725, 370, 65, 65);
-          textSize(50);
-          fill(0);
-          text("1", 633, 695);
-          text("2", 710, 390);
-          text("3", 550, 350);
-          text("4", 725, 297);
-          text("5", 550, 225);
-
+          drawSensorPos(false, SENSOR_ORDER1, SENSOR_ORDER2, SENSOR_ORDER3, SENSOR_ORDER4, SENSOR_ORDER5);
           groundTimeRight = sensorReactedTimeRight[3];
           println("groundTimeRight="+groundTimeRight);
           diffTime = groundTimeRight - groundTimeLeft;
           println("DiffTimeR = "+nf((float)diffTime/1000000000, 3, 3));
-          fill(255, 255, 255);
-          rect(325, 0, 150, 800);
           stride = diffTime/1000000000*runningSpeed*1000*100/3600;
           println("Stride="+nf((float)stride, 3, 3));
           fill(100, 100, 255);
           if (stride < 30) {
             rect(325, 800, 150, 0);
           } else {
-            if (runningSpeed == 3) {
-              if (stride >= minStride[0] && stride <= maxStride[0]) {
-                fill(255, 0, 0);
-              } else {
-                fill(0);
+            if (!isDrawStrideR) {
+              fill(255, 255, 255);
+              stroke(0);
+              rect(325, 0, 150, 800);
+              if (runningSpeed == 3) {
+                if (stride >= minStride[0] && stride <= maxStride[0]) {
+                  fill(255, 0, 0);
+                } else {
+                  fill(125, 125, 125);
+                }
+              } else if (runningSpeed == 6) {
+                if (stride >= minStride[1] && stride <= maxStride[1]) {
+                  fill(255, 0, 0);
+                } else {
+                  fill(125, 125, 125);
+                }
+              } else if (runningSpeed == 9) {
+                if (stride >= minStride[2] && stride <= maxStride[2]) {
+                  fill(255, 0, 0);
+                } else {
+                  fill(125, 125, 125);
+                }
               }
-            } else if (runningSpeed == 6) {
-              if (stride >= minStride[1] && stride <= maxStride[1]) {
-                fill(255, 0, 0);
-              } else {
-                fill(0);
-              }
-            } else if (runningSpeed == 9) {
-              if (stride >= minStride[2] && stride <= maxStride[2]) {
-                fill(255, 0, 0);
-              } else {
-                fill(0);
-              }
+              rect(325, 800 - ((float)stride - 30)*5.7, 150, ((float)stride - 30)*5.7);
+              textSize(35);
+              fill(0);
+              text(String.valueOf((int)stride)+"cm", 360, 800 - ((float)stride - 30)*DRAWING_RATIO + STRIDE_OFFSET);
+              isDrawStrideR = true;
+              isDrawStrideL = false;
             }
-            rect(325, 800 - ((float)stride - 30)*5.7, 150, ((float)stride - 30)*5.7);
-            textSize(35);
-            fill(0);
-            text(String.valueOf((int)stride)+"cm", 360, 800 - ((float)stride - 30)*DRAWING_RATIO + STRIDE_OFFSET);
           }
           fill(255);
         } else {
@@ -1063,7 +969,7 @@ void draw() {
       ellipse(725, 370, 65, 65); // 小指下
     }
     // かかと
-    if (sensorValueRight4 <= 1015) { // システム1：900, システム2：1000
+    if (sensorValueRight4 <= 990) {
       isLandingPoint2_4 = true;
       // このセンサ以外のセンサがまだ接地していない場合
       if (pressOrderRight[4] == 0) {
@@ -1073,55 +979,48 @@ void draw() {
         // 最初に接地しているか判定
         if (orderRight == 1) {
           image(right_foot, 520, 150, 250, 600);
-          noFill();
           strokeWeight(1);
-          ellipse(650, 675, 75, 75);
-          ellipse(565, 210, 65, 65);
-          ellipse(740, 280, 65, 65);
-          ellipse(565, 330, 65, 65);
-          ellipse(725, 370, 65, 65);
-          textSize(50);
-          fill(0);
-          text("1", 633, 695);
-          text("2", 710, 390);
-          text("3", 550, 350);
-          text("4", 725, 297);
-          text("5", 550, 225);
+          drawSensorPos(false, SENSOR_ORDER1, SENSOR_ORDER2, SENSOR_ORDER3, SENSOR_ORDER4, SENSOR_ORDER5);
           groundTimeRight = sensorReactedTimeRight[4];
           println("groundTimeRight="+groundTimeRight);
           diffTime = groundTimeRight - groundTimeLeft;
           println("DiffTimeR = "+nf((float)diffTime/1000000000, 3, 3));
-          fill(255, 255, 255);
-          rect(325, 0, 150, 800);
           stride = diffTime/1000000000*runningSpeed*1000*100/3600;
           println("Stride="+nf((float)stride, 3, 3));
           fill(100, 100, 255);
           if (stride < 30) {
             rect(325, 800, 150, 0);
           } else {
-            if (runningSpeed == 3) {
-              if (stride >= minStride[0] && stride <= maxStride[0]) {
-                fill(255, 0, 0);
-              } else {
-                fill(0);
+            if (!isDrawStrideR) {
+              fill(255, 255, 255);
+              stroke(0);
+              rect(325, 0, 150, 800);
+              if (runningSpeed == 3) {
+                if (stride >= minStride[0] && stride <= maxStride[0]) {
+                  fill(255, 0, 0);
+                } else {
+                  fill(125, 125, 125);
+                }
+              } else if (runningSpeed == 6) {
+                if (stride >= minStride[1] && stride <= maxStride[1]) {
+                  fill(255, 0, 0);
+                } else {
+                  fill(125, 125, 125);
+                }
+              } else if (runningSpeed == 9) {
+                if (stride >= minStride[2] && stride <= maxStride[2]) {
+                  fill(255, 0, 0);
+                } else {
+                  fill(125, 125, 125);
+                }
               }
-            } else if (runningSpeed == 6) {
-              if (stride >= minStride[1] && stride <= maxStride[1]) {
-                fill(255, 0, 0);
-              } else {
-                fill(0);
-              }
-            } else if (runningSpeed == 9) {
-              if (stride >= minStride[2] && stride <= maxStride[2]) {
-                fill(255, 0, 0);
-              } else {
-                fill(0);
-              }
+              rect(325, 800 - ((float)stride - 30)*5.7, 150, ((float)stride - 30)*5.7);
+              textSize(35);
+              fill(0);
+              text(String.valueOf((int)stride)+"cm", 360, 800 - ((float)stride - 30)*DRAWING_RATIO + STRIDE_OFFSET);
+              isDrawStrideR = true;
+              isDrawStrideL = false;
             }
-            rect(325, 800 - ((float)stride - 30)*5.7, 150, ((float)stride - 30)*5.7);
-            textSize(35);
-            fill(0);
-            text(String.valueOf((int)stride)+"cm", 360, 800 - ((float)stride - 30)*DRAWING_RATIO + STRIDE_OFFSET);
           }
           fill(255);
         } else {
@@ -1272,6 +1171,68 @@ void serialEvent(Serial port) {
   }
   println("time1="+nf((float)(System.nanoTime() - startTime)/1000000000, 3, 0)+",inByte1_0="+sensorValueLeft0+", inByte1_1="+sensorValueLeft1+", inByte1_2="+sensorValueLeft2+", inByte1_3="+sensorValueLeft3+", inByte1_4="+sensorValueLeft4);
   println("time2="+nf((float)(System.nanoTime() - startTime)/1000000000, 3, 0)+",inByte2_0="+sensorValueRight0+", inByte2_1="+sensorValueRight1+", inByte2_2="+sensorValueRight2+", inByte2_3="+sensorValueRight3+", inByte2_4="+sensorValueRight4);
+}
+
+void drawStride(int min, int max) {
+  textSize(25);
+  fill(0);
+  text(String.valueOf(min), 285, 780);
+  text(String.valueOf(min+(max - min)/4), 285, 590);
+  text(String.valueOf(min+(max - min)/4*2), 280, 400);
+  text(String.valueOf(min+(max - min)/4*3), 280, 200);
+  text(String.valueOf(max), 280, 30);
+  text(String.valueOf(min), 475, 780);
+  text(String.valueOf(min+(max - min)/4), 475, 590);
+  text(String.valueOf(min+(max - min)/4*2), 470, 400);
+  text(String.valueOf(min+(max - min)/4*3), 470, 200);
+  text(String.valueOf(max), 470, 30);
+  textSize(15);
+  text("cm", 295, 790);
+  text("cm", 285, 600);
+  text("cm", 295, 410);
+  text("cm", 285, 210);
+  text("cm", 295, 40);
+  text("cm", 485, 790);
+  text("cm", 485, 600);
+  text("cm", 485, 410);
+  text("cm", 485, 210);
+  text("cm", 480, 40);
+}
+
+void drawSensorPos(boolean isLeft, int finger1, int finger2, int finger3, int finger4, int finger5) { // 親指、小指、親指下、小指下、かかとの順番を入れる
+  if (isLeft) {
+    // 左足サークル
+    noFill();
+    ellipse(144, 674, 75, 75); // かかと
+    ellipse(230, 210, 65, 65); // 親指
+    ellipse(55, 280, 65, 65); //小指
+    ellipse(230, 330, 65, 65); // 親指下
+    ellipse(70, 380, 65, 65); // 小指下
+    // 左足テキスト
+    textSize(50);
+    fill(0);
+    text(String.valueOf(finger1), 215, 225); // 親指
+    text(String.valueOf(finger2), 40, 300); // 小指
+    text(String.valueOf(finger3), 215, 350); // 親指下
+    text(String.valueOf(finger4), 55, 400); // 小指下
+    text(String.valueOf(finger5), 128, 690); // かかと
+  } else {
+    // 右足サークル
+    noFill();
+    ellipse(650, 675, 75, 75); // かかと
+    ellipse(565, 210, 65, 65); // 親指
+    ellipse(740, 280, 65, 65); // 小指
+    ellipse(565, 330, 65, 65); // 親指下
+    ellipse(725, 370, 65, 65); // 小指下
+    // 右足テキスト
+    textSize(50);
+    fill(0);
+    text(String.valueOf(finger1), 550, 225); // 親指
+    text(String.valueOf(finger2), 725, 297); // 小指
+    text(String.valueOf(finger3), 550, 350); // 親指下
+    text(String.valueOf(finger4), 710, 390); // 小指下
+    text(String.valueOf(finger5), 633, 695); // かかと
+  }
 }
 
 void drawArrow(float x1, float y1, float x2, float y2) {
