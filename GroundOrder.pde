@@ -3,11 +3,12 @@ import java.util.Map;
 public static final float STRIDE_OFFSET = 30;
 public static final float DRAWING_RATIO = 5.7;
 // 毎回速度に応じて変える
-public static final int SENSOR_ORDER1 = 5;
-public static final int SENSOR_ORDER2 = 3;
-public static final int SENSOR_ORDER3 = 4;
+public static final int SENSOR_ORDER1 = 4;
+public static final int SENSOR_ORDER2 = 5;
+public static final int SENSOR_ORDER3 = 3;
 public static final int SENSOR_ORDER4 = 2;
 public static final int SENSOR_ORDER5 = 1;
+public static final String RUNNER_NAME = "TAKEUCHI";
 
 PImage landingPoint100, landingPoint80, landingPoint60, landingPoint40, landingPoint20, landingPointWhite, right_foot, left_foot;
 Serial myPort1, myPort2;
@@ -44,12 +45,13 @@ boolean firstTouchLeft=false, firstTouchRight=false;
 boolean isDrawStrideL = false, isDrawStrideR = false;
 
 void setup() {
-  minStride[0] = 40;
-  minStride[1] = 71;
-  minStride[2] = 93;
-  maxStride[0] = 100;
-  maxStride[1] = 82;
-  maxStride[2] = 110;
+  // 正解ストライド
+  minStride[0] = 47;
+  minStride[1] = 48;
+  minStride[2] = 85;
+  maxStride[0] = 58;
+  maxStride[1] = 86;
+  maxStride[2] = 94;
   startTime = System.nanoTime();
   size(800, 800);
   //output = createWriter("Test1.csv");
@@ -57,9 +59,9 @@ void setup() {
   output = createWriter("SensorData1"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
   output2 = createWriter("SensorData2"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
   outputPressOrder = createWriter("PressOrder"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
-  output.println("time1,Left0,,Left1,,Left2,,Left3,,Left4,,time2,Right0,,Right1,,Right2,,Right3,,Right4,"+String.valueOf(runningSpeed)+"km/h");
+  output.println("time1,Left0,,Left1,,Left2,,Left3,,Left4,,time2,Right0,,Right1,,Right2,,Right3,,Right4,"+String.valueOf(runningSpeed)+"km/h,"+RUNNER_NAME);
   output2.println("time1,Left0,,Left1,,Left2,,Left3,,Left4,,time2,Right0,,Right1,,Right2,,Right3,,Right4");
-  outputPressOrder.println("TimeLeft,StrideLeft(cm),ContactTimeLeft(s),Left0,Left1,Left2,Left3,Left4,LPeak1,LPTime1,LPeak2,LPTime2,LPeak3,LPTime3,LPeak4,LPTime4,LPeak5,LPTime5,TIL0_1,TIL1_2,TIL2_3,TIL3_4,,TimeRight,StrideRight,ContactTimeRight,Right0,Right1,Right2,Right3,Right4,RPeak1,RPTime1,RPeak2,RPTime2,RPeak3,RPTime3,RPeak4,RPTime4,RPeak5,RPTime5,TIR0_1,TIR1_2,TIR2_3,TIR3_4,"+String.valueOf(runningSpeed)+"km/h");
+  outputPressOrder.println("TimeLeft,StrideLeft(cm),ContactTimeLeft(s),Left0,Left1,Left2,Left3,Left4,LPeak1,LPTime1,LPeak2,LPTime2,LPeak3,LPTime3,LPeak4,LPTime4,LPeak5,LPTime5,TIL0_1,TIL1_2,TIL2_3,TIL3_4,,TimeRight,StrideRight,ContactTimeRight,Right0,Right1,Right2,Right3,Right4,RPeak1,RPTime1,RPeak2,RPTime2,RPeak3,RPTime3,RPeak4,RPTime4,RPeak5,RPTime5,TIR0_1,TIR1_2,TIR2_3,TIR3_4,"+String.valueOf(runningSpeed)+"km/h,"+RUNNER_NAME);
   // システム1号機
   myPort2 = new Serial(this, "/dev/tty.HC-06-DevB-4", 9600); // 2
   //myPort1 = new Serial(this, "/dev/tty.HC-06-DevB-5", 9600); // 1*
@@ -80,7 +82,7 @@ void setup() {
   line(315, 400, 485, 400);
   line(315, 600, 485, 600);
   if (runningSpeed == 3) {
-    drawStride(30, 200);
+    drawStride(30, 160);
   } else if (runningSpeed == 6) {
     drawStride(60, 100);
   } else if (runningSpeed == 9) {
@@ -122,7 +124,6 @@ void draw() {
   if (myPort1.available()>0) {
     if (sensorValueLeft0 <= 1010) {
       isLandingPoint1_0 = true;
-      //image(landingPoint100, 200, 180, 60, 60);
       // センサの接地順序格納
       if (pressOrderLeft[0] == 0) {
         sensorReactedTimeLeft[0] = System.nanoTime() - startTime;
@@ -134,11 +135,8 @@ void draw() {
           strokeWeight(1);
           drawSensorPos(true, SENSOR_ORDER1, SENSOR_ORDER2, SENSOR_ORDER3, SENSOR_ORDER4, SENSOR_ORDER5);
           groundTimeLeft = sensorReactedTimeLeft[0];
-          println("GroundTimeLeft="+groundTimeLeft);
           diffTime = groundTimeLeft - groundTimeRight; // 左足を離してから右足が着くまでの時間
-          println("DiffTimeL = "+nf((float)diffTime/1000000000, 3, 3));
           stride = diffTime/1000000000*runningSpeed*1000*100/3600;
-          println("Stride="+nf((float)stride, 3, 0));
           fill(100, 100, 255);
           if (stride < 30) {
             rect(325, 800, 150, 0);
@@ -183,7 +181,6 @@ void draw() {
               if (pressOrderLeft[i] == orderLeft - 1) {
                 putArrow(true, i, 0);
                 isDrawLeft0 = true;
-                //println("3:"+i+"-"+3);
               }
             }
           }
@@ -218,15 +215,11 @@ void draw() {
         // 最初に接地しているか判定
         if (orderLeft == 1) {
           image(left_foot, 25, 150, 250, 600);
-          //noFill();
           strokeWeight(1);
           drawSensorPos(true, SENSOR_ORDER1, SENSOR_ORDER2, SENSOR_ORDER3, SENSOR_ORDER4, SENSOR_ORDER5);
           groundTimeLeft = sensorReactedTimeLeft[1];
-          println("GroundTimeLeft="+groundTimeLeft);
           diffTime = groundTimeLeft - groundTimeRight; // 左足を離してから右足が着くまでの時間
-          println("DiffTimeL = "+nf((float)diffTime/1000000000, 3, 3));
           stride = diffTime/1000000000*runningSpeed*1000*100/3600;
-          println("Stride="+nf((float)stride, 3, 3));
           fill(100, 100, 255);
           if (stride < 30) {
             rect(325, 800, 150, 0);
@@ -271,7 +264,6 @@ void draw() {
               if (pressOrderLeft[i] == orderLeft - 1) {
                 putArrow(true, i, 1);
                 isDrawLeft1 = true;
-                //println("3:"+i+"-"+3);
               }
             }
           }
@@ -297,7 +289,7 @@ void draw() {
       ellipse(55, 280, 65, 65);
     }
     // 親指下
-    if (sensorValueLeft2 <=1010) {
+    if (sensorValueLeft2 <=1015) {
       isLandingPoint1_2 = true;
       if (pressOrderLeft[2] == 0) {
         sensorReactedTimeLeft[2] = System.nanoTime() - startTime;
@@ -310,11 +302,8 @@ void draw() {
           strokeWeight(1);
           drawSensorPos(true, SENSOR_ORDER1, SENSOR_ORDER2, SENSOR_ORDER3, SENSOR_ORDER4, SENSOR_ORDER5);
           groundTimeLeft = sensorReactedTimeLeft[2];
-          println("GroundTimeLeft="+groundTimeLeft);
           diffTime = groundTimeLeft - groundTimeRight; // 左足を離してから右足が着くまでの時間
-          println("DiffTimeL = "+nf((float)diffTime/1000000000, 3, 3));
           stride = diffTime/1000000000*runningSpeed*1000*100/3600;
-          println("Stride="+nf((float)stride, 3, 3));
           fill(100, 100, 255);
           if (stride < 30) {
             rect(325, 800, 150, 0);
@@ -393,15 +382,11 @@ void draw() {
         // 最初に接地しているか判定
         if (orderLeft == 1) {
           image(left_foot, 25, 150, 250, 600);
-          //noFill();
           strokeWeight(1);
           drawSensorPos(true, SENSOR_ORDER1, SENSOR_ORDER2, SENSOR_ORDER3, SENSOR_ORDER4, SENSOR_ORDER5);
           groundTimeLeft = sensorReactedTimeLeft[3];
-          println("GroundTimeLeft="+groundTimeLeft);
           diffTime = groundTimeLeft - groundTimeRight; // 左足を離してから右足が着くまでの時間
-          println("DiffTimeL = "+nf((float)diffTime/1000000000, 3, 3));
           stride = diffTime/1000000000*runningSpeed*1000*100/3600;
-          println("Stride="+nf((float)stride, 3, 3));
           fill(100, 100, 255);
           if (stride < 30) {
             rect(325, 800, 150, 0);
@@ -471,7 +456,7 @@ void draw() {
       ellipse(70, 380, 65, 65);
     }
     // かかと
-    if (sensorValueLeft4 <= 1010) {
+    if (sensorValueLeft4 <= 1015) {
       isLandingPoint1_4 = true;
       // 接地した順序を格納
       if (pressOrderLeft[4] == 0) {
@@ -485,11 +470,8 @@ void draw() {
           strokeWeight(1);
           drawSensorPos(true, SENSOR_ORDER1, SENSOR_ORDER2, SENSOR_ORDER3, SENSOR_ORDER4, SENSOR_ORDER5);
           groundTimeLeft = sensorReactedTimeLeft[4];
-          println("GroundTimeLeft="+groundTimeLeft);
           diffTime = groundTimeLeft - groundTimeRight; // 左足を離してから右足が着くまでの時間
-          println("DiffTimeL = "+nf((float)diffTime/1000000000, 3, 3));
           stride = diffTime/1000000000*runningSpeed*1000*100/3600;
-          println("Stride="+nf((float)stride, 3, 3));
           fill(100, 100, 255);
           if (stride < 30) {
             rect(325, 800, 150, 0);
@@ -602,7 +584,6 @@ void draw() {
       peak1_2 = 2000;
       peak1_3 = 2000;
       peak1_4 = 2000;
-      // オーダーリセット
       for (int i = 0; i < pressOrderLeft.length; i++) {
         pressOrderLeft[i] = 0;
       }
@@ -617,7 +598,7 @@ void draw() {
   // Right
   // 親指
   if (myPort2.available()>0) {
-    if (sensorValueRight0 <= 990) {
+    if (sensorValueRight0 <= 980) {
       isLandingPoint2_0 = true;
       // 接地した順序を格納
       if (pressOrderRight[0] == 0) {
@@ -631,11 +612,8 @@ void draw() {
           strokeWeight(1);
           drawSensorPos(false, SENSOR_ORDER1, SENSOR_ORDER2, SENSOR_ORDER3, SENSOR_ORDER4, SENSOR_ORDER5);
           groundTimeRight = sensorReactedTimeRight[0];
-          println("GroundTimeRight="+groundTimeRight);
           diffTime = groundTimeRight - groundTimeLeft;
-          println("DiffTimeR = "+nf((float)diffTime/1000000000, 3, 3));
           stride = diffTime/1000000000*runningSpeed*1000*100/3600;
-          println("Stride="+nf((float)stride, 3, 3));
           fill(100, 100, 255);
           if (stride < 30) {
             rect(325, 800, 150, 0);
@@ -705,7 +683,7 @@ void draw() {
       ellipse(565, 210, 65, 65); // 親指
     }
     // 小指
-    if (sensorValueRight1 <= 990) {
+    if (sensorValueRight1 <= 1000) {
       isLandingPoint2_1 = true;
       // このセンサ以外のセンサがまだ接地していない場合
       if (pressOrderRight[1] == 0) {
@@ -715,15 +693,11 @@ void draw() {
         // 最初に接地しているか判定
         if (orderRight == 1) {
           image(right_foot, 520, 150, 250, 600);
-          //noFill();
           strokeWeight(1);
           drawSensorPos(false, SENSOR_ORDER1, SENSOR_ORDER2, SENSOR_ORDER3, SENSOR_ORDER4, SENSOR_ORDER5);
           groundTimeRight = sensorReactedTimeRight[1];
-          println("GroundTimeRight="+groundTimeRight);
           diffTime = groundTimeRight - groundTimeLeft;
-          println("DiffTimeR = "+nf((float)diffTime/1000000000, 3, 3));
           stride = diffTime/1000000000*runningSpeed*1000*100/3600;
-          println("Stride="+nf((float)stride, 3, 3));
           fill(100, 100, 255);
           if (stride < 30) {
             rect(325, 800, 150, 0);
@@ -793,7 +767,7 @@ void draw() {
       ellipse(740, 280, 65, 65); // 小指
     }
     // 親指下
-    if (sensorValueRight2 <= 990) {
+    if (sensorValueRight2 <=1000) {
       isLandingPoint2_2 = true;
       // このセンサ以外のセンサがまだ接地していない場合
       if (pressOrderRight[2] == 0) {
@@ -806,11 +780,8 @@ void draw() {
           strokeWeight(1);
           drawSensorPos(false, SENSOR_ORDER1, SENSOR_ORDER2, SENSOR_ORDER3, SENSOR_ORDER4, SENSOR_ORDER5);
           groundTimeRight = sensorReactedTimeRight[2];
-          println("groundTimeRight="+groundTimeRight);
           diffTime = groundTimeRight - groundTimeLeft;
-          println("DiffTimeR = "+nf((float)diffTime/1000000000, 3, 3));
           stride = diffTime/1000000000*runningSpeed*1000*100/3600;
-          println("Stride="+nf((float)stride, 3, 3));
           fill(100, 100, 255);
           if (stride < 30) {
             rect(325, 800, 150, 0);
@@ -855,7 +826,6 @@ void draw() {
               if (pressOrderRight[i] == orderRight - 1) {
                 putArrow(false, i, 2);
                 isDrawRight2 = true;
-                //println("3:"+i+"-"+3);
               }
             }
           }
@@ -881,7 +851,7 @@ void draw() {
       ellipse(565, 330, 65, 65); // 親指下
     }
     // 小指下
-    if (sensorValueRight3 <= 990) { 
+    if (sensorValueRight3 <= 1000) { 
       isLandingPoint2_3 = true;
       // このセンサ以外のセンサがまだ接地していない場合
       if (pressOrderRight[3] == 0) {
@@ -894,11 +864,8 @@ void draw() {
           strokeWeight(1);
           drawSensorPos(false, SENSOR_ORDER1, SENSOR_ORDER2, SENSOR_ORDER3, SENSOR_ORDER4, SENSOR_ORDER5);
           groundTimeRight = sensorReactedTimeRight[3];
-          println("groundTimeRight="+groundTimeRight);
           diffTime = groundTimeRight - groundTimeLeft;
-          println("DiffTimeR = "+nf((float)diffTime/1000000000, 3, 3));
           stride = diffTime/1000000000*runningSpeed*1000*100/3600;
-          println("Stride="+nf((float)stride, 3, 3));
           fill(100, 100, 255);
           if (stride < 30) {
             rect(325, 800, 150, 0);
@@ -943,7 +910,6 @@ void draw() {
               if (pressOrderRight[i] == orderRight - 1) {
                 putArrow(false, i, 3);
                 isDrawRight3 = true;
-                //println("3:"+i+"-"+3);
               }
             }
           }
@@ -969,7 +935,7 @@ void draw() {
       ellipse(725, 370, 65, 65); // 小指下
     }
     // かかと
-    if (sensorValueRight4 <= 990) {
+    if (sensorValueRight4 <= 1015) {
       isLandingPoint2_4 = true;
       // このセンサ以外のセンサがまだ接地していない場合
       if (pressOrderRight[4] == 0) {
@@ -982,11 +948,8 @@ void draw() {
           strokeWeight(1);
           drawSensorPos(false, SENSOR_ORDER1, SENSOR_ORDER2, SENSOR_ORDER3, SENSOR_ORDER4, SENSOR_ORDER5);
           groundTimeRight = sensorReactedTimeRight[4];
-          println("groundTimeRight="+groundTimeRight);
           diffTime = groundTimeRight - groundTimeLeft;
-          println("DiffTimeR = "+nf((float)diffTime/1000000000, 3, 3));
           stride = diffTime/1000000000*runningSpeed*1000*100/3600;
-          println("Stride="+nf((float)stride, 3, 3));
           fill(100, 100, 255);
           if (stride < 30) {
             rect(325, 800, 150, 0);
@@ -1031,7 +994,6 @@ void draw() {
               if (pressOrderRight[i] == orderRight - 1) {
                 putArrow(false, i, 4);
                 isDrawRight4 = true;
-                //println("3:"+i+"-"+3);
               }
             }
           }
@@ -1109,7 +1071,6 @@ void draw() {
 
 void serialEvent(Serial port) {
   if (port == myPort1) {
-    //println("available1:"+port.available());
     if (port.available() >= 12) {
       if (port.read() == 'H') {
         time1 = port.read();
@@ -1131,10 +1092,8 @@ void serialEvent(Serial port) {
       }
     }
   } else {
-    //println("Not found port1");
   }
   if (port == myPort2) {
-    //println(", available2:"+port.available());
     if (port.available() >= 12) {
       if (port.read() == 'H') {
         time2 = port.read();
@@ -1158,6 +1117,7 @@ void serialEvent(Serial port) {
   } else {
     //println("Not found port2");
   }
+  
   if ((System.nanoTime() - startTime)/1000000000 >= 0 && (System.nanoTime() - startTime)/1000000000 < 550) {
     if (sensorValueLeft0 > 0 && sensorValueLeft1 > 0 && sensorValueLeft2 > 0 && sensorValueLeft3 > 0 && sensorValueLeft4 > 0 && sensorValueRight0 > 0 && sensorValueRight1 > 0 && sensorValueRight2 > 0 && sensorValueRight3 > 0 && sensorValueRight4 > 0) {
       output.println((System.nanoTime() - startTime)/1000000000+","+sensorValueLeft0+","+","+sensorValueLeft1+","+","+sensorValueLeft2+","+","+sensorValueLeft3+","+","+sensorValueLeft4+","+","+(System.nanoTime() - startTime)/1000000000+","+sensorValueRight0+","+","+sensorValueRight1+","+","+sensorValueRight2+","+","+sensorValueRight3+","+","+sensorValueRight4);
