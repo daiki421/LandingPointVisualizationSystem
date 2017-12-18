@@ -4,18 +4,18 @@ public static final float STRIDE_OFFSET = 30;
 public static final float DRAWING_RATIO = 5.7;
 // 毎回速度に応じて変える
 public static final int SENSOR_ORDER1 = 4;
-public static final int SENSOR_ORDER2 = 5;
-public static final int SENSOR_ORDER3 = 3;
-public static final int SENSOR_ORDER4 = 2;
+public static final int SENSOR_ORDER2 = 2;
+public static final int SENSOR_ORDER3 = 5;
+public static final int SENSOR_ORDER4 = 3;
 public static final int SENSOR_ORDER5 = 1;
-public static final String RUNNER_NAME = "TAKEUCHI";
+public static final String RUNNER_NAME = "NAKAO";
 
 PImage landingPoint100, landingPoint80, landingPoint60, landingPoint40, landingPoint20, landingPointWhite, right_foot, left_foot;
 Serial myPort1, myPort2;
 int analog1_0_high, analog1_0_low, analog1_1_high, analog1_1_low, analog1_2_high, analog1_2_low, analog1_3_high, analog1_3_low, analog1_4_high, analog1_4_low; // Arduinoから送られてきた分割された値
 int analog2_0_high, analog2_0_low, analog2_1_high, analog2_1_low, analog2_2_high, analog2_2_low, analog2_3_high, analog2_3_low, analog2_4_high, analog2_4_low;
 int sensorValueLeft0, sensorValueLeft1, sensorValueLeft2, sensorValueLeft3, sensorValueLeft4, sensorValueRight0, sensorValueRight1, sensorValueRight2, sensorValueRight3, sensorValueRight4; // 分割された値から算出したセンサ値
-PrintWriter output, output2, outputPressOrder; // ファイル変数
+PrintWriter output, output2, output3, outputPressOrder; // ファイル変数
 boolean isLandingPoint1_0 = false, isLandingPoint1_1 = false, isLandingPoint1_2 = false, isLandingPoint1_3 = false, isLandingPoint1_4 = false; // 圧力センサの接地判定
 boolean isLandingPoint2_0 = false, isLandingPoint2_1 = false, isLandingPoint2_2 = false, isLandingPoint2_3 = false, isLandingPoint2_4 = false;
 boolean isDrawLeft0 = false, isDrawLeft1 = false, isDrawLeft2 = false, isDrawLeft3 = false, isDrawLeft4 = false, isDrawRight0 = false, isDrawRight1 = false, isDrawRight2 = false, isDrawRight3 = false, isDrawRight4 = false;
@@ -26,7 +26,7 @@ double diffTime = 0; // 片足が接地してからもう片足が接地する�
 double sensorReactedTimeLeft[] = {0, 0, 0, 0, 0}, sensorReactedTimeRight[] = {0, 0, 0, 0, 0}; // 各センサが地面に設置した時間
 double evacuateLeft2 = 0, evacuateLeft3 = 0, evacuateLeft4 = 0, evacuateRight2 = 0, evacuateRight3 = 0, evacuateRight4 = 0; //センサが反応した時間を一時保存
 int runningSpeed = 6;// トレッドミルの時速を指定
-int peak1_0 = 2000, peak1_1 = 2000, peak1_2 = 2000, peak1_3 = 2000, peak1_4 = 2000, peak2_0 = 2000, peak2_1 = 2000, peak2_2 = 2000, peak2_3 = 2000, peak2_4 = 2000; // 各圧力センサ値のピーク
+int peak1_0 = 1024, peak1_1 = 1024, peak1_2 = 1024, peak1_3 = 1024, peak1_4 = 1024, peak2_0 = 1024, peak2_1 = 1024, peak2_2 = 1024, peak2_3 = 1024, peak2_4 = 1024; // 各圧力センサ値のピーク
 double peakTime1_0 = 0, peakTime1_1 = 0, peakTime1_2 = 0, peakTime1_3 = 0, peakTime1_4 = 0, peakTime2_0 = 0, peakTime2_1 = 0, peakTime2_2 = 0, peakTime2_3 = 0, peakTime2_4 = 0;
 int pressOrderLeft[] = {0, 0, 0, 0, 0}, pressOrderRight[] = {0, 0, 0, 0, 0}; // 着地点の順番を格納する
 int orderLeft = 1, orderRight = 1; // 着地点の順番
@@ -41,26 +41,32 @@ double left1_2, left2_3, left3_4, left4_5, right1_2, right2_3, right3_4, right4_
 
 double minStride[] = {0, 0, 0}, maxStride[] = {0, 0, 0}, stride = 0;
 boolean firstTouchLeft=false, firstTouchRight=false;
-
 boolean isDrawStrideL = false, isDrawStrideR = false;
+
+// 外で実験する用の変数
+double speed = 0;
+double amount = 0;
+double pressure = 0;
 
 void setup() {
   // 正解ストライド
-  minStride[0] = 47;
-  minStride[1] = 48;
+  minStride[0] = 42;
+  minStride[1] = 50;
   minStride[2] = 85;
-  maxStride[0] = 58;
-  maxStride[1] = 86;
-  maxStride[2] = 94;
+  maxStride[0] = 50;
+  maxStride[1] = 99;
+  maxStride[2] = 113;
   startTime = System.nanoTime();
   size(800, 800);
   //output = createWriter("Test1.csv");
   //outputPressOrder = createWriter("TestOrder1.csv");
   output = createWriter("SensorData1"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
   output2 = createWriter("SensorData2"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
+  output3 = createWriter("SensorData3"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
   outputPressOrder = createWriter("PressOrder"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
-  output.println("time1,Left0,,Left1,,Left2,,Left3,,Left4,,time2,Right0,,Right1,,Right2,,Right3,,Right4,"+String.valueOf(runningSpeed)+"km/h,"+RUNNER_NAME);
+  output.println("time1,Left0,amountL0,pressureL0,Left1,amountL1,pressureL1,Left2,amountL2,pressureL2,Left3,amountL3,pressureL3,Left4,amountL4,pressureL4,,time2,Right0,amountR0,pressureR0,Right1,amountR1,pressureR1,Right2,amountR2,pressureR2,Right3,amountR3,pressureR3,Right4,amountR4,pressureR4,"+String.valueOf(runningSpeed)+"km/h,"+RUNNER_NAME);
   output2.println("time1,Left0,,Left1,,Left2,,Left3,,Left4,,time2,Right0,,Right1,,Right2,,Right3,,Right4");
+  output3.println("Speed, AvePeak");
   outputPressOrder.println("TimeLeft,StrideLeft(cm),ContactTimeLeft(s),Left0,Left1,Left2,Left3,Left4,LPeak1,LPTime1,LPeak2,LPTime2,LPeak3,LPTime3,LPeak4,LPTime4,LPeak5,LPTime5,TIL0_1,TIL1_2,TIL2_3,TIL3_4,,TimeRight,StrideRight,ContactTimeRight,Right0,Right1,Right2,Right3,Right4,RPeak1,RPTime1,RPeak2,RPTime2,RPeak3,RPTime3,RPeak4,RPTime4,RPeak5,RPTime5,TIR0_1,TIR1_2,TIR2_3,TIR3_4,"+String.valueOf(runningSpeed)+"km/h,"+RUNNER_NAME);
   // システム1号機
   myPort2 = new Serial(this, "/dev/tty.HC-06-DevB-4", 9600); // 2
@@ -100,6 +106,16 @@ void setup() {
   fill(255);
 }
 
+double calcAmount (double sensorValue) {
+  double amount = 880.79/(0.1*(sensorValue*5/1024)/(5-sensorValue*5/1024))+47.96;
+  return amount;
+}
+
+double calcPressure (double amount) {
+  double pressure = amount/1000*9.8/0.16925518916;
+  return pressure;
+}
+
 void draw() {
   fill(255);
   strokeWeight(1);
@@ -114,6 +130,8 @@ void draw() {
       output.close(); // ファイル閉じる
       output2.flush(); // データ書き込み
       output2.close(); // ファイル閉じる
+      output3.flush(); // データ書き込み
+      output3.close(); // ファイル閉じる
       outputPressOrder.flush();
       outputPressOrder.close();
       println("File Close");
@@ -122,6 +140,7 @@ void draw() {
   // Left
   // 親指
   if (myPort1.available()>0) {
+
     if (sensorValueLeft0 <= 1010) {
       isLandingPoint1_0 = true;
       // センサの接地順序格納
@@ -188,13 +207,19 @@ void draw() {
         orderLeft++;
       }
       // 取得したセンサ値が前の値より小さければピークを更新
-      if (sensorValueLeft0 <= peak1_0) {
+      if (sensorValueLeft0 < peak1_0) {
         peak1_0 = sensorValueLeft0;
         peakTime1_0 = (System.nanoTime() - startTime) - sensorReactedTimeLeft[0];
+        amount = calcAmount(sensorValueLeft0);
+        pressure = amount/1000*9.8/0.16925518916;
+        speed = (59 - pressure) * 6 / 17;
+        //println(amount+", "+pressure+", "+peak1_0+", "+speed);
+        output3.println(speed+","+pressure);
       }
     } else {
       isLandingPoint1_0 = false;
     }
+
     if (isLandingPoint1_0) {
       noFill();
       stroke(255, 0, 0);
@@ -270,10 +295,9 @@ void draw() {
         }
         orderLeft++;
       }
-      if (sensorValueLeft1 <= peak1_1) {
+      if (sensorValueLeft1 < peak1_1) {
         peak1_1 = sensorValueLeft1;
         peakTime1_1 = (System.nanoTime() - startTime) - sensorReactedTimeLeft[1];
-      } else if (sensorValueLeft1 > peak1_1) {
       }
     } else {
       isLandingPoint1_1 = false;
@@ -354,7 +378,7 @@ void draw() {
         }
         orderLeft++;
       }
-      if (sensorValueLeft2 <= peak1_2) {
+      if (sensorValueLeft2 < peak1_2) {
         peak1_2 = sensorValueLeft2;
         peakTime1_2 = (System.nanoTime() - startTime) - sensorReactedTimeLeft[2];
       } else if (sensorValueLeft2 > peak1_2) {
@@ -437,7 +461,7 @@ void draw() {
         }
         orderLeft++;
       }
-      if (sensorValueLeft3 <= peak1_3) {
+      if (sensorValueLeft3 < peak1_3) {
         peak1_3 = sensorValueLeft3;
         peakTime1_3 = (System.nanoTime() - startTime) - sensorReactedTimeLeft[3];
       } else if (sensorValueLeft3 > peak1_3) {
@@ -522,7 +546,7 @@ void draw() {
         }
         orderLeft++;
       }
-      if (sensorValueLeft4 <= peak1_4) {
+      if (sensorValueLeft4 < peak1_4) {
         peak1_4 = sensorValueLeft4;
         peakTime1_4 = (System.nanoTime() - startTime) - sensorReactedTimeLeft[4];
       }
@@ -579,11 +603,11 @@ void draw() {
         // 計算したものをファイルに保存
         outputPressOrder.println((System.nanoTime() - startTime)/1000000000+","+diffTime/1000000000*runningSpeed*1000*100/3600+","+(landingTimeLeft - groundTimeLeft)/1000000000+","+pressOrderLeft[0]+","+pressOrderLeft[1]+","+pressOrderLeft[2]+","+pressOrderLeft[3]+","+pressOrderLeft[4]+","+peak1_0+","+peakTime1_0/1000000000+","+peak1_1+","+peakTime1_1/1000000000+","+peak1_2+","+peakTime1_2/1000000000+","+peak1_3+","+peakTime1_3/1000000000+","+peak1_4+","+peakTime1_4/1000000000+","+left1_2+","+left2_3+","+left3_4+","+left4_5+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+",");
       }
-      peak1_0 = 2000;
-      peak1_1 = 2000;
-      peak1_2 = 2000;
-      peak1_3 = 2000;
-      peak1_4 = 2000;
+      peak1_0 = 1024;
+      peak1_1 = 1024;
+      peak1_2 = 1024;
+      peak1_3 = 1024;
+      peak1_4 = 1024;
       for (int i = 0; i < pressOrderLeft.length; i++) {
         pressOrderLeft[i] = 0;
       }
@@ -664,7 +688,7 @@ void draw() {
         }
         orderRight++;
       }
-      if (sensorValueRight0 <= peak2_0) {
+      if (sensorValueRight0 < peak2_0) {
         peak2_0 = sensorValueRight0;
         peakTime2_0 = (System.nanoTime() - startTime) - sensorReactedTimeRight[0];
       } else if (sensorValueRight0 > peak2_0) {
@@ -683,7 +707,7 @@ void draw() {
       ellipse(565, 210, 65, 65); // 親指
     }
     // 小指
-    if (sensorValueRight1 <= 1000) {
+    if (sensorValueRight1 <= 960) {
       isLandingPoint2_1 = true;
       // このセンサ以外のセンサがまだ接地していない場合
       if (pressOrderRight[1] == 0) {
@@ -748,7 +772,7 @@ void draw() {
         }
         orderRight++;
       }
-      if (sensorValueRight1 <= peak2_1) {
+      if (sensorValueRight1 < peak2_1) {
         peak2_1 = sensorValueRight1;
         peakTime2_1 = (System.nanoTime() - startTime) - sensorReactedTimeRight[1];
       } else if (sensorValueRight1 > peak2_1) {
@@ -767,7 +791,7 @@ void draw() {
       ellipse(740, 280, 65, 65); // 小指
     }
     // 親指下
-    if (sensorValueRight2 <=1000) {
+    if (sensorValueRight2 <=960) {
       isLandingPoint2_2 = true;
       // このセンサ以外のセンサがまだ接地していない場合
       if (pressOrderRight[2] == 0) {
@@ -832,7 +856,7 @@ void draw() {
         }
         orderRight++;
       }
-      if (sensorValueRight2 <= peak2_2) {
+      if (sensorValueRight2 < peak2_2) {
         peak2_2 = sensorValueRight2;
         peakTime2_2 = (System.nanoTime() - startTime) - sensorReactedTimeRight[2];
       } else if (sensorValueRight2 > peak2_2) {
@@ -851,7 +875,7 @@ void draw() {
       ellipse(565, 330, 65, 65); // 親指下
     }
     // 小指下
-    if (sensorValueRight3 <= 1000) { 
+    if (sensorValueRight3 <= 960) { 
       isLandingPoint2_3 = true;
       // このセンサ以外のセンサがまだ接地していない場合
       if (pressOrderRight[3] == 0) {
@@ -916,7 +940,7 @@ void draw() {
         }
         orderRight++;
       }
-      if (sensorValueRight3 <= peak2_3) {
+      if (sensorValueRight3 < peak2_3) {
         peak2_3 = sensorValueRight3;
         peakTime2_3 = (System.nanoTime() - startTime) - sensorReactedTimeRight[3];
       } else if (sensorValueRight3 > peak2_3) {
@@ -1000,7 +1024,7 @@ void draw() {
         }
         orderRight++;
       }
-      if (sensorValueRight4 <= peak2_4) {
+      if (sensorValueRight4 < peak2_4) {
         peak2_4 = sensorValueRight4;
         peakTime2_4 = (System.nanoTime() - startTime) - sensorReactedTimeRight[4];
       } else if (sensorValueRight4 > peak2_4) {
@@ -1053,11 +1077,11 @@ void draw() {
           right4_5 = (orderTimeR.get(5) - orderTimeR.get(4))/1000000000;
         }
         outputPressOrder.println(","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+(System.nanoTime() - startTime)/1000000000+","+diffTime/1000000000*runningSpeed*1000*100/3600+","+(landingTimeRight - groundTimeRight)/1000000000+","+pressOrderRight[0]+","+pressOrderRight[1]+","+pressOrderRight[2]+","+pressOrderRight[3]+","+pressOrderRight[4]+","+peak2_0+","+peakTime2_0/1000000000+","+peak2_1+","+peakTime2_1/1000000000+","+peak2_2+","+peakTime2_2/1000000000+","+peak2_3+","+peakTime2_3/1000000000+","+peak2_4+","+peakTime2_4/1000000000+","+right1_2+","+right2_3+","+right3_4+","+right4_5);
-        peak2_0 = 2000;
-        peak2_1 = 2000;
-        peak2_2 = 2000;
-        peak2_3 = 2000;
-        peak2_4 = 2000;
+        peak2_0 = 1024;
+        peak2_1 = 1024;
+        peak2_2 = 1024;
+        peak2_3 = 1024;
+        peak2_4 = 1024;
         for (int i = 0; i < pressOrderRight.length; i++) {
           pressOrderRight[i] = 0;
         }
@@ -1117,16 +1141,16 @@ void serialEvent(Serial port) {
   } else {
     //println("Not found port2");
   }
-  
+
   if ((System.nanoTime() - startTime)/1000000000 >= 0 && (System.nanoTime() - startTime)/1000000000 < 550) {
     if (sensorValueLeft0 > 0 && sensorValueLeft1 > 0 && sensorValueLeft2 > 0 && sensorValueLeft3 > 0 && sensorValueLeft4 > 0 && sensorValueRight0 > 0 && sensorValueRight1 > 0 && sensorValueRight2 > 0 && sensorValueRight3 > 0 && sensorValueRight4 > 0) {
-      output.println((System.nanoTime() - startTime)/1000000000+","+sensorValueLeft0+","+","+sensorValueLeft1+","+","+sensorValueLeft2+","+","+sensorValueLeft3+","+","+sensorValueLeft4+","+","+(System.nanoTime() - startTime)/1000000000+","+sensorValueRight0+","+","+sensorValueRight1+","+","+sensorValueRight2+","+","+sensorValueRight3+","+","+sensorValueRight4);
+      output.println((System.nanoTime() - startTime)/1000000000+","+sensorValueLeft0+","+calcAmount(sensorValueLeft0)+","+calcPressure(calcAmount(sensorValueLeft0))+","+sensorValueLeft1+","+calcAmount(sensorValueLeft1)+","+calcPressure(calcAmount(sensorValueLeft1))+","+sensorValueLeft2+","+calcAmount(sensorValueLeft2)+","+calcPressure(calcAmount(sensorValueLeft2))+","+sensorValueLeft3+","+calcAmount(sensorValueLeft3)+","+calcPressure(calcAmount(sensorValueLeft3))+","+sensorValueLeft4+","+calcAmount(sensorValueLeft4)+","+calcPressure(calcAmount(sensorValueLeft4))+","+","+(System.nanoTime() - startTime)/1000000000+","+sensorValueRight0+","+calcAmount(sensorValueRight0)+","+calcPressure(calcAmount(sensorValueRight0))+","+sensorValueRight1+","+calcAmount(sensorValueRight1)+","+calcPressure(calcAmount(sensorValueRight1))+","+sensorValueRight2+","+calcAmount(sensorValueRight2)+","+calcPressure(calcAmount(sensorValueRight2))+","+sensorValueRight3+","+calcAmount(sensorValueRight3)+","+calcPressure(calcAmount(sensorValueRight3))+","+sensorValueRight4+","+calcAmount(sensorValueRight4)+","+calcPressure(calcAmount(sensorValueRight4)));
     }
   } else if ((System.nanoTime() - startTime)/1000000000 >= 550 && (System.nanoTime() - startTime)/1000000000 < 1100) {
     output.flush();
     output.close();
     if (sensorValueLeft0 > 0 && sensorValueLeft1 > 0 && sensorValueLeft2 > 0 && sensorValueLeft3 > 0 && sensorValueLeft4 > 0 && sensorValueRight0 > 0 && sensorValueRight1 > 0 && sensorValueRight2 > 0 && sensorValueRight3 > 0 && sensorValueRight4 > 0) {
-      output2.println((System.nanoTime() - startTime)/1000000000+","+sensorValueLeft0+","+","+sensorValueLeft1+","+","+sensorValueLeft2+","+","+sensorValueLeft3+","+","+sensorValueLeft4+","+","+(System.nanoTime() - startTime)/1000000000+","+sensorValueRight0+","+","+sensorValueRight1+","+","+sensorValueRight2+","+","+sensorValueRight3+","+","+sensorValueRight4);
+      output2.println((System.nanoTime() - startTime)/1000000000+","+sensorValueLeft0+","+calcAmount(sensorValueLeft0)+","+calcPressure(calcAmount(sensorValueLeft0))+","+sensorValueLeft1+","+calcAmount(sensorValueLeft1)+","+calcPressure(calcAmount(sensorValueLeft1))+","+sensorValueLeft2+","+calcAmount(sensorValueLeft2)+","+calcPressure(calcAmount(sensorValueLeft2))+","+sensorValueLeft3+","+calcAmount(sensorValueLeft3)+","+calcPressure(calcAmount(sensorValueLeft3))+","+sensorValueLeft4+","+calcAmount(sensorValueLeft4)+","+calcPressure(calcAmount(sensorValueLeft4))+","+","+(System.nanoTime() - startTime)/1000000000+","+sensorValueRight0+","+calcAmount(sensorValueRight0)+","+calcPressure(calcAmount(sensorValueRight0))+","+sensorValueRight1+","+calcAmount(sensorValueRight1)+","+calcPressure(calcAmount(sensorValueRight1))+","+sensorValueRight2+","+calcAmount(sensorValueRight2)+","+calcPressure(calcAmount(sensorValueRight2))+","+sensorValueRight3+","+calcAmount(sensorValueRight3)+","+calcPressure(calcAmount(sensorValueRight3))+","+sensorValueRight4+","+calcAmount(sensorValueRight4)+","+calcPressure(calcAmount(sensorValueRight4)));
     }
   }
   println("time1="+nf((float)(System.nanoTime() - startTime)/1000000000, 3, 0)+",inByte1_0="+sensorValueLeft0+", inByte1_1="+sensorValueLeft1+", inByte1_2="+sensorValueLeft2+", inByte1_3="+sensorValueLeft3+", inByte1_4="+sensorValueLeft4);
