@@ -3,12 +3,12 @@ import java.util.Map;
 public static final float STRIDE_OFFSET = 30;
 public static final float DRAWING_RATIO = 5.7;
 // 毎回速度に応じて変える
-public static final int SENSOR_ORDER1 = 4;
-public static final int SENSOR_ORDER2 = 2;
-public static final int SENSOR_ORDER3 = 5;
-public static final int SENSOR_ORDER4 = 3;
+public static final int SENSOR_ORDER1 = 5;
+public static final int SENSOR_ORDER2 = 3;
+public static final int SENSOR_ORDER3 = 4;
+public static final int SENSOR_ORDER4 = 2;
 public static final int SENSOR_ORDER5 = 1;
-public static final String RUNNER_NAME = "NAKAO";
+public static final String RUNNER_NAME = "OBANA";
 
 PImage landingPoint100, landingPoint80, landingPoint60, landingPoint40, landingPoint20, landingPointWhite, right_foot, left_foot;
 Serial myPort1, myPort2;
@@ -50,20 +50,20 @@ double pressure = 0;
 
 void setup() {
   // 正解ストライド
-  minStride[0] = 42;
-  minStride[1] = 50;
-  minStride[2] = 85;
-  maxStride[0] = 50;
-  maxStride[1] = 99;
-  maxStride[2] = 113;
+  minStride[0] = 30;
+  minStride[1] = 41;
+  minStride[2] = 79;
+  maxStride[0] = 39;
+  maxStride[1] = 72;
+  maxStride[2] = 92;
   startTime = System.nanoTime();
   size(800, 800);
   //output = createWriter("Test1.csv");
   //outputPressOrder = createWriter("TestOrder1.csv");
-  output = createWriter("SensorData1"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
-  output2 = createWriter("SensorData2"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
-  output3 = createWriter("SensorData3"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
-  outputPressOrder = createWriter("PressOrder"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
+  output = createWriter("SD1"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
+  output2 = createWriter("SD2"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
+  output3 = createWriter("SD3"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
+  outputPressOrder = createWriter("PO"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
   output.println("time1,Left0,amountL0,pressureL0,Left1,amountL1,pressureL1,Left2,amountL2,pressureL2,Left3,amountL3,pressureL3,Left4,amountL4,pressureL4,,time2,Right0,amountR0,pressureR0,Right1,amountR1,pressureR1,Right2,amountR2,pressureR2,Right3,amountR3,pressureR3,Right4,amountR4,pressureR4,"+String.valueOf(runningSpeed)+"km/h,"+RUNNER_NAME);
   output2.println("time1,Left0,,Left1,,Left2,,Left3,,Left4,,time2,Right0,,Right1,,Right2,,Right3,,Right4");
   output3.println("Speed, AvePeak");
@@ -707,7 +707,7 @@ void draw() {
       ellipse(565, 210, 65, 65); // 親指
     }
     // 小指
-    if (sensorValueRight1 <= 960) {
+    if (sensorValueRight1 <= 980) {
       isLandingPoint2_1 = true;
       // このセンサ以外のセンサがまだ接地していない場合
       if (pressOrderRight[1] == 0) {
@@ -791,7 +791,7 @@ void draw() {
       ellipse(740, 280, 65, 65); // 小指
     }
     // 親指下
-    if (sensorValueRight2 <=960) {
+    if (sensorValueRight2 <=980) {
       isLandingPoint2_2 = true;
       // このセンサ以外のセンサがまだ接地していない場合
       if (pressOrderRight[2] == 0) {
@@ -875,7 +875,7 @@ void draw() {
       ellipse(565, 330, 65, 65); // 親指下
     }
     // 小指下
-    if (sensorValueRight3 <= 960) { 
+    if (sensorValueRight3 <= 980) { 
       isLandingPoint2_3 = true;
       // このセンサ以外のセンサがまだ接地していない場合
       if (pressOrderRight[3] == 0) {
