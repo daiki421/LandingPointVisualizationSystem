@@ -3,12 +3,12 @@ import java.util.Map;
 public static final float STRIDE_OFFSET = 30;
 public static final float DRAWING_RATIO = 5.7;
 // 毎回速度に応じて変える
-public static final int SENSOR_ORDER1 = 5;
-public static final int SENSOR_ORDER2 = 3;
+public static final int SENSOR_ORDER1 = 3;
+public static final int SENSOR_ORDER2 = 5;
 public static final int SENSOR_ORDER3 = 4;
 public static final int SENSOR_ORDER4 = 2;
 public static final int SENSOR_ORDER5 = 1;
-public static final String RUNNER_NAME = "OBANA";
+public static final String RUNNER_NAME = "SOMURA";
 
 PImage landingPoint100, landingPoint80, landingPoint60, landingPoint40, landingPoint20, landingPointWhite, right_foot, left_foot;
 Serial myPort1, myPort2;
@@ -43,6 +43,8 @@ double minStride[] = {0, 0, 0}, maxStride[] = {0, 0, 0}, stride = 0;
 boolean firstTouchLeft=false, firstTouchRight=false;
 boolean isDrawStrideL = false, isDrawStrideR = false;
 
+boolean isSetBT1 = false, isSetBT2 = false;
+
 // 外で実験する用の変数
 double speed = 0;
 double amount = 0;
@@ -50,16 +52,14 @@ double pressure = 0;
 
 void setup() {
   // 正解ストライド
-  minStride[0] = 30;
-  minStride[1] = 41;
-  minStride[2] = 79;
-  maxStride[0] = 39;
-  maxStride[1] = 72;
-  maxStride[2] = 92;
+  minStride[0] = 43;
+  minStride[1] = 16;
+  minStride[2] = 82;
+  maxStride[0] = 61;
+  maxStride[1] = 89;
+  maxStride[2] = 103;
   startTime = System.nanoTime();
   size(800, 800);
-  //output = createWriter("Test1.csv");
-  //outputPressOrder = createWriter("TestOrder1.csv");
   output = createWriter("SD1"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
   output2 = createWriter("SD2"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
   output3 = createWriter("SD3"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
@@ -69,11 +69,11 @@ void setup() {
   output3.println("Speed, AvePeak");
   outputPressOrder.println("TimeLeft,StrideLeft(cm),ContactTimeLeft(s),Left0,Left1,Left2,Left3,Left4,LPeak1,LPTime1,LPeak2,LPTime2,LPeak3,LPTime3,LPeak4,LPTime4,LPeak5,LPTime5,TIL0_1,TIL1_2,TIL2_3,TIL3_4,,TimeRight,StrideRight,ContactTimeRight,Right0,Right1,Right2,Right3,Right4,RPeak1,RPTime1,RPeak2,RPTime2,RPeak3,RPTime3,RPeak4,RPTime4,RPeak5,RPTime5,TIR0_1,TIR1_2,TIR2_3,TIR3_4,"+String.valueOf(runningSpeed)+"km/h,"+RUNNER_NAME);
   // システム1号機
-  myPort2 = new Serial(this, "/dev/tty.HC-06-DevB-4", 9600); // 2
+  myPort2 = new Serial(this, "/dev/tty.HC-06-DevB-1", 9600); // 2
   //myPort1 = new Serial(this, "/dev/tty.HC-06-DevB-5", 9600); // 1*
   // システム2号機
   myPort1 = new Serial(this, "/dev/tty.HC-06-DevB-2", 9600); // 0
-  //myPort1 = new Serial(this, "/dev/tty.HC-06-DevB-3", 9600); // 3
+  //myPort1 = new Serial(this, "/dev/tty.HC-06-DevB", 9600); // 3
   left_foot = loadImage("left_foot.jpg");
   right_foot = loadImage("right_foot.jpg");
   landingPointWhite = loadImage("white.png");
@@ -88,11 +88,11 @@ void setup() {
   line(315, 400, 485, 400);
   line(315, 600, 485, 600);
   if (runningSpeed == 3) {
-    drawStride(30, 160);
+    drawStride(30, 90);
   } else if (runningSpeed == 6) {
-    drawStride(60, 100);
+    drawStride(10, 150);
   } else if (runningSpeed == 9) {
-    drawStride(80, 140);
+    drawStride(70, 170);
   } else {
     drawStride(30, 170);
   }
@@ -117,6 +117,7 @@ double calcPressure (double amount) {
 }
 
 void draw() {
+  
   fill(255);
   strokeWeight(1);
   stroke(0);
@@ -397,7 +398,7 @@ void draw() {
       ellipse(230, 330, 65, 65);
     }
     // 小指下
-    if (sensorValueLeft3 <= 1010) {
+    if (sensorValueLeft3 <= 1015) {
       isLandingPoint1_3 = true;
       if (pressOrderLeft[3] == 0) {
         sensorReactedTimeLeft[3] = System.nanoTime() - startTime;
@@ -622,7 +623,7 @@ void draw() {
   // Right
   // 親指
   if (myPort2.available()>0) {
-    if (sensorValueRight0 <= 980) {
+    if (sensorValueRight0 <= 970) {
       isLandingPoint2_0 = true;
       // 接地した順序を格納
       if (pressOrderRight[0] == 0) {
@@ -707,7 +708,7 @@ void draw() {
       ellipse(565, 210, 65, 65); // 親指
     }
     // 小指
-    if (sensorValueRight1 <= 980) {
+    if (sensorValueRight1 <= 970) {
       isLandingPoint2_1 = true;
       // このセンサ以外のセンサがまだ接地していない場合
       if (pressOrderRight[1] == 0) {
@@ -791,7 +792,7 @@ void draw() {
       ellipse(740, 280, 65, 65); // 小指
     }
     // 親指下
-    if (sensorValueRight2 <=980) {
+    if (sensorValueRight2 <=970) {
       isLandingPoint2_2 = true;
       // このセンサ以外のセンサがまだ接地していない場合
       if (pressOrderRight[2] == 0) {
@@ -875,7 +876,7 @@ void draw() {
       ellipse(565, 330, 65, 65); // 親指下
     }
     // 小指下
-    if (sensorValueRight3 <= 980) { 
+    if (sensorValueRight3 <= 970) { 
       isLandingPoint2_3 = true;
       // このセンサ以外のセンサがまだ接地していない場合
       if (pressOrderRight[3] == 0) {
@@ -959,7 +960,7 @@ void draw() {
       ellipse(725, 370, 65, 65); // 小指下
     }
     // かかと
-    if (sensorValueRight4 <= 1015) {
+    if (sensorValueRight4 <= 1000) {
       isLandingPoint2_4 = true;
       // このセンサ以外のセンサがまだ接地していない場合
       if (pressOrderRight[4] == 0) {
@@ -1139,7 +1140,7 @@ void serialEvent(Serial port) {
       }
     }
   } else {
-    //println("Not found port2");
+    //println("2:未接続");
   }
 
   if ((System.nanoTime() - startTime)/1000000000 >= 0 && (System.nanoTime() - startTime)/1000000000 < 550) {
