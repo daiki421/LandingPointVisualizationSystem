@@ -3,12 +3,12 @@ import java.util.Map;
 public static final float STRIDE_OFFSET = 30;
 public static final float DRAWING_RATIO = 5.7;
 // 毎回速度に応じて変える
-public static final int SENSOR_ORDER1 = 3;
-public static final int SENSOR_ORDER2 = 5;
+public static final int SENSOR_ORDER1 = 5;
+public static final int SENSOR_ORDER2 = 3;
 public static final int SENSOR_ORDER3 = 4;
 public static final int SENSOR_ORDER4 = 2;
 public static final int SENSOR_ORDER5 = 1;
-public static final String RUNNER_NAME = "SOMURA";
+public static final String RUNNER_NAME = "TAMIYA";
 
 PImage landingPoint100, landingPoint80, landingPoint60, landingPoint40, landingPoint20, landingPointWhite, right_foot, left_foot;
 Serial myPort1, myPort2;
@@ -25,7 +25,7 @@ double landingTimeRight = 0, landingTimeLeft = 0; // 地面から離れた時間
 double diffTime = 0; // 片足が接地してからもう片足が接地するまでの時間
 double sensorReactedTimeLeft[] = {0, 0, 0, 0, 0}, sensorReactedTimeRight[] = {0, 0, 0, 0, 0}; // 各センサが地面に設置した時間
 double evacuateLeft2 = 0, evacuateLeft3 = 0, evacuateLeft4 = 0, evacuateRight2 = 0, evacuateRight3 = 0, evacuateRight4 = 0; //センサが反応した時間を一時保存
-int runningSpeed = 6;// トレッドミルの時速を指定
+double runningSpeed = 9;// トレッドミルの時速を指定
 int peak1_0 = 1024, peak1_1 = 1024, peak1_2 = 1024, peak1_3 = 1024, peak1_4 = 1024, peak2_0 = 1024, peak2_1 = 1024, peak2_2 = 1024, peak2_3 = 1024, peak2_4 = 1024; // 各圧力センサ値のピーク
 double peakTime1_0 = 0, peakTime1_1 = 0, peakTime1_2 = 0, peakTime1_3 = 0, peakTime1_4 = 0, peakTime2_0 = 0, peakTime2_1 = 0, peakTime2_2 = 0, peakTime2_3 = 0, peakTime2_4 = 0;
 int pressOrderLeft[] = {0, 0, 0, 0, 0}, pressOrderRight[] = {0, 0, 0, 0, 0}; // 着地点の順番を格納する
@@ -53,11 +53,11 @@ double pressure = 0;
 void setup() {
   // 正解ストライド
   minStride[0] = 43;
-  minStride[1] = 16;
-  minStride[2] = 82;
+  minStride[1] = 51;
+  minStride[2] = 28;
   maxStride[0] = 61;
-  maxStride[1] = 89;
-  maxStride[2] = 103;
+  maxStride[1] = 92;
+  maxStride[2] = 97;
   startTime = System.nanoTime();
   size(800, 800);
   output = createWriter("SD1"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
@@ -69,11 +69,11 @@ void setup() {
   output3.println("Speed, AvePeak");
   outputPressOrder.println("TimeLeft,StrideLeft(cm),ContactTimeLeft(s),Left0,Left1,Left2,Left3,Left4,LPeak1,LPTime1,LPeak2,LPTime2,LPeak3,LPTime3,LPeak4,LPTime4,LPeak5,LPTime5,TIL0_1,TIL1_2,TIL2_3,TIL3_4,,TimeRight,StrideRight,ContactTimeRight,Right0,Right1,Right2,Right3,Right4,RPeak1,RPTime1,RPeak2,RPTime2,RPeak3,RPTime3,RPeak4,RPTime4,RPeak5,RPTime5,TIR0_1,TIR1_2,TIR2_3,TIR3_4,"+String.valueOf(runningSpeed)+"km/h,"+RUNNER_NAME);
   // システム1号機
-  myPort2 = new Serial(this, "/dev/tty.HC-06-DevB-1", 9600); // 2
+  //myPort2 = new Serial(this, "/dev/tty.HC-06-DevB-1", 9600); // 2
   //myPort1 = new Serial(this, "/dev/tty.HC-06-DevB-5", 9600); // 1*
   // システム2号機
   myPort1 = new Serial(this, "/dev/tty.HC-06-DevB-2", 9600); // 0
-  //myPort1 = new Serial(this, "/dev/tty.HC-06-DevB", 9600); // 3
+  myPort2 = new Serial(this, "/dev/tty.HC-06-DevB", 9600); // 3
   left_foot = loadImage("left_foot.jpg");
   right_foot = loadImage("right_foot.jpg");
   landingPointWhite = loadImage("white.png");
@@ -90,9 +90,9 @@ void setup() {
   if (runningSpeed == 3) {
     drawStride(30, 90);
   } else if (runningSpeed == 6) {
-    drawStride(10, 150);
+    drawStride(30, 130);
   } else if (runningSpeed == 9) {
-    drawStride(70, 170);
+    drawStride(30, 190);
   } else {
     drawStride(30, 170);
   }
@@ -623,7 +623,7 @@ void draw() {
   // Right
   // 親指
   if (myPort2.available()>0) {
-    if (sensorValueRight0 <= 970) {
+    if (sensorValueRight0 <= 980) {
       isLandingPoint2_0 = true;
       // 接地した順序を格納
       if (pressOrderRight[0] == 0) {
@@ -708,7 +708,7 @@ void draw() {
       ellipse(565, 210, 65, 65); // 親指
     }
     // 小指
-    if (sensorValueRight1 <= 970) {
+    if (sensorValueRight1 <= 980) {
       isLandingPoint2_1 = true;
       // このセンサ以外のセンサがまだ接地していない場合
       if (pressOrderRight[1] == 0) {
@@ -792,7 +792,7 @@ void draw() {
       ellipse(740, 280, 65, 65); // 小指
     }
     // 親指下
-    if (sensorValueRight2 <=970) {
+    if (sensorValueRight2 <=980) {
       isLandingPoint2_2 = true;
       // このセンサ以外のセンサがまだ接地していない場合
       if (pressOrderRight[2] == 0) {
@@ -876,7 +876,7 @@ void draw() {
       ellipse(565, 330, 65, 65); // 親指下
     }
     // 小指下
-    if (sensorValueRight3 <= 970) { 
+    if (sensorValueRight3 <= 980) { 
       isLandingPoint2_3 = true;
       // このセンサ以外のセンサがまだ接地していない場合
       if (pressOrderRight[3] == 0) {
