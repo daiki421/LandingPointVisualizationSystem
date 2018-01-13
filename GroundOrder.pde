@@ -66,7 +66,7 @@ void setup() {
   outputPressOrder = createWriter("PO"+year()+"-"+month()+"-"+day()+"-"+hour()+"-"+minute()+"-"+second()+".csv");
   output.println("time1,Left0,amountL0,pressureL0,Left1,amountL1,pressureL1,Left2,amountL2,pressureL2,Left3,amountL3,pressureL3,Left4,amountL4,pressureL4,,time2,Right0,amountR0,pressureR0,Right1,amountR1,pressureR1,Right2,amountR2,pressureR2,Right3,amountR3,pressureR3,Right4,amountR4,pressureR4,"+String.valueOf(runningSpeed)+"km/h,"+RUNNER_NAME);
   output2.println("time1,Left0,,Left1,,Left2,,Left3,,Left4,,time2,Right0,,Right1,,Right2,,Right3,,Right4");
-  output3.println("Speed, AvePeak");
+  output3.println("Stride, GroundTime");
   outputPressOrder.println("TimeLeft,StrideLeft(cm),ContactTimeLeft(s),Left0,Left1,Left2,Left3,Left4,LPeak1,LPTime1,LPeak2,LPTime2,LPeak3,LPTime3,LPeak4,LPTime4,LPeak5,LPTime5,TIL0_1,TIL1_2,TIL2_3,TIL3_4,,TimeRight,StrideRight,ContactTimeRight,Right0,Right1,Right2,Right3,Right4,RPeak1,RPTime1,RPeak2,RPTime2,RPeak3,RPTime3,RPeak4,RPTime4,RPeak5,RPTime5,TIR0_1,TIR1_2,TIR2_3,TIR3_4,"+String.valueOf(runningSpeed)+"km/h,"+RUNNER_NAME);
   // システム1号機
   //myPort2 = new Serial(this, "/dev/tty.HC-06-DevB-1", 9600); // 2
@@ -211,11 +211,11 @@ void draw() {
       if (sensorValueLeft0 < peak1_0) {
         peak1_0 = sensorValueLeft0;
         peakTime1_0 = (System.nanoTime() - startTime) - sensorReactedTimeLeft[0];
-        amount = calcAmount(sensorValueLeft0);
-        pressure = amount/1000*9.8/0.16925518916;
-        speed = (59 - pressure) * 6 / 17;
-        //println(amount+", "+pressure+", "+peak1_0+", "+speed);
-        output3.println(speed+","+pressure);
+        //amount = calcAmount(sensorValueLeft0);
+        //pressure = amount/1000*9.8/0.16925518916;
+        //speed = (59 - pressure) * 6 / 17;
+        ////println(amount+", "+pressure+", "+peak1_0+", "+speed);
+        //output3.println(speed+","+pressure);
       }
     } else {
       isLandingPoint1_0 = false;
@@ -601,8 +601,17 @@ void draw() {
         } else {
           left4_5 = (orderTimeL.get(5) - orderTimeL.get(4))/1000000000;
         }
+        
         // 計算したものをファイルに保存
         outputPressOrder.println((System.nanoTime() - startTime)/1000000000+","+diffTime/1000000000*runningSpeed*1000*100/3600+","+(landingTimeLeft - groundTimeLeft)/1000000000+","+pressOrderLeft[0]+","+pressOrderLeft[1]+","+pressOrderLeft[2]+","+pressOrderLeft[3]+","+pressOrderLeft[4]+","+peak1_0+","+peakTime1_0/1000000000+","+peak1_1+","+peakTime1_1/1000000000+","+peak1_2+","+peakTime1_2/1000000000+","+peak1_3+","+peakTime1_3/1000000000+","+peak1_4+","+peakTime1_4/1000000000+","+left1_2+","+left2_3+","+left3_4+","+left4_5+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+",");
+        if ((landingTimeLeft - groundTimeLeft)/1000000000 <= 0.230251009 && (landingTimeLeft - groundTimeLeft)/1000000000 >= 0.204457422) {
+          output3.println(70.06147951+","+(landingTimeLeft - groundTimeLeft)/1000000000);
+        } else if ((landingTimeLeft - groundTimeLeft)/1000000000 > 0.230251009) {
+          double speed = calcSpeed((landingTimeLeft - groundTimeLeft)/1000000000);
+          println(diffTime);
+          println("stride"+diffTime/1000000000*speed*1000*100/3600);
+          output3.println(diffTime/1000000000*speed*1000*100/3600+","+(landingTimeLeft - groundTimeLeft)/1000000000);
+        }
       }
       peak1_0 = 1024;
       peak1_1 = 1024;
@@ -1077,19 +1086,27 @@ void draw() {
         } else {
           right4_5 = (orderTimeR.get(5) - orderTimeR.get(4))/1000000000;
         }
+        
         outputPressOrder.println(","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+","+(System.nanoTime() - startTime)/1000000000+","+diffTime/1000000000*runningSpeed*1000*100/3600+","+(landingTimeRight - groundTimeRight)/1000000000+","+pressOrderRight[0]+","+pressOrderRight[1]+","+pressOrderRight[2]+","+pressOrderRight[3]+","+pressOrderRight[4]+","+peak2_0+","+peakTime2_0/1000000000+","+peak2_1+","+peakTime2_1/1000000000+","+peak2_2+","+peakTime2_2/1000000000+","+peak2_3+","+peakTime2_3/1000000000+","+peak2_4+","+peakTime2_4/1000000000+","+right1_2+","+right2_3+","+right3_4+","+right4_5);
+        if ((landingTimeRight - groundTimeRight)/1000000000 <= 0.230251009 && (landingTimeRight - groundTimeRight)/1000000000 >= 0.204457422) {
+          output3.println(","+","+70.06147951+","+(landingTimeRight - groundTimeRight)/1000000000);
+        } else {
+          double speed = calcSpeed((landingTimeRight - groundTimeRight)/1000000000);
+          output3.println(","+","+diffTime/1000000000*speed*1000*100/3600+","+(landingTimeRight - groundTimeRight)/1000000000);
+        }
         peak2_0 = 1024;
         peak2_1 = 1024;
         peak2_2 = 1024;
         peak2_3 = 1024;
         peak2_4 = 1024;
-        for (int i = 0; i < pressOrderRight.length; i++) {
-          pressOrderRight[i] = 0;
-        }
-        orderRight = 1;
-        //groundTimeRight = 0;
-        landingTimeRight = 0;
+        
       }
+      for (int i = 0; i < pressOrderRight.length; i++) {
+        pressOrderRight[i] = 0;
+      }
+      orderRight = 1;
+      //groundTimeRight = 0;
+      landingTimeRight = 0;
     }
   }
 }
@@ -1154,8 +1171,13 @@ void serialEvent(Serial port) {
       output2.println((System.nanoTime() - startTime)/1000000000+","+sensorValueLeft0+","+calcAmount(sensorValueLeft0)+","+calcPressure(calcAmount(sensorValueLeft0))+","+sensorValueLeft1+","+calcAmount(sensorValueLeft1)+","+calcPressure(calcAmount(sensorValueLeft1))+","+sensorValueLeft2+","+calcAmount(sensorValueLeft2)+","+calcPressure(calcAmount(sensorValueLeft2))+","+sensorValueLeft3+","+calcAmount(sensorValueLeft3)+","+calcPressure(calcAmount(sensorValueLeft3))+","+sensorValueLeft4+","+calcAmount(sensorValueLeft4)+","+calcPressure(calcAmount(sensorValueLeft4))+","+","+(System.nanoTime() - startTime)/1000000000+","+sensorValueRight0+","+calcAmount(sensorValueRight0)+","+calcPressure(calcAmount(sensorValueRight0))+","+sensorValueRight1+","+calcAmount(sensorValueRight1)+","+calcPressure(calcAmount(sensorValueRight1))+","+sensorValueRight2+","+calcAmount(sensorValueRight2)+","+calcPressure(calcAmount(sensorValueRight2))+","+sensorValueRight3+","+calcAmount(sensorValueRight3)+","+calcPressure(calcAmount(sensorValueRight3))+","+sensorValueRight4+","+calcAmount(sensorValueRight4)+","+calcPressure(calcAmount(sensorValueRight4)));
     }
   }
-  println("time1="+nf((float)(System.nanoTime() - startTime)/1000000000, 3, 0)+",inByte1_0="+sensorValueLeft0+", inByte1_1="+sensorValueLeft1+", inByte1_2="+sensorValueLeft2+", inByte1_3="+sensorValueLeft3+", inByte1_4="+sensorValueLeft4);
-  println("time2="+nf((float)(System.nanoTime() - startTime)/1000000000, 3, 0)+",inByte2_0="+sensorValueRight0+", inByte2_1="+sensorValueRight1+", inByte2_2="+sensorValueRight2+", inByte2_3="+sensorValueRight3+", inByte2_4="+sensorValueRight4);
+  //println("time1="+nf((float)(System.nanoTime() - startTime)/1000000000, 3, 0)+",inByte1_0="+sensorValueLeft0+", inByte1_1="+sensorValueLeft1+", inByte1_2="+sensorValueLeft2+", inByte1_3="+sensorValueLeft3+", inByte1_4="+sensorValueLeft4);
+  //println("time2="+nf((float)(System.nanoTime() - startTime)/1000000000, 3, 0)+",inByte2_0="+sensorValueRight0+", inByte2_1="+sensorValueRight1+", inByte2_2="+sensorValueRight2+", inByte2_3="+sensorValueRight3+", inByte2_4="+sensorValueRight4);
+}
+
+double calcSpeed(double time) {
+  double speed = (time - 25.252611941262) / -8.185796091754;
+  return speed;
 }
 
 void drawStride(int min, int max) {
